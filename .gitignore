@@ -1,0 +1,9 @@
+nbproject/private
+*~
+composer.lock
+vendor
+
+.idea
+
+node_modules
+.usdocker
