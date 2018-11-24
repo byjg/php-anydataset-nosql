@@ -93,7 +93,7 @@ $value = $dynamodb->get(1201, $options);
 */
 ```
 
-### Retrieve a value
+### Remove a value
 
 ```php
 <?php
@@ -127,7 +127,7 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-## Further lecture
+## Further reading
 
 - https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html
 - https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html

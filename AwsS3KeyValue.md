@@ -35,6 +35,14 @@ $s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
 $value = $s3->get("object_name");
 ```
 
+## Remove a value
+
+```php
+<?php
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3->remove("object_name");
+```
+
 ## Get parts of the document
 
 ```php
