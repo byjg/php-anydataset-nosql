@@ -42,7 +42,7 @@ class MongoDbDriver implements NoSqlInterface
     /**
      * Creates a new MongoDB connection.
      *
-     *  mongodb://username:passwortd@host:port/database
+     *  mongodb://username:password@host:port/database
      *
      * @param Uri $connUri
      */

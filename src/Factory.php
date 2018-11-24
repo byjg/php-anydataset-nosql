@@ -44,6 +44,7 @@ class Factory
             array_merge(
                 [
                     "s3" => $prefix . "AwsS3Driver",
+                    "dynamodb" => $prefix . "AwsDynamoDbDriver",
                 ],
                 (array)$schemesAlternative
             ),

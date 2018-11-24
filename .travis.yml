@@ -24,5 +24,7 @@ install:
   - php -i
   - composer install
 
-script: 
+script:
   - vendor/bin/phpunit testsdb/MongoDbDriverTest.php
+  - vendor/bin/phpunit testsdb/AwsDynamoDbDriverTest.php
+  - vendor/bin/phpunit testsdb/AwsS3DriverTest.php

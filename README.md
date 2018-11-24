@@ -12,6 +12,7 @@ See more about Anydataset [here](https://github.com/byjg/anydataset).
 ## Examples
 
 - [Read More about using MongoDb](MongoDB.md)
+- [Read More about using Aws DynamoDb Key Value](AwsDynamoDbKeyValue.md)
 - [Read More about using Aws S3 Key Value](AwsS3KeyValue.md)
 
 ## Install
@@ -41,6 +42,18 @@ node_modules/.bin/usdocker -v --no-link mongodb up
 ```php
 vendor/bin/phpunit testsdb/MongoDbDriverTest.php
 ```
+### AWS DynamoDb
+
+You need setup your environment with:
+ 
+- DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/bucketname"
+
+Once defined:
+
+```php
+vendor/bin/phpunit testsdb/AwsDynamoDbDriverTest.php
+```
+
 
 ### AWS S3
 
@@ -51,7 +64,7 @@ You need setup your environment with:
 Once defined:
 
 ```php
-vendor/bin/phpunit testsdb/.php
+vendor/bin/phpunit testsdb/AwsS3DriverTest.php
 ```
 
 

@@ -15,7 +15,7 @@ interface KeyValueInterface
 
     public function get($key, $options = []);
 
-    public function put($key, $value, $contentType = null, $options = []);
+    public function put($key, $value, $options = []);
 
     public function remove($key, $options = []);
 

@@ -84,7 +84,7 @@ class AwsS3Driver implements KeyValueInterface
         return $result["Body"]->getContents();
     }
 
-    public function put($key, $value, $contentType = null, $options = [])
+    public function put($key, $value, $options = [])
     {
         $data = array_merge(
             [
@@ -95,9 +95,9 @@ class AwsS3Driver implements KeyValueInterface
             $options
         );
 
-        if (!empty($contentType)) {
-            $data['ContentType'] = $contentType;
-        }
+//        if (!empty($contentType)) {
+//            $data['ContentType'] = $contentType;
+//        }
 
         if (!isset($data['ACL'])) {
             $data['ACL'] = 'private';

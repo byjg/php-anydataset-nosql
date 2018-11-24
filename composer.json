@@ -21,6 +21,7 @@
     "aws/aws-sdk-php": "3.*",
     "byjg/anydataset": "4.0.*",
     "byjg/anydataset-array": "4.0.*",
+    "byjg/serializer": "1.0.*",
     "byjg/uri": "1.0.*"
   },
   "require-dev": {
