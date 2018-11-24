@@ -14,7 +14,6 @@ See more about Anydataset [here](https://github.com/byjg/anydataset).
 - [Read More about using MongoDb](MongoDB.md)
 - [Read More about using Aws S3 Key Value](AwsS3KeyValue.md)
 
-
 ## Install
 
 Just type: 
@@ -43,11 +42,11 @@ node_modules/.bin/usdocker -v --no-link mongodb up
 vendor/bin/phpunit testsdb/MongoDbDriverTest.php
 ```
 
-### AWS
+### AWS S3
 
 You need setup your environment with:
  
-- AWS_CONNECTION = "s3://access_key:secret_key@region/bucketname"
+- S3_CONNECTION = "s3://access_key:secret_key@region/bucketname"
 
 Once defined:
 

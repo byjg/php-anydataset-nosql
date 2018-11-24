@@ -15,7 +15,7 @@ class AwsS3DriverTest extends TestCase
 
     protected function setUp()
     {
-        $awsConnection = getenv("AWS_CONNECTION");
+        $awsConnection = getenv("S3_CONNECTION");
         if (!empty($awsConnection)) {
             $this->object = Factory::getKeyValueInstance($awsConnection);
             $this->object->remove("KEY");
@@ -25,13 +25,17 @@ class AwsS3DriverTest extends TestCase
 
     protected function tearDown()
     {
-        $this->object = null;
+        if (!empty($this->object)) {
+            $this->object->remove("KEY");
+            $this->object->remove("ANOTHER");
+            $this->object = null;
+        }
     }
 
     public function testBucketOperations()
     {
         if (empty($this->object)) {
-            $this->markTestIncomplete("You must define AWS_CONNECTION");
+            $this->markTestIncomplete("In order to test S3 you must define S3_CONNECTION");
         }
 
         // Get current bucket
@@ -63,6 +67,10 @@ class AwsS3DriverTest extends TestCase
 
     public function testGetChunk()
     {
+        if (empty($this->object)) {
+            $this->markTestIncomplete("In order to test S3 you must define S3_CONNECTION");
+        }
+
         $this->object->put(
             "KEY",
             str_repeat("0", 256) . str_repeat("1", 256) . str_repeat("2", 250)
