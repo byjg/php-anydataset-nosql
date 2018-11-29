@@ -1,4 +1,4 @@
-# Connecting To AWS S3 as Key Value
+# AWS S3
 
 ```php
 <?php
@@ -10,7 +10,7 @@ The full connection string can be:
 ```
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket
 ```
-## List all objects
+# List all objects
 
 ```php
 <?php
@@ -19,7 +19,7 @@ $iterator = $s3->getIterator();
 print_r($iterator->toArray());
 ```
 
-## Inserting/Updating data
+# Inserting/Updating data
 
 ```php
 <?php
@@ -27,7 +27,7 @@ $s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
 $s3->put("object_name", "value");
 ```
 
-## Retrieve a value
+# Retrieve a value
 
 ```php
 <?php
@@ -35,7 +35,7 @@ $s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
 $value = $s3->get("object_name");
 ```
 
-## Remove a value
+# Remove a value
 
 ```php
 <?php
@@ -43,7 +43,7 @@ $s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
 $s3->remove("object_name");
 ```
 
-## Get parts of the document
+# Get parts of the document
 
 ```php
 <?php
