@@ -5,6 +5,7 @@ namespace ByJG\AnyDataset\NoSql;
 use ByJG\AnyDataset\Core\IteratorInterface;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 use ByJG\Util\CurlException;
 use ByJG\Util\Uri;
 use ByJG\Util\WebRequest;
@@ -64,7 +65,7 @@ class CloudflareKV implements KeyValueInterface
      * @param array $options
      * @return string
      * @throws CurlException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function putBatch($keyValueArray, $options = [])
     {
@@ -74,7 +75,6 @@ class CloudflareKV implements KeyValueInterface
                 "application/json"
             )
         );
-
     }
 
     /**
@@ -88,9 +88,20 @@ class CloudflareKV implements KeyValueInterface
         return $this->webRequest("/values/$key")->delete();
     }
 
-    public function removeBatch($key, $options = [])
+    /**
+     * @param object[] $keys
+     * @param array $options
+     * @return mixed
+     * @throws CurlException
+     */
+    public function removeBatch($keys, $options = [])
     {
-        // TODO: Implement removeBatch() method.
+        return $this->checkResult(
+            $this->webRequest("/bulk")->deletePayload(
+                json_encode($keys),
+                "application/json"
+            )
+        );
     }
 
     /**

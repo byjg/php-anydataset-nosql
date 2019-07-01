@@ -70,6 +70,8 @@ $value = $kv->get("object_name");
 <?php
 $kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
 $kv->remove("object_name");
+
+// or
+
+$kv->removeBatch(["key1", "key2"]);
 ```
-
-

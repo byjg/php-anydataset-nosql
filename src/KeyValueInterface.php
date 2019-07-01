@@ -27,11 +27,11 @@ interface KeyValueInterface
     public function remove($key, $options = []);
 
     /**
-     * @param object[] $key
+     * @param object[] $keys
      * @param array $options
      * @return mixed
      */
-    public function removeBatch($key, $options = []);
+    public function removeBatch($keys, $options = []);
 
     public function getDbConnection();
 
