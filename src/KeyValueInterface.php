@@ -17,9 +17,21 @@ interface KeyValueInterface
 
     public function put($key, $value, $options = []);
 
+    /**
+     * @param KeyValueDocument[] $keyValueArray
+     * @param array $options
+     * @return void
+     */
+    public function putBatch($keyValueArray, $options = []);
+
     public function remove($key, $options = []);
 
-    public function getChunk($key, $options = [], $size = 1024, $offset = 0);
+    /**
+     * @param object[] $key
+     * @param array $options
+     * @return mixed
+     */
+    public function removeBatch($key, $options = []);
 
     public function getDbConnection();
 

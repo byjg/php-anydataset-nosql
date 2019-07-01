@@ -4,11 +4,11 @@ namespace ByJG\AnyDataset\NoSql;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Result;
-use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\BinderObject;
 use ByJG\Util\Uri;
+use InvalidArgumentException;
 
 class AwsDynamoDbDriver implements KeyValueInterface
 {
@@ -60,11 +60,11 @@ class AwsDynamoDbDriver implements KeyValueInterface
         );
 
         if (empty($data["KeyConditions"]) && empty($data["ScanFilter"])) {
-            throw new \InvalidArgumentException("You must pass KeyConditions OR ScanFilter in \$options");
+            throw new InvalidArgumentException("You must pass KeyConditions OR ScanFilter in \$options");
         }
 
         if (!empty($data["KeyConditions"]) && !empty($data["ScanFilter"])) {
-            throw new \InvalidArgumentException("You can pass only KeyConditions OR ScanFilter in \$options at time");
+            throw new InvalidArgumentException("You can pass only KeyConditions OR ScanFilter in \$options at time");
         }
 
         $iterator = $this->dynamoDbClient->getIterator(
@@ -82,7 +82,7 @@ class AwsDynamoDbDriver implements KeyValueInterface
 
     protected function validateOptions($options) {
         if (!isset($options["KeyName"])) {
-            throw new \InvalidArgumentException("KeyName is required in \$options");
+            throw new InvalidArgumentException("KeyName is required in \$options");
         }
     }
 
@@ -196,14 +196,22 @@ class AwsDynamoDbDriver implements KeyValueInterface
     }
 
     /**
-     * @param $key
+     * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @param int $size
-     * @param int $offset
-     * @throws NotImplementedException
+     * @return void
      */
-    public function getChunk($key, $options = [], $size = 1024, $offset = 0)
+    public function putBatch($keyValueArray, $options = [])
     {
-        throw new NotImplementedException("Get Chunk is not implemented for DynamoDb");
+        // TODO: Implement putBatch() method.
+    }
+
+    /**
+     * @param object[] $key
+     * @param array $options
+     * @return mixed
+     */
+    public function removeBatch($key, $options = [])
+    {
+        // TODO: Implement removeBatch() method.
     }
 }

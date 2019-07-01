@@ -139,4 +139,24 @@ class AwsS3Driver implements KeyValueInterface
 
         return $this->get($key, $options);
     }
+
+    /**
+     * @param KeyValueDocument[] $keyValueArray
+     * @param array $options
+     * @return void
+     */
+    public function putBatch($keyValueArray, $options = [])
+    {
+        // TODO: Implement putBatch() method.
+    }
+
+    /**
+     * @param object[] $key
+     * @param array $options
+     * @return mixed
+     */
+    public function removeBatch($key, $options = [])
+    {
+        // TODO: Implement removeBatch() method.
+    }
 }
