@@ -14,7 +14,7 @@ services:
   - docker
 
 before_install:
-  - docker --name mongodb-container --rm -e TZ=America/Winnipeg -p 27017:27017 -d mongo:3
+  - docker run --name mongodb-container --rm -e TZ=America/Winnipeg -p 27017:27017 -d mongo:3
   - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 
