@@ -170,6 +170,16 @@ class AwsDynamoDbDriver implements KeyValueInterface
         return $this->dynamoDbClient->putItem($data);
     }
 
+    /**
+     * @param KeyValueDocument[] $keyValueArray
+     * @param array $options
+     * @return void
+     */
+    public function putBatch($keyValueArray, $options = [])
+    {
+        // TODO: Implement putBatch() method.
+    }
+
     public function remove($key, $options = [])
     {
         $this->validateOptions($options);
@@ -193,16 +203,6 @@ class AwsDynamoDbDriver implements KeyValueInterface
     public function getDbConnection()
     {
         return $this->dynamoDbClient;
-    }
-
-    /**
-     * @param KeyValueDocument[] $keyValueArray
-     * @param array $options
-     * @return void
-     */
-    public function putBatch($keyValueArray, $options = [])
-    {
-        // TODO: Implement putBatch() method.
     }
 
     /**

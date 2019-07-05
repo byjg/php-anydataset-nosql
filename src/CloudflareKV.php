@@ -43,7 +43,7 @@ class CloudflareKV implements KeyValueInterface
      */
     public function get($key, $options = [])
     {
-        return $this->webRequest("/values/$key")->get();
+        return $this->webRequest("/values/$key", $options)->get();
     }
 
     /**
@@ -56,7 +56,7 @@ class CloudflareKV implements KeyValueInterface
     public function put($key, $value, $options = [])
     {
         return $this->checkResult(
-            $this->webRequest("/values/$key")->putPayload($value)
+            $this->webRequest("/values/$key", $options)->putPayload($value)
         );
     }
 
@@ -70,7 +70,7 @@ class CloudflareKV implements KeyValueInterface
     public function putBatch($keyValueArray, $options = [])
     {
         return $this->checkResult(
-            $this->webRequest("/bulk")->putPayload(
+            $this->webRequest("/bulk", $options)->putPayload(
                 json_encode(BinderObject::toArrayFrom($keyValueArray)),
                 "application/json"
             )
@@ -85,7 +85,7 @@ class CloudflareKV implements KeyValueInterface
      */
     public function remove($key, $options = [])
     {
-        return $this->webRequest("/values/$key")->delete();
+        return $this->webRequest("/values/$key", $options)->delete();
     }
 
     /**
@@ -97,7 +97,7 @@ class CloudflareKV implements KeyValueInterface
     public function removeBatch($keys, $options = [])
     {
         return $this->checkResult(
-            $this->webRequest("/bulk")->deletePayload(
+            $this->webRequest("/bulk", $options)->deletePayload(
                 json_encode($keys),
                 "application/json"
             )
@@ -106,12 +106,14 @@ class CloudflareKV implements KeyValueInterface
 
     /**
      * @param $method
+     * @param array $options
      * @return WebRequest
      */
-    protected function webRequest($method)
+    protected function webRequest($method, $options = [])
     {
-        print_r($this->kvUri . $method);
-        $webRequest = new WebRequest($this->kvUri . $method);
+        $uri = new Uri($this->kvUri . $method);
+        $uri->withQuery(http_build_query($options));
+        $webRequest = new WebRequest($uri->__toString());
         $webRequest->addRequestHeader("X-Auth-Email", $this->username);
         $webRequest->addRequestHeader("X-Auth-Key", $this->password);
 
@@ -129,7 +131,7 @@ class CloudflareKV implements KeyValueInterface
     public function getIterator($options = [])
     {
         $result = $this->checkResult(
-            $this->webRequest("/keys")->get($options)
+            $this->webRequest("/keys", $options)->get()
         );
         $this->lastCursor = $options;
         $this->lastCursor["cursor"] = $result["result_info"]["cursor"];
