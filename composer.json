@@ -16,13 +16,12 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.6.0",
-    "ext-mongodb": "*",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
     "byjg/anydataset": "4.0.*",
     "byjg/anydataset-array": "4.0.*",
     "byjg/serializer": "1.0.*",
-    "byjg/uri": "1.0.*",
+    "byjg/uri": "2.0.*",
     "byjg/webrequest": "1.0.*",
     "ext-json": "*"
   },
@@ -30,6 +29,7 @@
     "phpunit/phpunit": "5.7.*|7.4.*"
   },
   "suggest": {
+    "ext-mongodb": "*",
     "byjg/cache-engine": "4.0.*"
   },
   "license": "MIT"
