@@ -13,6 +13,7 @@ See more about Anydataset [here](https://opensource.byjg.com/anydataset).
 - [Read More about using MongoDb](MongoDB.md)
 - [Read More about using Aws DynamoDb Key Value](AwsDynamoDbKeyValue.md)
 - [Read More about using Aws S3 Key Value](AwsS3KeyValue.md)
+- [Read More about using CloudFlare KV](CloudFlareKV.md)
 
 # Install
 
@@ -65,6 +66,19 @@ Once defined:
 ```php
 vendor/bin/phpunit testsdb/AwsS3DriverTest.php
 ```
+
+## Cloudflare KV
+
+You need setup your environment with:
+ 
+- CLOUDFLAREKV_CONNECTION = "kv://email:authkey@accountid/namespaceid"
+
+Once defined:
+
+```php
+vendor/bin/phpunit testsdb/.....php
+```
+
 
 
 ----

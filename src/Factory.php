@@ -45,6 +45,7 @@ class Factory
                 [
                     "s3" => $prefix . "AwsS3Driver",
                     "dynamodb" => $prefix . "AwsDynamoDbDriver",
+                    "kv" => $prefix . "CloudflareKV",
                 ],
                 (array)$schemesAlternative
             ),
