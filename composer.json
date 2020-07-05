@@ -21,7 +21,7 @@
     "byjg/anydataset": "4.0.*",
     "byjg/anydataset-array": "4.0.*",
     "byjg/serializer": "1.0.*",
-    "byjg/webrequest": "dev-psr7",
+    "byjg/webrequest": "2.0.*",
     "ext-json": "*"
   },
   "require-dev": {
