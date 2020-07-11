@@ -6,9 +6,15 @@ use ByJG\AnyDataset\Core\IteratorInterface;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\BinderObject;
 use ByJG\Serializer\Exception\InvalidArgumentException;
-use ByJG\Util\CurlException;
+use ByJG\Util\Exception\CurlException;
+use ByJG\Util\HttpClient;
+use ByJG\Util\Psr7\Message;
+use ByJG\Util\Psr7\MessageException;
+use ByJG\Util\Psr7\Request;
 use ByJG\Util\Uri;
-use ByJG\Util\WebRequest;
+use MintWare\Streams\MemoryStream;
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 
 class CloudflareKV implements KeyValueInterface
 {
@@ -40,40 +46,52 @@ class CloudflareKV implements KeyValueInterface
      * @param array $options
      * @return string
      * @throws CurlException
+     * @throws MessageException
      */
     public function get($key, $options = [])
     {
-        return $this->webRequest("/values/$key", $options)->get();
+        $request = $this->request("/values/$key", $options)
+            ->withMethod("get");
+
+        return $this->send($request);
     }
 
     /**
      * @param $key
      * @param $value
      * @param array $options
-     * @return string
+     * @return mixed
      * @throws CurlException
+     * @throws MessageException
      */
     public function put($key, $value, $options = [])
     {
+        $request = $this->request("/values/$key", $options)
+            ->withMethod("put")
+            ->withBody(new MemoryStream($value));
+
         return $this->checkResult(
-            $this->webRequest("/values/$key", $options)->putPayload($value)
+            $this->send($request)
         );
     }
 
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @return string
-     * @throws CurlException
+     * @return mixed|void
      * @throws InvalidArgumentException
+     * @throws CurlException
+     * @throws MessageException
      */
     public function putBatch($keyValueArray, $options = [])
     {
+        $request = $this->request("/bulk", $options)
+            ->withMethod("put")
+            ->withHeader("Content-Type", "application/json")
+            ->withBody(new MemoryStream(json_encode(BinderObject::toArrayFrom($keyValueArray))));
+
         return $this->checkResult(
-            $this->webRequest("/bulk", $options)->putPayload(
-                json_encode(BinderObject::toArrayFrom($keyValueArray)),
-                "application/json"
-            )
+            $this->send($request)
         );
     }
 
@@ -85,7 +103,10 @@ class CloudflareKV implements KeyValueInterface
      */
     public function remove($key, $options = [])
     {
-        return $this->webRequest("/values/$key", $options)->delete();
+        $request = $this->request("/values/$key", $options)
+            ->withMethod("delete");
+
+        return $this->send($request);
     }
 
     /**
@@ -93,31 +114,46 @@ class CloudflareKV implements KeyValueInterface
      * @param array $options
      * @return mixed
      * @throws CurlException
+     * @throws MessageException
      */
     public function removeBatch($keys, $options = [])
     {
+        $request = $this->request("/bulk", $options)
+            ->withMethod("delete")
+            ->withHeader("Content-Type", "application/json")
+            ->withBody(new MemoryStream(json_encode($keys)));
+
         return $this->checkResult(
-            $this->webRequest("/bulk", $options)->deletePayload(
-                json_encode($keys),
-                "application/json"
-            )
+            $this->send($request)
         );
     }
 
     /**
-     * @param $method
-     * @param array $options
-     * @return WebRequest
+     * @param RequestInterface $request
+     * @return string
+     * @throws CurlException
+     * @throws MessageException
      */
-    protected function webRequest($method, $options = [])
+    protected function send(RequestInterface $request)
     {
-        $uri = new Uri($this->kvUri . $method);
-        $uri->withQuery(http_build_query($options));
-        $webRequest = new WebRequest($uri->__toString());
-        $webRequest->addRequestHeader("X-Auth-Email", $this->username);
-        $webRequest->addRequestHeader("X-Auth-Key", $this->password);
+        return $client = HttpClient::getInstance()
+            ->sendRequest($request)->getBody()->getContents();
+    }
 
-        return $webRequest;
+    /**
+     * @param $endpoint
+     * @param array $options
+     * @return Message|Request|MessageInterface
+     * @throws MessageException
+     */
+    protected function request($endpoint, $options = [])
+    {
+        $uri = Uri::getInstanceFromString($this->kvUri . $endpoint)
+            ->withQuery(http_build_query($options));
+
+        return Request::getInstance($uri)
+            ->withHeader("X-Auth-Email", $this->username)
+            ->withHeader("X-Auth-Key", $this->password);
     }
 
     /**
@@ -127,11 +163,15 @@ class CloudflareKV implements KeyValueInterface
      * @param array $options
      * @return IteratorInterface
      * @throws CurlException
+     * @throws MessageException
      */
     public function getIterator($options = [])
     {
+        $request = $this->request("/keys", $options)
+            ->withMethod("get");
+
         $result = $this->checkResult(
-            $this->webRequest("/keys", $options)->get()
+            $this->send($request)
         );
         $this->lastCursor = $options;
         $this->lastCursor["cursor"] = $result["result_info"]["cursor"];

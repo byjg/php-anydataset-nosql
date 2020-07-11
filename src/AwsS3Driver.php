@@ -32,14 +32,22 @@ class AwsS3Driver implements KeyValueInterface
     {
         $uri = new Uri($connectionString);
 
-        $this->s3Client = new S3Client([
-            'version'     => 'latest',
-            'region'      => $uri->getHost(),
-            'credentials' => [
-                'key'    => $uri->getUsername(),
-                'secret' => $uri->getPassword(),
-            ],
-        ]);
+        $defaultParameters =
+            [
+                'version'     => 'latest',
+                'region'      => $uri->getHost(),
+                'credentials' => [
+                    'key'    => $uri->getUsername(),
+                    'secret' => $uri->getPassword(),
+                ],
+            ];
+
+        $extraParameters = [];
+        parse_str($uri->getQuery(), $extraParameters);
+
+        $s3Parameters = array_merge($defaultParameters, $extraParameters);
+
+        $this->s3Client = new S3Client($s3Parameters);
 
         $this->bucket = preg_replace('~^/~', '', $uri->getPath());
     }

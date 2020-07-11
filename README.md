@@ -67,6 +67,11 @@ Once defined:
 vendor/bin/phpunit testsdb/AwsS3DriverTest.php
 ```
 
+You can add extra configurations available in the SDK `Aws\S3\S3Client` the by adding as query string:
+
+- S3_CONNECTION = "s3://access_key:secret_key@region/bucketname?endpoint=https://nyc3.digitaloceanspaces.com"
+
+
 ## Cloudflare KV
 
 You need setup your environment with:
