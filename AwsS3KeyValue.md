@@ -10,6 +10,30 @@ The full connection string can be:
 ```
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket
 ```
+
+You can add any extra arguments supported by the S3 api. You can get a full list here:
+ - https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct
+ - https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.S3.S3Client.html#___construct
+
+One of the most populars is the parameter `endpoint` where we can set a custom endpoint to access 
+an S3 compatible interface. 
+
+An example can be: 
+
+```
+s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket?endpoint=http://localhost:9000
+```
+
+There is a specific parameter called `create` from `anydataset/no-sql` that permit create a bucket if 
+it doesn't exist.
+
+Example:
+
+```
+s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket?create=true
+```
+ 
+
 # List all objects
 
 ```php

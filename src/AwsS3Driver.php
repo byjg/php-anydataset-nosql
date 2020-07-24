@@ -45,11 +45,35 @@ class AwsS3Driver implements KeyValueInterface
         $extraParameters = [];
         parse_str($uri->getQuery(), $extraParameters);
 
+        $createBucket = false;
+        if (isset($extraParameters["create"])) {
+            $createBucket = ($extraParameters["create"] == "true");
+            unset($extraParameters["create"]);
+        }
+
         $s3Parameters = array_merge($defaultParameters, $extraParameters);
 
         $this->s3Client = new S3Client($s3Parameters);
 
         $this->bucket = preg_replace('~^/~', '', $uri->getPath());
+
+        try {
+            $result = $this->s3Client->headBucket([
+                'Bucket' => $this->bucket,
+            ]);
+        } catch (\Aws\S3\Exception\S3Exception $ex) {
+            if (strpos($ex->getMessage(), "404") !== false && $createBucket) {
+                $this->s3Client->createBucket([
+                    'ACL' => 'private',
+                    'Bucket' => $this->bucket,
+                    'CreateBucketConfiguration' => [
+                        'LocationConstraint' => $uri->getHost(),
+                    ],
+                ]);
+            } else {
+                throw $ex;
+            }
+        }
     }
 
     /**
