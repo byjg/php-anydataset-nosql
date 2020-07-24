@@ -34,14 +34,21 @@ class AwsDynamoDbDriver implements KeyValueInterface
     {
         $uri = new Uri($connectionString);
 
-        $this->dynamoDbClient = new DynamoDbClient([
+        $defaultParameters = [
             'version'     => 'latest',
             'region'      => $uri->getHost(),
             'credentials' => [
                 'key'    => $uri->getUsername(),
                 'secret' => $uri->getPassword(),
             ],
-        ]);
+        ];
+
+        $extraParameters = [];
+        parse_str($uri->getQuery(), $extraParameters);
+
+        $dynamoDbParameters = array_merge($defaultParameters, $extraParameters);
+
+        $this->dynamoDbClient = new DynamoDbClient($dynamoDbParameters);
 
         $this->table = preg_replace('~^/~', '', $uri->getPath());
     }

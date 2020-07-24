@@ -2,6 +2,7 @@
 
 namespace TestsDb\AnyDataset;
 
+use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
 use ByJG\AnyDataset\NoSql\Factory;
 use PHPUnit\Framework\TestCase;
@@ -44,8 +45,39 @@ class AwsDynamoDbDriverTest extends TestCase
         $awsConnection = getenv("DYNAMODB_CONNECTION");
         if (!empty($awsConnection)) {
             $this->object = Factory::getKeyValueInstance($awsConnection);
+
+            $this->createTable();
+
             $this->object->remove(1, $this->options);
             $this->object->remove(2, $this->options);
+        }
+    }
+
+    protected function createTable()
+    {
+        try {
+            $this->object->client()->describeTable(['TableName' => $this->object->getTablename()]);
+        } catch (DynamoDbException $ex) {
+            // table doesn't exist, create it below
+            $this->object->client()->createTable([
+                'TableName' => $this->object->getTablename(),
+                'KeySchema' => [
+                    [
+                        'AttributeName' => 'key',
+                        'KeyType' => 'HASH'
+                    ]
+                ],
+                'AttributeDefinitions' => [
+                    [
+                        'AttributeName' => 'key',
+                        'AttributeType' => 'N'
+                    ],
+                ],
+                'ProvisionedThroughput' => [
+                    'ReadCapacityUnits' => 10,
+                    'WriteCapacityUnits' => 10
+                ]
+            ]);
         }
     }
 
