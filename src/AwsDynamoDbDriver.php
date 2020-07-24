@@ -214,4 +214,12 @@ class AwsDynamoDbDriver implements KeyValueInterface
     {
         // TODO: Implement removeBatch() method.
     }
+
+    public function getTablename() {
+        return $this->table;
+    }
+
+    public function client() {
+        return $this->dynamoDbClient;
+    }
 }

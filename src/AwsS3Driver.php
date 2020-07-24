@@ -191,4 +191,8 @@ class AwsS3Driver implements KeyValueInterface
     {
         // TODO: Implement removeBatch() method.
     }
+
+    public function client() {
+        return $this->s3Client;
+    }
 }
