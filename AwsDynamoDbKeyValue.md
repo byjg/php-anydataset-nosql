@@ -11,6 +11,19 @@ The full connection string can be:
 dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
+You can add any extra arguments supported by the DynamoDB api. You can get a full list here:
+ - https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct
+
+One of the most populars is the parameter `endpoint` where we can set a custom endpoint to access 
+an DynamoDB compatible interface. 
+
+An example can be: 
+
+```
+s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/tablename?endpoint=http://localhost:8000
+```
+
+
 # Preparing to use DynamoDb
 
 DynamoDb stores the information slightly different than a model dto structure.

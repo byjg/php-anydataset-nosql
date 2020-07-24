@@ -46,7 +46,7 @@ vendor/bin/phpunit testsdb/MongoDbDriverTest.php
 
 You need setup your environment with:
  
-- DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/bucketname"
+- DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/tablename"
 
 Once defined:
 
