@@ -20,7 +20,7 @@ See more about Anydataset [here](https://opensource.byjg.com/anydataset).
 Just type: 
 
 ```bash
-composer require "byjg/anydataset-nosql=4.0.*"
+composer require "byjg/anydataset-nosql=4.1.*"
 ```
 
 # Running Unit tests
