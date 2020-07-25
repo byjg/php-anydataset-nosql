@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test Project" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+    <CommandLine>
+      <envs>
+        <env name="DYNAMODB_CONNECTION" value="dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000" />
+        <env name="MONGODB_CONNECTION" value="mongodb://127.0.0.1/test" />
+        <env name="S3_CONNECTION" value="s3://aaa:12345678@us-east-1/mybucket?create=true&amp;endpoint=http://127.0.0.1:9000" />
+      </envs>
+    </CommandLine>
+    <TestRunner configuration_file="$PROJECT_DIR$/phpunit.xml.dist" scope="XML" use_alternative_configuration_file="true" />
+    <method v="2" />
+  </configuration>
+</component>

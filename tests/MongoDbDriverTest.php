@@ -20,7 +20,13 @@ class MongoDbDriverTest extends TestCase
 
     public function setUp()
     {
-        $this->dbDriver = Factory::getNoSqlInstance('mongodb://mongodb-container/test');
+        $mongodbConnection = getenv("MONGODB_CONNECTION");
+
+        if (empty($mongodbConnection)) {
+            return;
+        }
+
+        $this->dbDriver = Factory::getNoSqlInstance($mongodbConnection);
 
         $this->dbDriver->save(
             new NoSqlDocument(
@@ -68,11 +74,17 @@ class MongoDbDriverTest extends TestCase
     
     public function tearDown()
     {
-        $this->dbDriver->deleteDocuments(new IteratorFilter(), self::TEST_COLLECTION);
+        if (!empty($this->dbDriver)) {
+            $this->dbDriver->deleteDocuments(new IteratorFilter(), self::TEST_COLLECTION);
+        }
     }
 
     public function testSaveDocument()
     {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
         // Get the Object to test
         $filter = new IteratorFilter();
         $filter->addRelation('name', Relation::EQUAL, 'Hilux');
@@ -127,6 +139,10 @@ class MongoDbDriverTest extends TestCase
 
     public function testDelete()
     {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
         // Get the Object to test
         $filter = new IteratorFilter();
         $filter->addRelation('name', Relation::EQUAL, 'Uno');
@@ -143,6 +159,10 @@ class MongoDbDriverTest extends TestCase
 
     public function testGetDocuments()
     {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
         $filter = new IteratorFilter();
         $filter->addRelation('price', Relation::LESS_OR_EQUAL_THAN, 40000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
