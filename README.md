@@ -25,64 +25,35 @@ composer require "byjg/anydataset-nosql=4.0.*"
 
 # Running Unit tests
 
-## MongoDB
-
-The easiest way to run the tests is:
-
-**Prepare the environment**
-
-```php
-npm i
-node_modules/.bin/usdocker --refresh
-node_modules/.bin/usdocker -v --no-link mongodb up
+```bash
+vendor/bin/phpunit
 ```
 
-**Run the tests**
 
-```php
-vendor/bin/phpunit testsdb/MongoDbDriverTest.php
-```
-## AWS DynamoDb
+## Setup MongoDB for the unit test
 
-You need setup your environment with:
+Set the environment variable:
+
+- MONGODB_CONNECTION = "mongodb://127.0.0.1/test"
+
+## Setup AWS DynamoDb for the unit test
+
+Set the environment variable:
  
 - DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/tablename"
 
-Once defined:
+## Setup AWS S3 for the unit test
 
-```php
-vendor/bin/phpunit testsdb/AwsDynamoDbDriverTest.php
-```
-
-
-## AWS S3
-
-You need setup your environment with:
+Set the environment variable:
  
 - S3_CONNECTION = "s3://access_key:secret_key@region/bucketname"
-
-Once defined:
-
-```php
-vendor/bin/phpunit testsdb/AwsS3DriverTest.php
-```
-
-You can add extra configurations available in the SDK `Aws\S3\S3Client` the by adding as query string:
-
-- S3_CONNECTION = "s3://access_key:secret_key@region/bucketname?endpoint=https://nyc3.digitaloceanspaces.com"
 
 
 ## Cloudflare KV
 
-You need setup your environment with:
+Set the environment variable:
  
 - CLOUDFLAREKV_CONNECTION = "kv://email:authkey@accountid/namespaceid"
-
-Once defined:
-
-```php
-vendor/bin/phpunit testsdb/.....php
-```
 
 
 

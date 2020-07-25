@@ -1,0 +1,25 @@
+version: '2.0'
+services:
+
+  mongodb:
+    image: mongo:3
+    environment:
+      TZ: America/Winnipeg
+    ports:
+      - 27017:27017
+
+  dynanodb:
+    image: amazon/dynamodb-local
+    ports:
+      - 8000:8000
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ACCESS_KEY: aaa
+      MINIO_SECRET_KEY: 12345678
+    command: ["server", "/data"]
+    ports:
+      - 9000:9000
+
+
