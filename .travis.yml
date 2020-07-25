@@ -17,7 +17,7 @@ services:
 before_install:
   - docker-compose up -d
   - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - export MONGODB_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
+  - export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
   - export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
   - export DYNAMODB_CONNECTION="dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
 
