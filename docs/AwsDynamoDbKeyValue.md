@@ -142,8 +142,8 @@ print_r($iterator->toArray());
 
 ## Further reading
 
-- https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html
-- https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html
+- [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html]()
+- [https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html]()
 
 ----
 [Open source ByJG](http://opensource.byjg.com)

@@ -1,19 +1,19 @@
 # AnyDataset-NoSql
 
-[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg.com-brightgreen.svg)](http://opensource.byjg.com)
-[![Build Status](https://travis-ci.org/byjg/anydataset-nosql.svg?branch=master)](https://travis-ci.org/byjg/anydataset-nosql)
+[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
+[![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/anydataset-nosql/)
+[![GitHub license](https://img.shields.io/github/license/byjg/anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub release](https://img.shields.io/github/release/byjg/anydataset-nosql.svg)](https://github.com/byjg/anydataset-nosql/releases/)
+[![Build Status](https://travis-ci.com/byjg/anydataset-nosql.svg?branch=master)](https://travis-ci.com/byjg/anydataset-nosql)
 
 
 NoSql abstraction dataset. Anydataset is an agnostic data source abstraction layer in PHP. 
 
-See more about Anydataset [here](https://opensource.byjg.com/anydataset).
+See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
 
 ## Examples
 
-- [Read More about using MongoDb](MongoDB.md)
-- [Read More about using Aws DynamoDb Key Value](AwsDynamoDbKeyValue.md)
-- [Read More about using Aws S3 Key Value](AwsS3KeyValue.md)
-- [Read More about using CloudFlare KV](CloudFlareKV.md)
+Check implementation examples on [https://opensource.byjg.com/php/anydataset-nosql]()
 
 ## Install
 

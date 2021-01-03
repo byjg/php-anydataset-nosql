@@ -27,3 +27,10 @@ install:
 
 script:
   - vendor/bin/phpunit
+
+jobs:
+  include:
+    - stage: documentation
+      if: branch = master
+      install: skip
+      script: "curl https://opensource.byjg.com/add-doc.sh | bash /dev/stdin php anydataset-nosql docs"
