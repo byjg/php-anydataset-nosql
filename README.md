@@ -8,14 +8,14 @@ NoSql abstraction dataset. Anydataset is an agnostic data source abstraction lay
 
 See more about Anydataset [here](https://opensource.byjg.com/anydataset).
 
-# Examples
+## Examples
 
 - [Read More about using MongoDb](MongoDB.md)
 - [Read More about using Aws DynamoDb Key Value](AwsDynamoDbKeyValue.md)
 - [Read More about using Aws S3 Key Value](AwsS3KeyValue.md)
 - [Read More about using CloudFlare KV](CloudFlareKV.md)
 
-# Install
+## Install
 
 Just type: 
 
@@ -23,33 +23,33 @@ Just type:
 composer require "byjg/anydataset-nosql=4.1.*"
 ```
 
-# Running Unit tests
+## Running Unit tests
 
 ```bash
 vendor/bin/phpunit
 ```
 
 
-## Setup MongoDB for the unit test
+### Setup MongoDB for the unit test
 
 Set the environment variable:
 
 - MONGODB_CONNECTION = "mongodb://127.0.0.1/test"
 
-## Setup AWS DynamoDb for the unit test
+### Setup AWS DynamoDb for the unit test
 
 Set the environment variable:
  
 - DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/tablename"
 
-## Setup AWS S3 for the unit test
+### Setup AWS S3 for the unit test
 
 Set the environment variable:
  
 - S3_CONNECTION = "s3://access_key:secret_key@region/bucketname"
 
 
-## Cloudflare KV
+### Cloudflare KV
 
 Set the environment variable:
  

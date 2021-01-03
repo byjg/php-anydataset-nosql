@@ -24,7 +24,7 @@ s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/tablename?endpoint=http:
 ```
 
 
-# Preparing to use DynamoDb
+## Preparing to use DynamoDb
 
 DynamoDb stores the information slightly different than a model dto structure.
 
@@ -73,7 +73,7 @@ $options = [
 
 The examples below will use this definition.
 
-## Inserting/Updating data
+### Inserting/Updating data
 
 ```php
 <?php
@@ -89,7 +89,7 @@ $dynamodb->put(
 );
 ```
 
-## Retrieve a value
+### Retrieve a value
 
 ```php
 <?php
@@ -106,7 +106,7 @@ $value = $dynamodb->get(1201, $options);
 */
 ```
 
-## Remove a value
+### Remove a value
 
 ```php
 <?php
@@ -115,7 +115,7 @@ $dynamodb->remove(1201);
 ```
 
 
-# Listing objects
+## Listing objects
 
 To get a list of the objects you need to pass an array of options with the keys `KeyConditions` or `ScanFilter`.
 
@@ -140,8 +140,10 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-# Further reading
+## Further reading
 
 - https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html
 - https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html
 
+----
+[Open source ByJG](http://opensource.byjg.com)

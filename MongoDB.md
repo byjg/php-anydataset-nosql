@@ -11,7 +11,7 @@ The full connection string can be:
 mongodb://username:password@server1,server2,server3/dbname?param1=value1&param2=value2
 ```
 
-# Inserting data to a Collection
+## Inserting data to a Collection
 
 To insert data:
 
@@ -30,7 +30,7 @@ $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
 $mongo->save($document);
 ```
 
-# Updating a document
+## Updating a document
 
 Automatically is created the field 'created' and 'update' with the MongoDate() of the current insert.
 Because there is no ID (first parameter) is an INSERT; 
@@ -54,11 +54,11 @@ Automatically the field 'updated' is updated with the MongoDate() of the current
 Because there is an ID (first parameter) is an UPDATE; 
 
 
-# Querying the collection
+## Querying the collection
 
 Querying the database will result a GenericIterator. It will be compatible with all objects.
 
-## Retrieve a document by Id
+### Retrieve a document by Id
 
 ```php
 <?php
@@ -71,7 +71,7 @@ if (!empty($document)) {
 ```
 
 
-## Retrieve all data
+### Retrieve all data
 
 ```php
 <?php
@@ -84,7 +84,7 @@ foreach ($result as $document)
 }
 ```
 
-## Filtering the data
+### Filtering the data
 
 ```php
 <?php
@@ -99,3 +99,5 @@ foreach ($result as $document)
 }
 ```
 
+----
+[Open source ByJG](http://opensource.byjg.com)

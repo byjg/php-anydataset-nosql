@@ -5,7 +5,7 @@
 $kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://auth_email:auth_key@account_id/namespace');
 ```
 
-# List all objects
+## List all objects
 
 ```php
 <?php
@@ -32,10 +32,7 @@ print_r($iterator->toArray());
 ```
 
 
-
-
-
-# Inserting/Updating data
+## Inserting/Updating data
 
 ```php
 <?php
@@ -56,7 +53,7 @@ $kv->putBatch($bulk);
 ```
 
 
-# Retrieve a value
+## Retrieve a value
 
 ```php
 <?php
@@ -64,7 +61,7 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
 $value = $kv->get("object_name");
 ```
 
-# Remove a value
+## Remove a value
 
 ```php
 <?php
@@ -75,3 +72,6 @@ $kv->remove("object_name");
 
 $kv->removeBatch(["key1", "key2"]);
 ```
+
+----
+[Open source ByJG](http://opensource.byjg.com)
