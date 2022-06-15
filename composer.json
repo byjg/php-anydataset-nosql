@@ -1,12 +1,6 @@
 {
   "name": "byjg/anydataset-nosql",
   "description": "A NoSql abstraction dataset. Anydataset is an agnostic data source abstraction layer in PHP.",
-  "authors": [
-    {
-      "name": "João Gilberto Magalhães",
-      "email": "joao@byjg.com.br"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "ByJG\\AnyDataset\\NoSql\\": "src/"
