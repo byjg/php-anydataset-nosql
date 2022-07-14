@@ -13,7 +13,7 @@
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
     "byjg/anydataset": "4.1.*",
-    "byjg/anydataset-array": "4.0.*",
+    "byjg/anydataset-array": "4.1.*",
     "byjg/serializer": "1.0.*",
     "byjg/webrequest": "2.0.*",
     "ext-json": "*"
