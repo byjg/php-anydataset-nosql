@@ -29,7 +29,7 @@ jobs:
         ports:
           - 27017:27017
 
-      dynanodb:
+      dynamodb:
         image: amazon/dynamodb-local
         ports:
           - 8000:8000
@@ -52,9 +52,9 @@ jobs:
           --health-retries 5
 
     env:
-      MONGODB_CONNECTION: "mongodb://127.0.0.1/test"
-      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
-      DYNAMODB_CONNECTION: "dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
+      MONGODB_CONNECTION: "mongodb://mongodb/test"
+      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:9000"
+      DYNAMODB_CONNECTION: "dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
       - uses: actions/checkout@v3
