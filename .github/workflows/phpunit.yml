@@ -39,13 +39,13 @@ jobs:
         image: localstack/localstack
         ports:
           - "9000:4566"
-        environment:
-          - SERVICES=s3
-          - DEFAULT_REGION=us-west-1
-          - AWS_DEFAULT_REGION=us-west-1
-          - HOSTNAME_EXTERNAL=localhost
-          - USE_SSL=false
-          - DEBUG=1
+        env:
+          SERVICES: s3
+          DEFAULT_REGION: us-west-1
+          AWS_DEFAULT_REGION: us-west-1
+          HOSTNAME_EXTERNAL: localhost
+          USE_SSL: false
+          DEBUG: 1
         options: >-
           --health-cmd "awslocal s3 ls"
           --health-interval 5s
