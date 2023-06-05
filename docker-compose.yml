@@ -15,12 +15,25 @@ services:
     ports:
       - 8000:8000
 
+#  s3:
+#    container_name: anydataset_nosql_s3
+#    image: minio/minio
+#    environment:
+#      MINIO_ACCESS_KEY: aaa
+#      MINIO_SECRET_KEY: 12345678
+##    command: ["server", "/data"]
+#    ports:
+#      - 9000:9000
+
   s3:
     container_name: anydataset_nosql_s3
-    image: minio/minio
-    environment:
-      MINIO_ACCESS_KEY: aaa
-      MINIO_SECRET_KEY: 12345678
-    entrypoint: ["bash", "-c", "minio server /data"]
+    image: localstack/localstack
     ports:
-      - 9000:9000
+      - "9000:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-west-1
+      - AWS_DEFAULT_REGION=us-west-1
+      - HOSTNAME_EXTERNAL=localhost
+      - USE_SSL=false
+      - DEBUG=1

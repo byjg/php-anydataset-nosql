@@ -36,14 +36,21 @@ jobs:
           - 8000:8000
 
       s3:
-        image: minio/minio
-        env:
-          MINIO_ROOT_USER: aaa
-          MINIO_ROOT_PASSWORD: 12345678
-        options: |
-          --entrypoint "bash -c 'minio server /data'"
+        image: localstack/localstack
         ports:
-          - 9000:9000
+          - "9000:4566"
+        environment:
+          - SERVICES=s3
+          - DEFAULT_REGION=us-west-1
+          - AWS_DEFAULT_REGION=us-west-1
+          - HOSTNAME_EXTERNAL=localhost
+          - USE_SSL=false
+          - DEBUG=1
+        options: >-
+          --health-cmd "awslocal s3 ls"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 5
 
     env:
       MONGODB_CONNECTION: "mongodb://127.0.0.1/test"
