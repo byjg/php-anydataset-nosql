@@ -8,7 +8,7 @@ use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Util\Uri;
 
-class AwsS3Driver implements KeyValueInterface
+class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 {
 
     /**
@@ -183,16 +183,21 @@ class AwsS3Driver implements KeyValueInterface
     }
 
     /**
-     * @param object[] $key
+     * @param object[] $keys
      * @param array $options
      * @return mixed
      */
-    public function removeBatch($key, $options = [])
+    public function removeBatch($keys, $options = [])
     {
         // TODO: Implement removeBatch() method.
     }
 
     public function client() {
         return $this->s3Client;
+    }
+
+    public static function schema()
+    {
+        return "s3";
     }
 }

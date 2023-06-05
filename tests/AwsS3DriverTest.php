@@ -13,17 +13,17 @@ class AwsS3DriverTest extends TestCase
      */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $awsConnection = getenv("S3_CONNECTION");
         if (!empty($awsConnection)) {
-            $this->object = Factory::getKeyValueInstance($awsConnection);
+            $this->object = Factory::getInstance($awsConnection);
             $this->object->remove("KEY");
             $this->object->remove("ANOTHER");
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->object)) {
             $this->object->remove("KEY");

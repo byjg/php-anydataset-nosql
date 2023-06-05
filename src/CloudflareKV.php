@@ -16,7 +16,7 @@ use MintWare\Streams\MemoryStream;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
-class CloudflareKV implements KeyValueInterface
+class CloudflareKV implements KeyValueInterface, RegistrableInterface
 {
     protected $username;
     protected $password;
@@ -207,5 +207,10 @@ class CloudflareKV implements KeyValueInterface
             throw new CurlException($errorMsg);
         }
         return $array;
+    }
+
+    public static function schema()
+    {
+        return "kv";
     }
 }

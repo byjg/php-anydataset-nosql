@@ -10,7 +10,7 @@ use ByJG\Serializer\BinderObject;
 use ByJG\Util\Uri;
 use InvalidArgumentException;
 
-class AwsDynamoDbDriver implements KeyValueInterface
+class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 {
 
     /**
@@ -213,11 +213,11 @@ class AwsDynamoDbDriver implements KeyValueInterface
     }
 
     /**
-     * @param object[] $key
+     * @param object[] $keys
      * @param array $options
      * @return mixed
      */
-    public function removeBatch($key, $options = [])
+    public function removeBatch($keys, $options = [])
     {
         // TODO: Implement removeBatch() method.
     }
@@ -228,5 +228,10 @@ class AwsDynamoDbDriver implements KeyValueInterface
 
     public function client() {
         return $this->dynamoDbClient;
+    }
+
+    public static function schema()
+    {
+        return ["dynamo", "dynamodb"];
     }
 }

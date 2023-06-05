@@ -5,6 +5,7 @@ namespace ByJG\AnyDataset\NoSql;
 use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\Core\Enum\Relation;
 use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\SerializerObject;
 use ByJG\Util\Uri;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
@@ -17,7 +18,7 @@ use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\WriteConcern;
 
-class MongoDbDriver implements NoSqlInterface
+class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 {
     /**
      * @var array
@@ -144,7 +145,9 @@ class MongoDbDriver implements NoSqlInterface
             $result[] = new NoSqlDocument(
                 $item->_id,
                 $collection,
-                BinderObject::toArrayFrom($item, false, $this->excludeMongoClass)
+                SerializerObject::instance($item)
+                    ->withDoNotParse($this->excludeMongoClass)
+                    ->serialize()
             );
         }
 
@@ -240,7 +243,9 @@ class MongoDbDriver implements NoSqlInterface
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
         $bulkWrite = new BulkWrite();
 
-        $data = BinderObject::toArrayFrom($document->getDocument(), false, $this->excludeMongoClass);
+        $data = SerializerObject::instance($document->getDocument())
+            ->withDoNotParse($this->excludeMongoClass)
+            ->serialize();
 
         $idDocument = $document->getIdDocument();
         if (empty($idDocument)) {
@@ -267,5 +272,10 @@ class MongoDbDriver implements NoSqlInterface
         $document->setIdDocument($idDocument);
 
         return $document;
+    }
+
+    public static function schema()
+    {
+        return "mongodb";
     }
 }

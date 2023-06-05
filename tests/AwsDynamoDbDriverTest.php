@@ -40,11 +40,11 @@ class AwsDynamoDbDriverTest extends TestCase
             ]
         ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $awsConnection = getenv("DYNAMODB_CONNECTION");
         if (!empty($awsConnection)) {
-            $this->object = Factory::getKeyValueInstance($awsConnection);
+            $this->object = Factory::getInstance($awsConnection);
 
             $this->createTable();
 
@@ -81,7 +81,7 @@ class AwsDynamoDbDriverTest extends TestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->object)) {
             $this->object->remove(1, $this->options);

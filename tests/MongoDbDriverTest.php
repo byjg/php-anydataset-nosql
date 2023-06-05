@@ -18,7 +18,7 @@ class MongoDbDriverTest extends TestCase
     
     const TEST_COLLECTION = 'collectionTest';
 
-    public function setUp()
+    public function setUp(): void
     {
         $mongodbConnection = getenv("MONGODB_CONNECTION");
 
@@ -26,7 +26,7 @@ class MongoDbDriverTest extends TestCase
             return;
         }
 
-        $this->dbDriver = Factory::getNoSqlInstance($mongodbConnection);
+        $this->dbDriver = Factory::getInstance($mongodbConnection);
 
         $this->dbDriver->save(
             new NoSqlDocument(
@@ -72,7 +72,7 @@ class MongoDbDriverTest extends TestCase
         );
     }
     
-    public function tearDown()
+    public function tearDown(): void
     {
         if (!empty($this->dbDriver)) {
             $this->dbDriver->deleteDocuments(new IteratorFilter(), self::TEST_COLLECTION);

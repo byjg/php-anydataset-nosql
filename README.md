@@ -20,12 +20,16 @@ Check implementation examples on [https://opensource.byjg.com/php/anydataset-nos
 Just type: 
 
 ```bash
-composer require "byjg/anydataset-nosql=4.1.*"
+composer require "byjg/anydataset-nosql=^4.9"
 ```
 
 ## Running Unit tests
 
 ```bash
+docker-compose up -d
+export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
+export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
+export DYNAMODB_CONNECTION="dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
 vendor/bin/phpunit
 ```
 
