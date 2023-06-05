@@ -38,9 +38,10 @@ jobs:
       s3:
         image: minio/minio
         env:
-          MINIO_ACCESS_KEY: aaa
-          MINIO_SECRET_KEY: 12345678
-        command: ["server", "/data"]
+          MINIO_ROOT_USER: aaa
+          MINIO_ROOT_PASSWORD: 12345678
+        options: |
+          --entrypoint "bash -c 'minio server /data'"
         ports:
           - 9000:9000
 

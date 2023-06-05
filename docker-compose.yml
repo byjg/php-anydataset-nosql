@@ -1,4 +1,4 @@
-version: '2.0'
+version: '3.0'
 services:
 
   mongodb:
@@ -21,6 +21,6 @@ services:
     environment:
       MINIO_ACCESS_KEY: aaa
       MINIO_SECRET_KEY: 12345678
-    command: ["server", "/data"]
+    entrypoint: ["bash", "-c", "minio server /data"]
     ports:
       - 9000:9000
