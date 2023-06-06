@@ -29,7 +29,7 @@ services:
     container_name: anydataset_nosql_s3
     image: localstack/localstack
     ports:
-      - "9000:4566"
+      - "4566:4566"
     environment:
       - SERVICES=s3
       - DEFAULT_REGION=us-west-1

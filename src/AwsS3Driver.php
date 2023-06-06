@@ -51,7 +51,17 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
             unset($extraParameters["create"]);
         }
 
-        $s3Parameters = array_merge($defaultParameters, $extraParameters);
+        $s3Parameters = [];
+        foreach (array_merge($defaultParameters, $extraParameters) as $key => $value) {
+            if (strtolower($value) === "true") {
+                $value = true;
+            } elseif (strtolower($value) === "false") {
+                $value = false;
+            } elseif (is_numeric($value)) {
+                $value = 0 + $value;
+            }
+            $s3Parameters[$key] = $value;
+        }
 
         $this->s3Client = new S3Client($s3Parameters);
 

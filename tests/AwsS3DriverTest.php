@@ -4,6 +4,7 @@ namespace TestsDb\AnyDataset;
 
 use ByJG\AnyDataset\NoSql\AwsS3Driver;
 use ByJG\AnyDataset\NoSql\Factory;
+use ByJG\Util\Uri;
 use PHPUnit\Framework\TestCase;
 
 class AwsS3DriverTest extends TestCase
@@ -17,7 +18,9 @@ class AwsS3DriverTest extends TestCase
     {
         $awsConnection = getenv("S3_CONNECTION");
         if (!empty($awsConnection)) {
-            $this->object = Factory::getInstance($awsConnection);
+            $uri = new Uri($awsConnection);
+            $uri = $uri->withQueryKeyValue("use_path_style_endpoint", "true");
+            $this->object = Factory::getInstance($uri);
             $this->object->remove("KEY");
             $this->object->remove("ANOTHER");
         }
