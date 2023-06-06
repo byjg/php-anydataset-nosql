@@ -42,7 +42,8 @@ jobs:
           SERVICES: s3
           DEFAULT_REGION: us-west-1
           AWS_DEFAULT_REGION: us-west-1
-          HOSTNAME_EXTERNAL: localhost
+          HOSTNAME: s3
+          HOSTNAME_EXTERNAL: s3
           USE_SSL: false
           DEBUG: 1
         options: >-
@@ -53,7 +54,7 @@ jobs:
 
     env:
       MONGODB_CONNECTION: "mongodb://mongodb/test"
-      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:${{ job.services.s3.ports['4566'] }}"
+      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:4566"
       DYNAMODB_CONNECTION: "dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
