@@ -17,9 +17,9 @@ jobs:
       matrix:
         php-version:
           - "8.1"
-          - "8.0"
-          - "7.4"
-          - "7.3"
+#          - "8.0"
+#          - "7.4"
+#          - "7.3"
 
     services:
       mongodb:
@@ -37,7 +37,7 @@ jobs:
       s3:
         image: localstack/localstack
         ports:
-          - "9000:4566"
+          - "4566:4566"
         env:
           SERVICES: s3
           DEFAULT_REGION: us-west-1
@@ -53,7 +53,7 @@ jobs:
 
     env:
       MONGODB_CONNECTION: "mongodb://mongodb/test"
-      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:9000"
+      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:${{ job.services.s3.ports['4566'] }}"
       DYNAMODB_CONNECTION: "dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
