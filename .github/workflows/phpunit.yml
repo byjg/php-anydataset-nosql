@@ -17,9 +17,9 @@ jobs:
       matrix:
         php-version:
           - "8.1"
-#          - "8.0"
-#          - "7.4"
-#          - "7.3"
+          - "8.0"
+          - "7.4"
+          - "7.3"
 
     services:
       mongodb:
