@@ -2,7 +2,7 @@
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://access_key:secret_key@region/tablename');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://access_key:secret_key@region/tablename');
 ```
 
 The full connection string can be:
@@ -77,7 +77,7 @@ The examples below will use this definition.
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $dynamodb->put(
     1201,
     [
@@ -93,7 +93,7 @@ $dynamodb->put(
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $value = $dynamodb->get(1201, $options);
 
 /* Should Return:
@@ -110,7 +110,7 @@ $value = $dynamodb->get(1201, $options);
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $dynamodb->remove(1201);
 ```
 
@@ -123,7 +123,7 @@ Example:
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 
 $options = [
    "KeyConditions" => [

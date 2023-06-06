@@ -2,7 +2,7 @@
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://access_key:secret_key@region/bucket');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://access_key:secret_key@region/bucket');
 ```
 
 The full connection string can be:
@@ -24,7 +24,7 @@ An example can be:
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket?endpoint=http://localhost:9000
 ```
 
-There is a specific parameter called `create` from `anydataset/no-sql` that permit create a bucket if 
+There is a specific parameter called `create` from `anydataset/nosql` that permit create a bucket if 
 it doesn't exist.
 
 Example:
@@ -38,7 +38,7 @@ s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket?create=true
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 $iterator = $s3->getIterator();
 print_r($iterator->toArray());
 ```
@@ -47,7 +47,7 @@ print_r($iterator->toArray());
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 $s3->put("object_name", "value");
 ```
 
@@ -55,7 +55,7 @@ $s3->put("object_name", "value");
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 $value = $s3->get("object_name");
 ```
 
@@ -63,7 +63,7 @@ $value = $s3->get("object_name");
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 $s3->remove("object_name");
 ```
 
@@ -71,7 +71,7 @@ $s3->remove("object_name");
 
 ```php
 <?php
-$s3 = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('s3://....');
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 
 $size = 1024;
 $offset = 0;

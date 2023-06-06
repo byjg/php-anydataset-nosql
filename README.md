@@ -1,15 +1,41 @@
 # AnyDataset-NoSql
 
+
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/anydataset-nosql/)
 [![GitHub license](https://img.shields.io/github/license/byjg/anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/anydataset-nosql.svg)](https://github.com/byjg/anydataset-nosql/releases/)
 [![Build Status](https://travis-ci.com/byjg/anydataset-nosql.svg?branch=master)](https://travis-ci.com/byjg/anydataset-nosql)
 
+Anydataset NoSQL standardize the access to non-relational databases/repositories and treat them as Key/Value.
+The implementation can work with:
 
-NoSql abstraction dataset. Anydataset is an agnostic data source abstraction layer in PHP. 
+- MongoDB
+- Cloudflare KV
+- S3
+- DynamoDB
 
-See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
+Anydataset is an agnostic data source abstraction layer in PHP. See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
+
+## Features
+
+- Access as Key/Value repositories different datasource
+- Allow put and get data
+- Simplified way to connect to the datasources
+
+## Connection Based on URI
+
+The connection string for databases is based on URL.
+
+See below the current implemented drivers:
+
+| Datasource                                  | Connection String                                        |
+|---------------------------------------------|----------------------------------------------------------|
+| [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
+| [Cloudflare KV](docs/CloudflareKV.md)       | kv://username:password@accountid/namespaceid             |
+| [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
+| [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
+
 
 ## Examples
 
