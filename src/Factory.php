@@ -2,8 +2,8 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\AnyDataset\Core\Exception\NotAvailableException;
 use ByJG\Util\Uri;
+use InvalidArgumentException;
 
 class Factory
 {
@@ -16,13 +16,13 @@ class Factory
     public static function registerDriver($class)
     {
         if (!in_array(RegistrableInterface::class, class_implements($class))) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "The class '$class' is not a valid instance"
             );
         }
 
         if (empty($class::schema())) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "The class '$class' must implement the static method schema()"
             );
         }
@@ -53,7 +53,7 @@ class Factory
         $scheme = $connectionUri->getScheme();
 
         if (!isset(self::$config[$scheme])) {
-            throw new \InvalidArgumentException("The '$scheme' scheme does not exist.");
+            throw new InvalidArgumentException("The '$scheme' scheme does not exist.");
         }
 
         $class = self::$config[$scheme];

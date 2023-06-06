@@ -2,11 +2,12 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\Core\Enum\Relation;
-use ByJG\Serializer\BinderObject;
+use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\Serializer\SerializerObject;
 use ByJG\Util\Uri;
+use DateTime;
+use InvalidArgumentException;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\Javascript;
@@ -14,6 +15,7 @@ use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\BulkWrite;
+use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\WriteConcern;
@@ -99,9 +101,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * @param $idDocument
      * @param null $collection
-     * @return \ByJG\AnyDataset\NoSql\NoSqlDocument|null
-     * @throws \MongoDB\Driver\Exception\Exception
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @return NoSqlDocument|null
+     * @throws Exception
      */
     public function getDocumentById($idDocument, $collection = null)
     {
@@ -117,16 +118,15 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     }
 
     /**
-     * @param \ByJG\AnyDataset\Core\IteratorFilter $filter
+     * @param IteratorFilter $filter
      * @param null $collection
-     * @return \ByJG\AnyDataset\NoSql\NoSqlDocument[]|null
-     * @throws \MongoDB\Driver\Exception\Exception
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @return NoSqlDocument[]|null
+     * @throws Exception
      */
     public function getDocuments(IteratorFilter $filter, $collection = null)
     {
         if (empty($collection)) {
-            throw new \InvalidArgumentException('Collection is mandatory for MongoDB');
+            throw new InvalidArgumentException('Collection is mandatory for MongoDB');
         }
 
         $dataCursor = $this->mongoManager->executeQuery(
@@ -164,11 +164,11 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $value = $itemFilter[3];
 
             if ($itemFilter[0] == ' or ') {
-                throw new \InvalidArgumentException('MongoDBDriver does not support the addRelationOr');
+                throw new InvalidArgumentException('MongoDBDriver does not support the addRelationOr');
             }
 
             if (isset($result[$name])) {
-                throw new \InvalidArgumentException('MongoDBDriver does not support filtering the same field twice');
+                throw new InvalidArgumentException('MongoDBDriver does not support filtering the same field twice');
             }
 
             $data = [
@@ -215,7 +215,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function deleteDocuments(IteratorFilter $filter, $collection = null)
     {
         if (empty($collection)) {
-            throw new \InvalidArgumentException('Collection is mandatory for MongoDB');
+            throw new InvalidArgumentException('Collection is mandatory for MongoDB');
         }
 
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
@@ -230,14 +230,13 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     }
 
     /**
-     * @param \ByJG\AnyDataset\NoSql\NoSqlDocument $document
-     * @return \ByJG\AnyDataset\NoSql\NoSqlDocument
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @param NoSqlDocument $document
+     * @return NoSqlDocument
      */
     public function save(NoSqlDocument $document)
     {
         if (empty($document->getCollection())) {
-            throw new \InvalidArgumentException('Collection is mandatory for MongoDB');
+            throw new InvalidArgumentException('Collection is mandatory for MongoDB');
         }
 
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
@@ -249,13 +248,13 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
         $idDocument = $document->getIdDocument();
         if (empty($idDocument)) {
-            $idDocument = isset($data['_id']) ? $data['_id'] : null;
+            $idDocument = $data['_id'] ?? null;
         }
 
-        $data['updated'] = new UTCDateTime((new \DateTime())->getTimestamp()*1000);
+        $data['updated'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
             $data['_id'] = $idDocument = new ObjectID();
-            $data['created'] = new UTCDateTime((new \DateTime())->getTimestamp()*1000);
+            $data['created'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
             $data['_id'] = $idDocument;

@@ -2,11 +2,11 @@
 
 namespace TestsDb\AnyDataset;
 
-use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\Core\Enum\Relation;
+use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
-use ByJG\AnyDataset\NoSql\NoSqlDocument;
 use ByJG\AnyDataset\NoSql\MongoDbDriver;
+use ByJG\AnyDataset\NoSql\NoSqlDocument;
 use PHPUnit\Framework\TestCase;
 
 class MongoDbDriverTest extends TestCase
@@ -90,8 +90,8 @@ class MongoDbDriverTest extends TestCase
         $filter->addRelation('name', Relation::EQUAL, 'Hilux');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
 
-        // Check if get ONe
-        $this->assertEquals(1, count($document));
+        // Check if returns one document
+        $this->assertCount(1, $document);
 
         // Check if the default fields are here
         $data = $document[0]->getDocument();
@@ -147,12 +147,12 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('name', Relation::EQUAL, 'Uno');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(1, count($document));
+        $this->assertCount(1, $document);
 
         // Delete
         $this->dbDriver->deleteDocuments($filter, self::TEST_COLLECTION);
 
-        // Check if object does not exists
+        // Check if object do not exist
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertEmpty($document);
     }
@@ -166,7 +166,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('price', Relation::LESS_OR_EQUAL_THAN, 40000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(2, count($documents));
+        $this->assertCount(2, $documents);
         $this->assertEquals('Fox', $documents[0]->getDocument()['name']);
         $this->assertEquals('Volkswagen', $documents[0]->getDocument()['brand']);
         $this->assertEquals('40000', $documents[0]->getDocument()['price']);
@@ -177,7 +177,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('price', Relation::LESS_THAN, 40000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(1, count($documents));
+        $this->assertCount(1, $documents);
         $this->assertEquals('Uno', $documents[0]->getDocument()['name']);
         $this->assertEquals('Fiat', $documents[0]->getDocument()['brand']);
         $this->assertEquals('35000', $documents[0]->getDocument()['price']);
@@ -185,7 +185,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('price', Relation::GREATER_OR_EQUAL_THAN, 90000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(2, count($documents));
+        $this->assertCount(2, $documents);
         $this->assertEquals('Hilux', $documents[0]->getDocument()['name']);
         $this->assertEquals('Toyota', $documents[0]->getDocument()['brand']);
         $this->assertEquals('120000', $documents[0]->getDocument()['price']);
@@ -196,7 +196,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('price', Relation::GREATER_THAN, 90000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(1, count($documents));
+        $this->assertCount(1, $documents);
         $this->assertEquals('Hilux', $documents[0]->getDocument()['name']);
         $this->assertEquals('Toyota', $documents[0]->getDocument()['brand']);
         $this->assertEquals('120000', $documents[0]->getDocument()['price']);
@@ -204,7 +204,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('name', Relation::STARTS_WITH, 'Co');
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(2, count($documents));
+        $this->assertCount(2, $documents);
         $this->assertEquals('Corolla', $documents[0]->getDocument()['name']);
         $this->assertEquals('Toyota', $documents[0]->getDocument()['brand']);
         $this->assertEquals('80000', $documents[0]->getDocument()['price']);
@@ -215,7 +215,7 @@ class MongoDbDriverTest extends TestCase
         $filter = new IteratorFilter();
         $filter->addRelation('name', Relation::CONTAINS, 'oba');
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
-        $this->assertEquals(1, count($documents));
+        $this->assertCount(1, $documents);
         $this->assertEquals('Cobalt', $documents[0]->getDocument()['name']);
         $this->assertEquals('Chevrolet', $documents[0]->getDocument()['brand']);
         $this->assertEquals('60000', $documents[0]->getDocument()['price']);

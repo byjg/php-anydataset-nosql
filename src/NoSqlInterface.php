@@ -17,14 +17,14 @@ interface NoSqlInterface
     public function getDocumentById($idDocument, $collection = null);
 
     /**
-     * @param \ByJG\AnyDataset\Core\IteratorFilter $filter
+     * @param IteratorFilter $filter
      * @param null $collection
      * @return NoSqlDocument[]|null
      */
     public function getDocuments(IteratorFilter $filter, $collection = null);
 
     /**
-     * @param \ByJG\AnyDataset\NoSql\NoSqlDocument $document
+     * @param NoSqlDocument $document
      * @return NoSqlDocument
      */
     public function save(NoSqlDocument $document);
@@ -37,7 +37,7 @@ interface NoSqlInterface
     public function deleteDocumentById($idDocument, $collection = null);
 
     /**
-     * @param \ByJG\AnyDataset\Core\IteratorFilter $filter
+     * @param IteratorFilter $filter
      * @param null $collection
      * @return mixed
      */

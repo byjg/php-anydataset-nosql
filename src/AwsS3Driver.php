@@ -2,7 +2,7 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use Aws\Result;
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
@@ -70,10 +70,10 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         $this->bucket = preg_replace('~^/~', '', $uri->getPath());
 
         try {
-            $result = $this->s3Client->headBucket([
+            $this->s3Client->headBucket([
                 'Bucket' => $this->bucket,
             ]);
-        } catch (\Aws\S3\Exception\S3Exception $ex) {
+        } catch (S3Exception $ex) {
             if (strpos($ex->getMessage(), "404") !== false && $createBucket) {
                 $this->s3Client->createBucket([
                     'ACL' => 'private',
@@ -101,9 +101,6 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
             $options
         );
 
-        /**
-         * @var Result
-         */
         $result = $this->s3Client->listObjects($data);
 
         $contents = [];
@@ -177,7 +174,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         $options = array_merge(
             $options,
             [
-                'Range' => "bytes=${part}-${untilByte}"
+                'Range' => "bytes=$part-$untilByte"
             ]
         );
 
@@ -197,7 +194,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
     /**
      * @param object[] $keys
      * @param array $options
-     * @return mixed
+     * @return void
      */
     public function removeBatch($keys, $options = [])
     {

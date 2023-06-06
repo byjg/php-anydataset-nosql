@@ -79,7 +79,7 @@ class AwsS3DriverTest extends TestCase
             str_repeat("0", 256) . str_repeat("1", 256) . str_repeat("2", 250)
         );
 
-        $part1 = $this->object->getChunk("KEY", [], 256, 0);
+        $part1 = $this->object->getChunk("KEY", [], 256);
         $part2 = $this->object->getChunk("KEY", [], 256, 1);
         $part3 = $this->object->getChunk("KEY", [], 256, 2);
 

@@ -7,13 +7,13 @@ services:
     environment:
       TZ: America/Winnipeg
     ports:
-      - 27017:27017
+      - "27017:27017"
 
   dynanodb:
     container_name: anydataset_nosql_dynamodb
     image: amazon/dynamodb-local
     ports:
-      - 8000:8000
+      - "8000:8000"
 
 #  s3:
 #    container_name: anydataset_nosql_s3
