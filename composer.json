@@ -12,10 +12,10 @@
     "php": ">=5.6.0",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
-    "byjg/anydataset": "4.9.*",
-    "byjg/anydataset-array": "4.9.*",
-    "byjg/serializer": "4.9.*",
-    "byjg/webrequest": "4.9.*",
+    "byjg/anydataset": "^4.9",
+    "byjg/anydataset-array": "^4.9",
+    "byjg/serializer": "^4.9",
+    "byjg/webrequest": "^4.9",
     "ext-json": "*"
   },
   "require-dev": {
