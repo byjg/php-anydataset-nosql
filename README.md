@@ -32,7 +32,7 @@ See below the current implemented drivers:
 | Datasource                                  | Connection String                                        |
 |---------------------------------------------|----------------------------------------------------------|
 | [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
-| [Cloudflare KV](docs/CloudflareKV.md)       | kv://username:password@accountid/namespaceid             |
+| [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
 | [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
 | [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
@@ -54,7 +54,7 @@ composer require "byjg/anydataset-nosql=^4.9"
 ```bash
 docker-compose up -d
 export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
-export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
+export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:4566"
 export DYNAMODB_CONNECTION="dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
 vendor/bin/phpunit
 ```

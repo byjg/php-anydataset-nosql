@@ -1,7 +1,5 @@
 <?php
 
-namespace TestsDb\AnyDataset;
-
 use ByJG\AnyDataset\Core\Enum\Relation;
 use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
@@ -79,6 +77,9 @@ class MongoDbDriverTest extends TestCase
         }
     }
 
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
     public function testSaveDocument()
     {
         if (empty($this->dbDriver)) {
@@ -137,6 +138,9 @@ class MongoDbDriverTest extends TestCase
         );
     }
 
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
     public function testDelete()
     {
         if (empty($this->dbDriver)) {
@@ -157,6 +161,9 @@ class MongoDbDriverTest extends TestCase
         $this->assertEmpty($document);
     }
 
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
     public function testGetDocuments()
     {
         if (empty($this->dbDriver)) {

@@ -1,7 +1,5 @@
 <?php
 
-namespace TestsDb\AnyDataset;
-
 use ByJG\AnyDataset\NoSql\AwsS3Driver;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\Util\Uri;

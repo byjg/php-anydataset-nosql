@@ -1,7 +1,5 @@
 <?php
 
-namespace TestsDb\AnyDataset;
-
 use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
 use ByJG\AnyDataset\NoSql\Factory;
@@ -90,6 +88,9 @@ class AwsDynamoDbDriverTest extends TestCase
         }
     }
 
+    /**
+     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     */
     public function testDynamoDbOperations()
     {
         if (empty($this->object)) {
