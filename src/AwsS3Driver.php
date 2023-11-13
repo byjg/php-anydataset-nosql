@@ -10,6 +10,11 @@ use ByJG\Util\Uri;
 
 class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 {
+    const PARAM_BUCKET_ENDPOINT = 'bucket_endpoint';
+    const PARAM_USE_ARN_REGION = 'use_arn_region';
+    const PARAM_USE_ACCELERATE_ENDPOINT = 'use_accelerate_endpoint';
+    const PARAM_USE_PATH_STYLE_ENDPOINT = 'use_path_style_endpoint';
+    const PARAM_DISABLE_MULTIREGION_ACCESS_POINTS = 'disable_multiregion_access_points';
 
     /**
      * @var S3Client
