@@ -55,7 +55,7 @@ jobs:
     env:
       MONGODB_CONNECTION: "mongodb://mongodb/test"
       S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:4566"
-      DYNAMODB_CONNECTION: "dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://dynamodb:8000"
+      DYNAMODB_CONNECTION: "dynamodb://aaa:123456@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
       - uses: actions/checkout@v4

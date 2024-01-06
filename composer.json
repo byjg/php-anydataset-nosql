@@ -9,7 +9,7 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=7.4",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
     "byjg/anydataset": "4.9.*",
@@ -23,7 +23,7 @@
   },
   "suggest": {
     "ext-mongodb": "*",
-    "byjg/cache-engine": "4.0.*"
+    "byjg/cache-engine": "4.9.*"
   },
   "license": "MIT"
 }

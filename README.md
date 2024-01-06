@@ -45,7 +45,7 @@ Check implementation examples on [https://opensource.byjg.com/php/anydataset-nos
 Just type: 
 
 ```bash
-composer require "byjg/anydataset-nosql=^4.9"
+composer require "byjg/anydataset-nosql"
 ```
 
 ## Running Unit tests
@@ -69,13 +69,13 @@ Set the environment variable:
 
 Set the environment variable:
  
-- DYNAMODB_CONNECTION = "dynamodb://access_key:secret_key@region/tablename"
+- DYNAMODB_CONNECTION = "dynamodb://accesskey:secretkey@region/tablename"
 
 ### Setup AWS S3 for the unit test
 
 Set the environment variable:
  
-- S3_CONNECTION = "s3://access_key:secret_key@region/bucketname"
+- S3_CONNECTION = "s3://accesskey:secretkey@region/bucketname"
 
 
 ### Cloudflare KV
