@@ -6,10 +6,10 @@ use ByJG\AnyDataset\Core\IteratorInterface;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\SerializerObject;
 use ByJG\Util\Exception\CurlException;
+use ByJG\Util\Exception\MessageException;
 use ByJG\Util\HttpClient;
 use ByJG\Util\Psr7\MemoryStream;
 use ByJG\Util\Psr7\Message;
-use ByJG\Util\Psr7\MessageException;
 use ByJG\Util\Psr7\Request;
 use ByJG\Util\Uri;
 use Psr\Http\Message\MessageInterface;
@@ -201,7 +201,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         if (isset($array["success"]) && !$array["success"]) {
             $errorMsg = "";
             foreach ($array["errors"] as $error) {
-                $errorMsg .= "[${error["code"]}] ${error["message"]}\n";
+                $errorMsg .= "[{$error["code"]}] {$error["message"]}\n";
             }
             throw new CurlException($errorMsg);
         }
