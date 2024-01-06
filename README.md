@@ -54,7 +54,7 @@ composer require "byjg/anydataset-nosql"
 docker-compose up -d
 export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
 export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:4566"
-export DYNAMODB_CONNECTION="dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
+export DYNAMODB_CONNECTION="dynamodb://accesskey:secretkey@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
 vendor/bin/phpunit
 ```
 
@@ -84,7 +84,18 @@ Set the environment variable:
  
 - CLOUDFLAREKV_CONNECTION = "kv://email:authkey@accountid/namespaceid"
 
+## Dependencies
 
+```mermaid
+flowchart TD
+   byjg/anydataset-nosql --> ext-curl
+   byjg/anydataset-nosql --> aws/aws-sdk-php
+   byjg/anydataset-nosql --> byjg/anydataset
+   byjg/anydataset-nosql --> byjg/anydataset-array
+   byjg/anydataset-nosql --> byjg/serializer
+   byjg/anydataset-nosql --> byjg/webrequest
+   byjg/anydataset-nosql --> ext-json
+```
 
 ----
 [Open source ByJG](http://opensource.byjg.com)
