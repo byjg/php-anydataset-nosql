@@ -2,7 +2,7 @@
 
 ```php
 <?php
-$mongo = \ByJG\AnyDataset\NoSql\Factory::getNoSqlInstance('mongodb://server');
+$mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 ```
 
 The full connection string can be:
@@ -17,7 +17,7 @@ To insert data:
 
 ```php
 <?php
-$mongo = \ByJG\AnyDataset\NoSql\Factory::getNoSqlInstance('mongodb://server');
+$mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
     null,
     'mycollection',
@@ -37,7 +37,7 @@ Because there is no ID (first parameter) is an INSERT;
 
 ```php
 <?php
-$mongo = \ByJG\AnyDataset\NoSql\Factory::getNoSqlInstance('mongodb://server');
+$mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
     'someid',
     'mycollection',
@@ -62,7 +62,7 @@ Querying the database will result a GenericIterator. It will be compatible with 
 
 ```php
 <?php
-$mongo = \ByJG\AnyDataset\NoSql\Factory::getNoSqlInstance('mongodb://server');
+$mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $document = $mongo->getDocumentById($id);
 if (!empty($document)) {
     print_r($document->getIdDocument());
@@ -75,7 +75,7 @@ if (!empty($document)) {
 
 ```php
 <?php
-$mongo = \ByJG\AnyDataset\NoSql\Factory::getNoSqlInstance('mongodb://server');
+$mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $result = $mongo->getDocuments(null, 'mycollection');
 foreach ($result as $document)
 {

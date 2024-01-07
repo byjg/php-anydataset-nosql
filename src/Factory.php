@@ -2,84 +2,62 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\AnyDataset\Core\Exception\NotAvailableException;
 use ByJG\Util\Uri;
+use InvalidArgumentException;
 
 class Factory
 {
-    /**
-     * @param $connectionString
-     * @param $schemesAlternative
-     * @return NoSqlInterface
-     * @throws NotAvailableException
-     */
-    public static function getNoSqlInstance($connectionString, $schemesAlternative = null)
-    {
-        $prefix = '\\ByJG\\AnyDataset\\NoSql\\';
-
-        return self::getInstance(
-            $connectionString,
-            array_merge(
-                [
-                    "mongodb" => $prefix . "MongoDbDriver",
-                ],
-                (array)$schemesAlternative
-            ),
-            NoSqlInterface::class
-        );
-    }
+    private static $config = [];
 
     /**
-     * @param string $connectionString
-     * @param array $schemesAlternative
-     * @return KeyValueInterface
-     * @throws NotAvailableException
+     * @param string $class
+     * @return void
      */
-    public static function getKeyValueInstance($connectionString, $schemesAlternative = null)
+    public static function registerDriver($class)
     {
-        $prefix = '\\ByJG\\AnyDataset\\NoSql\\';
-
-        return self::getInstance(
-            $connectionString,
-            array_merge(
-                [
-                    "s3" => $prefix . "AwsS3Driver",
-                    "dynamodb" => $prefix . "AwsDynamoDbDriver",
-                    "kv" => $prefix . "CloudflareKV",
-                ],
-                (array)$schemesAlternative
-            ),
-            KeyValueInterface::class
-        );
-    }
-
-    /**
-     * @param $connectionString
-     * @param $validSchemes
-     * @param $typeOf
-     * @return mixed
-     * @throws NotAvailableException
-     */
-    protected static function getInstance($connectionString, $validSchemes, $typeOf)
-    {
-        $connectionUri = new Uri($connectionString);
-
-        $scheme = $connectionUri->getScheme();
-
-        if (!isset($validSchemes[$scheme])) {
-            throw new NotAvailableException("Not available: " . $scheme);
-        }
-
-        $class = $validSchemes[$scheme];
-
-        $instance = new $class($connectionUri);
-
-        if (!is_a($instance, $typeOf)) {
-            throw new \InvalidArgumentException(
-                "The class '$typeOf' is not a instance of DbDriverInterface"
+        if (!in_array(RegistrableInterface::class, class_implements($class))) {
+            throw new InvalidArgumentException(
+                "The class '$class' is not a valid instance"
             );
         }
 
-        return $instance;
+        if (empty($class::schema())) {
+            throw new InvalidArgumentException(
+                "The class '$class' must implement the static method schema()"
+            );
+        }
+
+        $protocolList = $class::schema();
+        foreach ((array)$protocolList as $item) {
+            self::$config[$item] = $class;
+        }
+    }
+
+    /**
+     * @param $connectionUri Uri|string
+     * @return NoSqlInterface|KeyValueInterface
+     */
+    public static function getInstance($connectionUri)
+    {
+        if (empty(self::$config)) {
+            self::registerDriver(AwsDynamoDbDriver::class);
+            self::registerDriver(AwsS3Driver::class);
+            self::registerDriver(CloudflareKV::class);
+            self::registerDriver(MongoDbDriver::class);
+        }
+
+        if (is_string($connectionUri)) {
+            $connectionUri = new Uri($connectionUri);
+        }
+
+        $scheme = $connectionUri->getScheme();
+
+        if (!isset(self::$config[$scheme])) {
+            throw new InvalidArgumentException("The '$scheme' scheme does not exist.");
+        }
+
+        $class = self::$config[$scheme];
+
+        return new $class($connectionUri);
     }
 }

@@ -4,19 +4,18 @@ namespace ByJG\AnyDataset\NoSql;
 
 use ByJG\AnyDataset\Core\IteratorInterface;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\BinderObject;
-use ByJG\Serializer\Exception\InvalidArgumentException;
+use ByJG\Serializer\SerializerObject;
 use ByJG\Util\Exception\CurlException;
+use ByJG\Util\Exception\MessageException;
 use ByJG\Util\HttpClient;
+use ByJG\Util\Psr7\MemoryStream;
 use ByJG\Util\Psr7\Message;
-use ByJG\Util\Psr7\MessageException;
 use ByJG\Util\Psr7\Request;
 use ByJG\Util\Uri;
-use MintWare\Streams\MemoryStream;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
-class CloudflareKV implements KeyValueInterface
+class CloudflareKV implements KeyValueInterface, RegistrableInterface
 {
     protected $username;
     protected $password;
@@ -79,7 +78,6 @@ class CloudflareKV implements KeyValueInterface
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
      * @return mixed|void
-     * @throws InvalidArgumentException
      * @throws CurlException
      * @throws MessageException
      */
@@ -88,7 +86,7 @@ class CloudflareKV implements KeyValueInterface
         $request = $this->request("/bulk", $options)
             ->withMethod("put")
             ->withHeader("Content-Type", "application/json")
-            ->withBody(new MemoryStream(json_encode(BinderObject::toArrayFrom($keyValueArray))));
+            ->withBody(new MemoryStream(json_encode(SerializerObject::instance($keyValueArray)->serialize())));
 
         return $this->checkResult(
             $this->send($request)
@@ -100,6 +98,7 @@ class CloudflareKV implements KeyValueInterface
      * @param array $options
      * @return string
      * @throws CurlException
+     * @throws MessageException
      */
     public function remove($key, $options = [])
     {
@@ -136,7 +135,7 @@ class CloudflareKV implements KeyValueInterface
      */
     protected function send(RequestInterface $request)
     {
-        return $client = HttpClient::getInstance()
+        return HttpClient::getInstance()
             ->sendRequest($request)->getBody()->getContents();
     }
 
@@ -202,10 +201,15 @@ class CloudflareKV implements KeyValueInterface
         if (isset($array["success"]) && !$array["success"]) {
             $errorMsg = "";
             foreach ($array["errors"] as $error) {
-                $errorMsg .= "[${error["code"]}] ${error["message"]}\n";
+                $errorMsg .= "[{$error["code"]}] {$error["message"]}\n";
             }
             throw new CurlException($errorMsg);
         }
         return $array;
+    }
+
+    public static function schema()
+    {
+        return "kv";
     }
 }

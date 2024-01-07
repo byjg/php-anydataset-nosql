@@ -6,11 +6,11 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\Result;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\SerializerObject;
 use ByJG\Util\Uri;
 use InvalidArgumentException;
 
-class AwsDynamoDbDriver implements KeyValueInterface
+class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 {
 
     /**
@@ -100,7 +100,7 @@ class AwsDynamoDbDriver implements KeyValueInterface
             }
 
             $val = [
-                isset($options['Types']) && isset($options['Types'][$key]) ? $options['Types'][$key] : "S" => $val
+                $options['Types'][$key] ?? "S" => $val
             ];
         });
 
@@ -156,12 +156,11 @@ class AwsDynamoDbDriver implements KeyValueInterface
      * @param $value
      * @param array $options
      * @return Result
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
      */
     public function put($key, $value, $options = [])
     {
         if (is_object($value)) {
-            $value = BinderObject::toArrayFrom($value);
+            $value = SerializerObject::instance($value)->serialize();
         }
 
         $this->validateOptions($options);
@@ -213,11 +212,11 @@ class AwsDynamoDbDriver implements KeyValueInterface
     }
 
     /**
-     * @param object[] $key
+     * @param object[] $keys
      * @param array $options
-     * @return mixed
+     * @return void
      */
-    public function removeBatch($key, $options = [])
+    public function removeBatch($keys, $options = [])
     {
         // TODO: Implement removeBatch() method.
     }
@@ -228,5 +227,10 @@ class AwsDynamoDbDriver implements KeyValueInterface
 
     public function client() {
         return $this->dynamoDbClient;
+    }
+
+    public static function schema()
+    {
+        return ["dynamo", "dynamodb"];
     }
 }

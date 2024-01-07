@@ -1,4 +1,4 @@
-version: '2.0'
+version: '3.0'
 services:
 
   mongodb:
@@ -7,20 +7,33 @@ services:
     environment:
       TZ: America/Winnipeg
     ports:
-      - 27017:27017
+      - "27017:27017"
 
   dynanodb:
     container_name: anydataset_nosql_dynamodb
     image: amazon/dynamodb-local
     ports:
-      - 8000:8000
+      - "8000:8000"
+
+#  s3:
+#    container_name: anydataset_nosql_s3
+#    image: minio/minio
+#    environment:
+#      MINIO_ACCESS_KEY: aaa
+#      MINIO_SECRET_KEY: 12345678
+##    command: ["server", "/data"]
+#    ports:
+#      - 9000:9000
 
   s3:
     container_name: anydataset_nosql_s3
-    image: minio/minio
-    environment:
-      MINIO_ACCESS_KEY: aaa
-      MINIO_SECRET_KEY: 12345678
-    command: ["server", "/data"]
+    image: localstack/localstack
     ports:
-      - 9000:9000
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-west-1
+      - AWS_DEFAULT_REGION=us-west-1
+      - HOSTNAME_EXTERNAL=localhost
+      - USE_SSL=false
+      - DEBUG=1

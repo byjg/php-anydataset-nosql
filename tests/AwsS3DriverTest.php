@@ -1,9 +1,8 @@
 <?php
 
-namespace TestsDb\AnyDataset;
-
 use ByJG\AnyDataset\NoSql\AwsS3Driver;
 use ByJG\AnyDataset\NoSql\Factory;
+use ByJG\Util\Uri;
 use PHPUnit\Framework\TestCase;
 
 class AwsS3DriverTest extends TestCase
@@ -13,17 +12,19 @@ class AwsS3DriverTest extends TestCase
      */
     protected $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $awsConnection = getenv("S3_CONNECTION");
         if (!empty($awsConnection)) {
-            $this->object = Factory::getKeyValueInstance($awsConnection);
+            $uri = new Uri($awsConnection);
+            $uri = $uri->withQueryKeyValue("use_path_style_endpoint", "true");
+            $this->object = Factory::getInstance($uri);
             $this->object->remove("KEY");
             $this->object->remove("ANOTHER");
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->object)) {
             $this->object->remove("KEY");
@@ -76,7 +77,7 @@ class AwsS3DriverTest extends TestCase
             str_repeat("0", 256) . str_repeat("1", 256) . str_repeat("2", 250)
         );
 
-        $part1 = $this->object->getChunk("KEY", [], 256, 0);
+        $part1 = $this->object->getChunk("KEY", [], 256);
         $part2 = $this->object->getChunk("KEY", [], 256, 1);
         $part3 = $this->object->getChunk("KEY", [], 256, 2);
 

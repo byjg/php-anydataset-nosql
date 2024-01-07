@@ -2,14 +2,14 @@
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://auth_email:auth_key@account_id/namespace');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://auth_email:auth_key@account_id/namespace');
 ```
 
 ## List all objects
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $iterator = $kv->getIterator();
 print_r($iterator->toArray());
 ```
@@ -18,7 +18,7 @@ You can add some a prefix to search and a limit to search:
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $iterator = $kv->getIterator([
     "prefix" => "prefix_to_match",
     "limit" => 30
@@ -36,7 +36,7 @@ print_r($iterator->toArray());
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $kv->put("object_name", "value");
 ```
 
@@ -44,7 +44,7 @@ Put Bulk:
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $bulk = [
     new \ByJG\AnyDataset\NoSql\KeyValueDocument("key1", "value1"),
     new \ByJG\AnyDataset\NoSql\KeyValueDocument("key2", "value2"),
@@ -57,7 +57,7 @@ $kv->putBatch($bulk);
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $value = $kv->get("object_name");
 ```
 
@@ -65,7 +65,7 @@ $value = $kv->get("object_name");
 
 ```php
 <?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('kv://....');
+$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $kv->remove("object_name");
 
 // or

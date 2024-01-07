@@ -1,7 +1,5 @@
 <?php
 
-namespace TestsDb\AnyDataset;
-
 use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
 use ByJG\AnyDataset\NoSql\Factory;
@@ -40,11 +38,11 @@ class AwsDynamoDbDriverTest extends TestCase
             ]
         ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $awsConnection = getenv("DYNAMODB_CONNECTION");
         if (!empty($awsConnection)) {
-            $this->object = Factory::getKeyValueInstance($awsConnection);
+            $this->object = Factory::getInstance($awsConnection);
 
             $this->createTable();
 
@@ -81,7 +79,7 @@ class AwsDynamoDbDriverTest extends TestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->object)) {
             $this->object->remove(1, $this->options);
@@ -90,6 +88,9 @@ class AwsDynamoDbDriverTest extends TestCase
         }
     }
 
+    /**
+     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     */
     public function testDynamoDbOperations()
     {
         if (empty($this->object)) {

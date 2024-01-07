@@ -2,7 +2,7 @@
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://access_key:secret_key@region/tablename');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://access_key:secret_key@region/tablename');
 ```
 
 The full connection string can be:
@@ -26,7 +26,7 @@ s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/tablename?endpoint=http:
 
 ## Preparing to use DynamoDb
 
-DynamoDb stores the information slightly different than a model dto structure.
+DynamoDb stores the information slightly different from a model dto structure.
 
 Here an example how DynamoDb requires a model:
 
@@ -50,7 +50,7 @@ and a definition more usual is to have :
 ]
 ```
 
-We will use the second definition. However, every put/get/remove method we will need to setup 
+We will use the second definition. However, every put/get/remove method we will need to set up 
 a list of options to define this data model. 
 
 basically we have to create an array with 2 keys:
@@ -77,7 +77,7 @@ The examples below will use this definition.
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $dynamodb->put(
     1201,
     [
@@ -93,7 +93,7 @@ $dynamodb->put(
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $value = $dynamodb->get(1201, $options);
 
 /* Should Return:
@@ -110,7 +110,7 @@ $value = $dynamodb->get(1201, $options);
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $dynamodb->remove(1201);
 ```
 
@@ -123,7 +123,7 @@ Example:
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getKeyValueInstance('dynamodb://....');
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 
 $options = [
    "KeyConditions" => [

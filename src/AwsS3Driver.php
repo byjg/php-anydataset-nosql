@@ -2,14 +2,19 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use Aws\Result;
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Util\Uri;
 
-class AwsS3Driver implements KeyValueInterface
+class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 {
+    const PARAM_BUCKET_ENDPOINT = 'bucket_endpoint';
+    const PARAM_USE_ARN_REGION = 'use_arn_region';
+    const PARAM_USE_ACCELERATE_ENDPOINT = 'use_accelerate_endpoint';
+    const PARAM_USE_PATH_STYLE_ENDPOINT = 'use_path_style_endpoint';
+    const PARAM_DISABLE_MULTIREGION_ACCESS_POINTS = 'disable_multiregion_access_points';
 
     /**
      * @var S3Client
@@ -51,17 +56,29 @@ class AwsS3Driver implements KeyValueInterface
             unset($extraParameters["create"]);
         }
 
-        $s3Parameters = array_merge($defaultParameters, $extraParameters);
+        $s3Parameters = [];
+        foreach (array_merge($defaultParameters, $extraParameters) as $key => $value) {
+            if (is_string($value)) {
+                if (strtolower($value) === "true") {
+                    $value = true;
+                } elseif (strtolower($value) === "false") {
+                    $value = false;
+                } elseif (is_numeric($value)) {
+                    $value = 0 + $value;
+                }
+            }
+            $s3Parameters[$key] = $value;
+        }
 
         $this->s3Client = new S3Client($s3Parameters);
 
         $this->bucket = preg_replace('~^/~', '', $uri->getPath());
 
         try {
-            $result = $this->s3Client->headBucket([
+            $this->s3Client->headBucket([
                 'Bucket' => $this->bucket,
             ]);
-        } catch (\Aws\S3\Exception\S3Exception $ex) {
+        } catch (S3Exception $ex) {
             if (strpos($ex->getMessage(), "404") !== false && $createBucket) {
                 $this->s3Client->createBucket([
                     'ACL' => 'private',
@@ -89,9 +106,6 @@ class AwsS3Driver implements KeyValueInterface
             $options
         );
 
-        /**
-         * @var Result
-         */
         $result = $this->s3Client->listObjects($data);
 
         $contents = [];
@@ -165,7 +179,7 @@ class AwsS3Driver implements KeyValueInterface
         $options = array_merge(
             $options,
             [
-                'Range' => "bytes=${part}-${untilByte}"
+                'Range' => "bytes=$part-$untilByte"
             ]
         );
 
@@ -183,16 +197,21 @@ class AwsS3Driver implements KeyValueInterface
     }
 
     /**
-     * @param object[] $key
+     * @param object[] $keys
      * @param array $options
-     * @return mixed
+     * @return void
      */
-    public function removeBatch($key, $options = [])
+    public function removeBatch($keys, $options = [])
     {
         // TODO: Implement removeBatch() method.
     }
 
     public function client() {
         return $this->s3Client;
+    }
+
+    public static function schema()
+    {
+        return "s3";
     }
 }
