@@ -4,23 +4,23 @@ namespace ByJG\AnyDataset\NoSql;
 
 class NoSqlDocument
 {
-    protected $idDocument;
+    protected ?string $idDocument;
 
-    protected $collection;
+    protected ?string $collection;
 
-    protected $document;
+    protected mixed $document;
 
-    protected $subDocument = [];
+    protected array $subDocument = [];
 
 
     /**
      * NoSqlDocument constructor.
      *
-     * @param $idDocument
-     * @param $collection
+     * @param string|null $idDocument
+     * @param string|null $collection
      * @param array $document
      */
-    public function __construct($idDocument = null, $collection = null, $document = [])
+    public function __construct(?string $idDocument = null, ?string $collection = null, array $document = [])
     {
         $this->idDocument = $idDocument;
         $this->collection = $collection;
@@ -29,27 +29,27 @@ class NoSqlDocument
     }
 
     /**
-     * @return null
+     * @return string|null
      */
-    public function getIdDocument()
+    public function getIdDocument(): ?string
     {
         return $this->idDocument;
     }
 
     /**
-     * @param null $idDocument
+     * @param string|null $idDocument
      * @return $this
      */
-    public function setIdDocument($idDocument)
+    public function setIdDocument(?string $idDocument): self
     {
         $this->idDocument = $idDocument;
         return $this;
     }
 
     /**
-     * @return null
+     * @return string|null
      */
-    public function getCollection()
+    public function getCollection(): ?string
     {
         return $this->collection;
     }
@@ -58,7 +58,7 @@ class NoSqlDocument
      * @param null $collection
      * @return $this
      */
-    public function setCollection($collection)
+    public function setCollection(mixed $collection): self
     {
         $this->collection = $collection;
         return $this;
@@ -68,7 +68,7 @@ class NoSqlDocument
     /**
      * @return array
      */
-    public function getDocument()
+    public function getDocument(): array
     {
         return $this->document;
     }
@@ -77,13 +77,13 @@ class NoSqlDocument
      * @param array $document
      * @return $this
      */
-    public function setDocument($document)
+    public function setDocument(array $document): self
     {
         $this->document = $document;
         return $this;
     }
 
-    public function addSubDocument(NoSqlDocument $document)
+    public function addSubDocument(NoSqlDocument $document): void
     {
         $this->subDocument[] = $document;
     }

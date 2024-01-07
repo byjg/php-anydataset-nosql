@@ -2,6 +2,7 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
+use Aws\Result;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use ByJG\AnyDataset\Core\GenericIterator;
@@ -19,12 +20,12 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
     /**
      * @var S3Client
      */
-    protected $s3Client;
+    protected S3Client $s3Client;
 
     /**
      * @var string
      */
-    protected $bucket;
+    protected string $bucket;
 
     /**
      * AwsS3Driver constructor.
@@ -33,7 +34,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
      *
      * @param string $connectionString
      */
-    public function __construct($connectionString)
+    public function __construct(string $connectionString)
     {
         $uri = new Uri($connectionString);
 
@@ -79,7 +80,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
                 'Bucket' => $this->bucket,
             ]);
         } catch (S3Exception $ex) {
-            if (strpos($ex->getMessage(), "404") !== false && $createBucket) {
+            if (str_contains($ex->getMessage(), "404") && $createBucket) {
                 $this->s3Client->createBucket([
                     'ACL' => 'private',
                     'Bucket' => $this->bucket,
@@ -97,7 +98,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return GenericIterator
      */
-    public function getIterator($options = [])
+    public function getIterator(array $options = []): GenericIterator
     {
         $data = array_merge(
             [
@@ -115,7 +116,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return (new ArrayDataset($contents))->getIterator();
     }
 
-    public function get($key, $options = [])
+    public function get(string $key, array $options = []): mixed
     {
         $data = array_merge(
             [
@@ -130,7 +131,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $result["Body"]->getContents();
     }
 
-    public function put($key, $value, $options = [])
+    public function put(string $key, mixed $value, array $options = []): Result
     {
         $data = array_merge(
             [
@@ -152,7 +153,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $this->s3Client->putObject($data);
     }
 
-    public function remove($key, $options = [])
+    public function remove(string $key, array $options = []): bool
     {
         $data = array_merge(
             [
@@ -163,9 +164,10 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         );
 
         $this->s3Client->deleteObject($data);
+        return true;
     }
 
-    public function getDbConnection()
+    public function getDbConnection(): S3Client
     {
         return $this->s3Client;
     }
@@ -189,29 +191,32 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @return void
+     * @return mixed
      */
-    public function putBatch($keyValueArray, $options = [])
+    public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         // TODO: Implement putBatch() method.
+        return null;
     }
 
     /**
      * @param object[] $keys
      * @param array $options
-     * @return void
+     * @return mixed
      */
-    public function removeBatch($keys, $options = [])
+    public function removeBatch(array $keys, array $options = []): mixed
     {
         // TODO: Implement removeBatch() method.
+        return null;
     }
 
-    public function client() {
+    public function client(): S3Client
+    {
         return $this->s3Client;
     }
 
-    public static function schema()
+    public static function schema(): array
     {
-        return "s3";
+        return ["s3"];
     }
 }

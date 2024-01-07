@@ -25,22 +25,22 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * @var array
      */
-    private $excludeMongoClass;
+    private array $excludeMongoClass;
 
     /**
      *
-     * @var Manager;
+     * @var Manager|null;
      */
-    protected $mongoManager = null;
+    protected ?Manager $mongoManager = null;
 
     /**
      * Enter description here...
      *
      * @var Uri
      */
-    protected $connectionUri;
+    protected Uri $connectionUri;
 
-    protected $database;
+    protected string $database;
 
     /**
      * Creates a new MongoDB connection.
@@ -91,20 +91,20 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * Gets the instance of MongoDB; You do not need uses this directly.
      * If you have to, probably something is missing in this class
-     * @return Manager
+     * @return Manager|null
      */
-    public function getDbConnection()
+    public function getDbConnection(): ?Manager
     {
         return $this->mongoManager;
     }
 
     /**
-     * @param $idDocument
+     * @param string $idDocument
      * @param null $collection
      * @return NoSqlDocument|null
      * @throws Exception
      */
-    public function getDocumentById($idDocument, $collection = null)
+    public function getDocumentById(string $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
         $filter->addRelation('_id', Relation::EQUAL, $idDocument);
@@ -123,7 +123,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @return NoSqlDocument[]|null
      * @throws Exception
      */
-    public function getDocuments(IteratorFilter $filter, $collection = null)
+    public function getDocuments(IteratorFilter $filter, mixed $collection = null): ?array
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -154,7 +154,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $result;
     }
 
-    protected function getMongoFilterArray(IteratorFilter $filter)
+    protected function getMongoFilterArray(IteratorFilter $filter): Query
     {
         $result = [];
 
@@ -204,15 +204,16 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return new Query($result);
     }
 
-    public function deleteDocumentById($idDocument, $collection = null)
+    public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
         $filter->addRelation('_id', Relation::EQUAL, $idDocument);
         $this->deleteDocuments($filter, $collection);
+        return null;
     }
 
 
-    public function deleteDocuments(IteratorFilter $filter, $collection = null)
+    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): mixed
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -227,13 +228,14 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $bulkWrite,
             $writeConcern
         );
+        return null;
     }
 
     /**
      * @param NoSqlDocument $document
      * @return NoSqlDocument
      */
-    public function save(NoSqlDocument $document)
+    public function save(NoSqlDocument $document): NoSqlDocument
     {
         if (empty($document->getCollection())) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -273,8 +275,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $document;
     }
 
-    public static function schema()
+    public static function schema(): array
     {
-        return "mongodb";
+        return ["mongodb", "mongo"];
     }
 }

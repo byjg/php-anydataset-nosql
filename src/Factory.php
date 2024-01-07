@@ -7,13 +7,13 @@ use InvalidArgumentException;
 
 class Factory
 {
-    private static $config = [];
+    private static array $config = [];
 
     /**
      * @param string $class
      * @return void
      */
-    public static function registerDriver($class)
+    public static function registerDriver(string $class): void
     {
         if (!in_array(RegistrableInterface::class, class_implements($class))) {
             throw new InvalidArgumentException(
@@ -21,6 +21,7 @@ class Factory
             );
         }
 
+        /** @var RegistrableInterface $class */
         if (empty($class::schema())) {
             throw new InvalidArgumentException(
                 "The class '$class' must implement the static method schema()"
@@ -28,7 +29,7 @@ class Factory
         }
 
         $protocolList = $class::schema();
-        foreach ((array)$protocolList as $item) {
+        foreach ($protocolList as $item) {
             self::$config[$item] = $class;
         }
     }
@@ -37,7 +38,7 @@ class Factory
      * @param $connectionUri Uri|string
      * @return NoSqlInterface|KeyValueInterface
      */
-    public static function getInstance($connectionUri)
+    public static function getInstance(Uri|string $connectionUri): NoSqlInterface|KeyValueInterface
     {
         if (empty(self::$config)) {
             self::registerDriver(AwsDynamoDbDriver::class);

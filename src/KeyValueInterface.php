@@ -6,33 +6,32 @@ use ByJG\AnyDataset\Core\GenericIterator;
 
 interface KeyValueInterface
 {
-
     /**
      * @param array $options
      * @return GenericIterator
      */
-    public function getIterator($options = []);
+    public function getIterator(array $options = []): GenericIterator;
 
-    public function get($key, $options = []);
+    public function get(string $key, array $options = []): mixed;
 
-    public function put($key, $value, $options = []);
+    public function put(string $key, mixed $value, array $options = []): mixed;
 
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
      * @return void
      */
-    public function putBatch($keyValueArray, $options = []);
+    public function putBatch(array $keyValueArray, array $options = []): mixed;
 
-    public function remove($key, $options = []);
+    public function remove(string $key, array $options = []): mixed;
 
     /**
      * @param object[] $keys
      * @param array $options
-     * @return mixed
+     * @return void
      */
-    public function removeBatch($keys, $options = []);
+    public function removeBatch(array $keys, array $options = []): mixed;
 
-    public function getDbConnection();
+    public function getDbConnection(): mixed;
 
 }
