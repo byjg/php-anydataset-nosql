@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
 use ByJG\AnyDataset\NoSql\Factory;

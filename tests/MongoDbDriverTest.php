@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 use ByJG\AnyDataset\Core\Enum\Relation;
 use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
@@ -98,8 +100,7 @@ class MongoDbDriverTest extends TestCase
         $data = $document[0]->getDocument();
         $this->assertNotEmpty($data['_id']);
         $this->assertNotEmpty($data['created']);
-        $this->assertNotEmpty($data['updated']);
-        $this->assertEquals($data['created']->toDatetime(), $data['updated']->toDatetime());
+        $this->assertArrayNotHasKey('updated', $data);
         unset($data['_id']);
         unset($data['created']);
         unset($data['updated']);

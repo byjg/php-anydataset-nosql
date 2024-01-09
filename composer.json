@@ -6,6 +6,11 @@
       "ByJG\\AnyDataset\\NoSql\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {

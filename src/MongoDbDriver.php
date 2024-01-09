@@ -107,7 +107,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function getDocumentById(string $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
-        $filter->addRelation('_id', Relation::EQUAL, $idDocument);
+        $filter->addRelation('_id', Relation::EQUAL, new ObjectID($idDocument));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -253,14 +253,17 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $idDocument = $data['_id'] ?? null;
         }
 
-        $data['updated'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
             $data['_id'] = $idDocument = new ObjectID();
             $data['created'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
+            if (!($idDocument instanceof ObjectID)) {
+                $idDocument = new ObjectID($idDocument);
+            }
             $data['_id'] = $idDocument;
-            $bulkWrite->update(['_id' => $idDocument], ["\$set" => $data]);
+            $data['updated'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
+            $bulkWrite->update(['_id' => $idDocument], ['$set' => $data], ['multi' => false, 'upsert' => true]);
         }
 
         $this->mongoManager->executeBulkWrite(
