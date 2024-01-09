@@ -4,7 +4,7 @@ namespace ByJG\AnyDataset\NoSql;
 
 use ByJG\AnyDataset\Core\Enum\Relation;
 use ByJG\AnyDataset\Core\IteratorFilter;
-use ByJG\Serializer\SerializerObject;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use DateTime;
 use InvalidArgumentException;
@@ -145,9 +145,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $result[] = new NoSqlDocument(
                 $item->_id,
                 $collection,
-                SerializerObject::instance($item)
+                Serialize::from($item)
                     ->withDoNotParse($this->excludeMongoClass)
-                    ->serialize()
+                    ->toArray()
             );
         }
 
@@ -244,9 +244,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
         $bulkWrite = new BulkWrite();
 
-        $data = SerializerObject::instance($document->getDocument())
+        $data = Serialize::from($document->getDocument())
             ->withDoNotParse($this->excludeMongoClass)
-            ->serialize();
+            ->toArray();
 
         $idDocument = $document->getIdDocument();
         if (empty($idDocument)) {
