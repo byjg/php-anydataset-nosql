@@ -1,26 +1,22 @@
-# AnyDataset-NoSql
+# AnyDataset-DB
 
-[![Build Status](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml)
+[![Build Status](https://github.com/byjg/php-anydataset-db/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-anydataset-db/actions/workflows/phpunit.yml)
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
-[![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-anydataset-nosql/)
-[![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
-[![GitHub release](https://img.shields.io/github/release/byjg/php-anydataset-nosql.svg)](https://github.com/byjg/php-anydataset-nosql/releases/)
+[![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-anydataset-db/)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-db.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub release](https://img.shields.io/github/release/byjg/php-anydataset-db.svg)](https://github.com/byjg/php-anydataset-db/releases/)
 
-Anydataset NoSQL standardize the access to non-relational databases/repositories and treat them as Key/Value.
-The implementation can work with:
+Anydataset Database Relational abstraction. Anydataset is an agnostic data source abstraction layer in PHP.
 
-- MongoDB
-- Cloudflare KV
-- S3
-- DynamoDB
-
-Anydataset is an agnostic data source abstraction layer in PHP. See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
+See more about Anydataset [here](https://opensource.byjg.com/anydataset).
 
 ## Features
 
-- Access as Key/Value repositories different datasource
-- Allow put and get data
-- Simplified way to connect to the datasources
+- Connection based on URI
+- Support and fix code tricks with several databases (MySQL, PostgresSql, MS SQL Server, etc)
+- Natively supports Query Cache by implementing a PSR-6 interface
+- Supports Connection Routes based on regular expression against the queries, that's mean a select in a table should be
+executed in a database and in another table should be executed in another (even if in different DB)
 
 ## Connection Based on URI
 
@@ -28,73 +24,56 @@ The connection string for databases is based on URL.
 
 See below the current implemented drivers:
 
-| Datasource                                  | Connection String                                        |
-|---------------------------------------------|----------------------------------------------------------|
-| [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
-| [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
-| [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
-| [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
+| Database            | Connection String                                 | Factory                   |
+|---------------------|---------------------------------------------------|---------------------------|
+| Sqlite              | sqlite:///path/to/file                            | getDbRelationalInstance() |
+| MySql/MariaDb       | mysql://username:password@hostname:port/database  | getDbRelationalInstance() |
+| Postgres            | psql://username:password@hostname:port/database   | getDbRelationalInstance() |
+| Sql Server (DbLib)  | dblib://username:password@hostname:port/database  | getDbRelationalInstance() |
+| Sql Server (Sqlsrv) | sqlsrv://username:password@hostname:port/database | getDbRelationalInstance() |
+| Oracle (OCI)        | oci://username:password@hostname:port/database    | getDbRelationalInstance() |
+| Oracle (OCI8)       | oci8://username:password@hostname:port/database   | getDbRelationalInstance() |
+| Generic PDO         | pdo://username:password@pdo_driver?PDO_PARAMETERS | getDbRelationalInstance() |
 
+```php
+<?php
+$conn = \ByJG\AnyDataset\Db\Factory::getDbRelationalInstance("mysql://root:password@10.0.1.10/myschema");
+```
 
 ## Examples
 
-Check implementation examples on [https://opensource.byjg.com/php/anydataset-nosql](https://opensource.byjg.com/php/anydataset-nosql)
+- [Basic Query and Update](basic-query.md)
+- [Cache results](cache.md)
+- [Database Transaction](transaction.md)
+- [Load Balance and Connection Pooling](load-balance.md)
+- [Database Helper](helper.md)
+
+## Advanced Topics
+
+- [Passing Parameters to PDODriver](parameters.md)
+- [MySQL SSL Connection](mysql-ssl.md)
+- [FreeTDS/Dblib Date Issue](freetds.md)
+- [Generic PDO Driver](generic-pdo-driver.md)
+- [Running Tests](tests.md)
+
 
 ## Install
 
-Just type: 
+Just type:
 
 ```bash
-composer require "byjg/anydataset-nosql"
+composer require "byjg/anydataset"
 ```
-
-## Running Unit tests
-
-```bash
-docker-compose up -d
-export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
-export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:4566"
-export DYNAMODB_CONNECTION="dynamodb://accesskey:secretkey@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
-vendor/bin/phpunit
-```
-
-
-### Setup MongoDB for the unit test
-
-Set the environment variable:
-
-- MONGODB_CONNECTION = "mongodb://127.0.0.1/test"
-
-### Setup AWS DynamoDb for the unit test
-
-Set the environment variable:
- 
-- DYNAMODB_CONNECTION = "dynamodb://accesskey:secretkey@region/tablename"
-
-### Setup AWS S3 for the unit test
-
-Set the environment variable:
- 
-- S3_CONNECTION = "s3://accesskey:secretkey@region/bucketname"
-
-
-### Cloudflare KV
-
-Set the environment variable:
- 
-- CLOUDFLAREKV_CONNECTION = "kv://email:authkey@accountid/namespaceid"
 
 ## Dependencies
 
 ```mermaid
 flowchart TD
-   byjg/anydataset-nosql --> ext-curl
-   byjg/anydataset-nosql --> aws/aws-sdk-php
-   byjg/anydataset-nosql --> byjg/anydataset
-   byjg/anydataset-nosql --> byjg/anydataset-array
-   byjg/anydataset-nosql --> byjg/serializer
-   byjg/anydataset-nosql --> byjg/webrequest
-   byjg/anydataset-nosql --> ext-json
+    byjg/anydataset-db --> byjg/anydataset-array
+    byjg/anydataset-db --> ext-pdo
+    byjg/anydataset-db --> byjg/uri
+    byjg/anydataset-db --> psr/cache
+    byjg/anydataset-db --> psr/log
 ```
 
 ----
