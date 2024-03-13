@@ -81,5 +81,22 @@ while (strlen($data) <= $size) {
 }
 ```
 
+## Rename a key
+
+```php
+<?php
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
+$s3->rename("object_name", "new_object_name");
+```
+
+## Check if a key exists
+
+```php
+<?php
+$s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
+if ($s3->has("object_name")) {
+    echo "exist!";
+}
+```
 ----
 [Open source ByJG](http://opensource.byjg.com)

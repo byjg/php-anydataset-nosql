@@ -214,4 +214,21 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
     {
         return "s3";
     }
+
+    public function rename($oldKey, $newKey)
+    {
+        $data = [
+            'Bucket' => $this->bucket,
+            'Key'    => $newKey,
+            'CopySource' => "{$this->bucket}/{$oldKey}",
+        ];
+
+        $this->s3Client->copyObject($data);
+        $this->remove($oldKey);
+    }
+
+    public function has($key, $options = [])
+    {
+        return $this->s3Client->doesObjectExistV2($this->bucket, $key, false, $options);
+    }
 }
