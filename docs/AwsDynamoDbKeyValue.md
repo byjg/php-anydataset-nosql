@@ -140,6 +140,16 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
+### Check if a key exists
+
+```php
+<?php
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+if ($dynamodb->has(1201)) {
+    echo "exist!";
+}
+```
+
 ## Further reading
 
 - [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
