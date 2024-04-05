@@ -68,15 +68,16 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $database = $path;
         $username = $this->connectionUri->getUsername();
         $password = $this->connectionUri->getPassword();
+        parse_str($this->connectionUri->getQuery(), $options);
 
-        if ($username != '' && $password != '') {
-            $auth = array('username' => $username, 'password' => $password, 'connect' => 'true');
+        if (!empty($username) && !empty($password)) {
+            $auth = "$username:$password@";
         } else {
-            $auth = array('connect' => 'true');
+            $auth = "";
         }
 
-        $connectString = sprintf('mongodb://%s:%d', $hosts, $port);
-        $this->mongoManager = new Manager($connectString, $auth);
+        $connectString = sprintf('mongodb://%s%s:%d', $auth, $hosts, $port);
+        $this->mongoManager = new Manager($connectString, $options);
         $this->database = $database;
     }
 

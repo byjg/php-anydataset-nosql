@@ -73,7 +73,9 @@ class MongoDbDriverTest extends TestCase
     public function tearDown(): void
     {
         if (!empty($this->dbDriver)) {
-            $this->dbDriver->deleteDocuments(new IteratorFilter(), self::TEST_COLLECTION);
+            $filter = new IteratorFilter();
+            $filter->addRelation('brand', Relation::NOT_EQUAL, 'Toyota');
+            $this->dbDriver->deleteDocuments($filter, self::TEST_COLLECTION);
         }
     }
 
