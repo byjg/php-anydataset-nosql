@@ -42,6 +42,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
     protected $database;
 
+    protected $idField;
+
     /**
      * Creates a new MongoDB connection.
      *
@@ -69,6 +71,17 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $username = $this->connectionUri->getUsername();
         $password = $this->connectionUri->getPassword();
         parse_str($this->connectionUri->getQuery(), $options);
+        $uriOptions = [];
+        $driverOptions = [];
+        foreach ($options as $key => $value) {
+            if (strpos($key, 'uri.') === 0) {
+                $options[$key] = $value;
+            } elseif (strpos($key, 'driver.') === 0) {
+                $driverOptions[$key] = $value;
+            } else {
+                throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
+            }
+        }
 
         if (!empty($username) && !empty($password)) {
             $auth = "$username:$password@";
@@ -77,7 +90,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         }
 
         $connectString = sprintf('mongodb://%s%s:%d', $auth, $hosts, $port);
-        $this->mongoManager = new Manager($connectString, $options);
+        $this->mongoManager = new Manager($connectString, $uriOptions, $driverOptions);
         $this->database = $database;
     }
 
@@ -252,10 +265,10 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $idDocument = $data['_id'] ?? null;
         }
 
-        $data['updated'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
+        $data['updatedAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
             $data['_id'] = $idDocument = new ObjectID();
-            $data['created'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
+            $data['createdAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
             $data['_id'] = $idDocument;

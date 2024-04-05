@@ -2,6 +2,8 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
+use ByJG\Serializer\BinderObject;
+
 class NoSqlDocument
 {
     protected $idDocument;
@@ -66,11 +68,18 @@ class NoSqlDocument
 
 
     /**
-     * @return array
+     * @return array|object
      */
-    public function getDocument()
+    public function getDocument($entityClass = null)
     {
-        return $this->document;
+        if (is_null($entityClass)) {
+            return $this->document;
+        }
+
+        $entity = new $entityClass();
+        BinderObject::bind($this->document, $entity);
+
+        return $entity;
     }
 
     /**
