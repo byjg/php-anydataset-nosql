@@ -3,7 +3,7 @@ services:
 
   mongodb:
     container_name: anydataset_nosql_mongodb
-    image: mongo:3
+    image: mongo:7
     environment:
       TZ: America/Winnipeg
     ports:
