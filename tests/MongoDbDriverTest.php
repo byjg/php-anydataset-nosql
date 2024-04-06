@@ -220,6 +220,12 @@ class MongoDbDriverTest extends TestCase
         // Check if object do not exist
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertEmpty($document);
+
+        // Check if other objects weren't deleted
+        $filter = new IteratorFilter();
+        $filter->addRelation('name', Relation::EQUAL, 'Hilux');
+        $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(1, $document);
     }
 
     /**
@@ -287,5 +293,40 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('Cobalt', $documents[0]->getDocument()['name']);
         $this->assertEquals('Chevrolet', $documents[0]->getDocument()['brand']);
         $this->assertEquals('60000', $documents[0]->getDocument()['price']);
+    }
+
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
+    public function testBulkUpdate()
+    {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
+        // Get the Object to test
+        $filter = new IteratorFilter();
+        $filter->addRelation('brand', Relation::IN, ['Toyota', 'Audi']);
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(3, $documentList);
+        foreach ($documentList as $document) {
+            $this->assertNotEquals('30000', $document->getDocument()['price']);
+        }
+
+        // Delete
+        $this->dbDriver->updateDocuments($filter, ["price" => 30000], self::TEST_COLLECTION);
+
+        // Check if object do not exist
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(3, $documentList);
+        foreach ($documentList as $document) {
+            $this->assertEquals('30000', $document->getDocument()['price']);
+        }
+
+        // Check if other objects weren't deleted
+        $filter = new IteratorFilter();
+        $filter->addRelation('name', Relation::EQUAL, 'Hilux');
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(1, $documentList);
     }
 }

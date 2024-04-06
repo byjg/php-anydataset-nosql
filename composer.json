@@ -17,7 +17,7 @@
     "php": ">=7.4",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
-    "byjg/anydataset": "4.9.*",
+    "byjg/anydataset": "4.9.x-dev",
     "byjg/anydataset-array": "4.9.*",
     "byjg/serializer": "4.9.*",
     "byjg/webrequest": "4.9.*",
