@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use MongoDB\BSON\UTCDateTime;
+
 class Document
 {
     protected ?string $_id;
@@ -11,9 +13,9 @@ class Document
 
     protected ?int $price;
 
-    protected mixed $createdAt;
+    protected ?UTCDateTime $createdAt;
 
-    protected mixed $updatedAt;
+    protected ?UTCDateTime $updatedAt;
 
     public function __construct(?string $name = null, ?string $brand = null, ?int $price = null)
     {
@@ -89,7 +91,7 @@ class Document
     /**
      * @return mixed|null
      */
-    public function getCreatedAt(): mixed
+    public function getCreatedAt(): UTCDateTime
     {
         return $this->createdAt;
     }
@@ -97,7 +99,7 @@ class Document
     /**
      * @param mixed|null $createdAt
      */
-    public function setCreatedAt(mixed $createdAt): void
+    public function setCreatedAt(?UTCDateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
@@ -105,7 +107,7 @@ class Document
     /**
      * @return mixed|null
      */
-    public function getUpdatedAt(): mixed
+    public function getUpdatedAt(): ?UTCDateTime
     {
         return $this->updatedAt;
     }
@@ -113,7 +115,7 @@ class Document
     /**
      * @param mixed|null $updatedAt
      */
-    public function setUpdatedAt(mixed $updatedAt): void
+    public function setUpdatedAt(?UTCDateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
