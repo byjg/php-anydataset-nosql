@@ -3,9 +3,10 @@ services:
 
   mongodb:
     container_name: anydataset_nosql_mongodb
-    image: mongo:3
+    image: mongo:7
     environment:
-      TZ: America/Winnipeg
+      MONGO_INITDB_ROOT_USERNAME: rootuser
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
     ports:
       - "27017:27017"
 

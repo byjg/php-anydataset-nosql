@@ -212,4 +212,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     {
         return "kv";
     }
+
+    public function rename($oldKey, $newKey)
+    {
+        // TODO: Implement rename() method.
+    }
+
+    public function has($key, $options = [])
+    {
+        // TODO: Implement has() method.
+    }
 }

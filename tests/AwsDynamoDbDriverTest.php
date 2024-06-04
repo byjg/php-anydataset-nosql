@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
 use ByJG\AnyDataset\NoSql\Factory;
@@ -102,8 +104,12 @@ class AwsDynamoDbDriverTest extends TestCase
         $this->assertEquals(0, $iterator->count());
 
         // Add an element
+        $this->assertFalse($this->object->has(1, $this->options));
+        $this->assertFalse($this->object->has(2, $this->options));
         $this->object->put(1, ["Name" => "John", "SurName" => "Doe"], $this->options);
         $this->object->put(2, ["Name" => "Jane", "SurName" => "Smith"], $this->options);
+        $this->assertTrue($this->object->has(1, $this->options));
+        $this->assertTrue($this->object->has(2, $this->options));
 
         // Check new elements
         $iterator = $this->object->getIterator($this->queryOptions);

@@ -42,6 +42,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
     protected $database;
 
+    protected $idField;
+
     /**
      * Creates a new MongoDB connection.
      *
@@ -68,15 +70,27 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $database = $path;
         $username = $this->connectionUri->getUsername();
         $password = $this->connectionUri->getPassword();
-
-        if ($username != '' && $password != '') {
-            $auth = array('username' => $username, 'password' => $password, 'connect' => 'true');
-        } else {
-            $auth = array('connect' => 'true');
+        parse_str($this->connectionUri->getQuery(), $options);
+        $uriOptions = [];
+        $driverOptions = [];
+        foreach ($options as $key => $value) {
+            if (strpos($key, 'uri.') === 0) {
+                $options[$key] = $value;
+            } elseif (strpos($key, 'driver.') === 0) {
+                $driverOptions[$key] = $value;
+            } else {
+                throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
+            }
         }
 
-        $connectString = sprintf('mongodb://%s:%d', $hosts, $port);
-        $this->mongoManager = new Manager($connectString, $auth);
+        if (!empty($username) && !empty($password)) {
+            $auth = "$username:$password@";
+        } else {
+            $auth = "";
+        }
+
+        $connectString = sprintf('mongodb://%s%s:%d', $auth, $hosts, $port);
+        $this->mongoManager = new Manager($connectString, $uriOptions, $driverOptions);
         $this->database = $database;
     }
 
@@ -131,7 +145,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
         $dataCursor = $this->mongoManager->executeQuery(
             $this->database . '.' . $collection,
-            $this->getMongoFilterArray($filter)
+            new Query($this->getMongoFilterArray($filter))
         );
 
         if (empty($dataCursor)) {
@@ -154,9 +168,43 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $result;
     }
 
-    protected function getMongoFilterArray(IteratorFilter $filter)
+    protected function getMongoFilterArray(IteratorFilter $filter): array
     {
         $result = [];
+
+        $data = [
+            Relation::EQUAL => function ($value) {
+                return $value;
+            },
+            Relation::GREATER_THAN => function ($value) {
+                return [ '$gt' => $value ];
+            },
+            Relation::LESS_THAN => function ($value) {
+                return [ '$lt' => $value ];
+            },
+            Relation::GREATER_OR_EQUAL_THAN => function ($value) {
+                return [ '$gte' => $value ];
+            },
+            Relation::LESS_OR_EQUAL_THAN => function ($value) {
+                return [ '$lte' => $value ];
+            },
+            Relation::NOT_EQUAL => function ($value) {
+                return [ '$ne' => $value ];
+            },
+            Relation::STARTS_WITH => function ($value) {
+                return [ '$regex' => "^$value" ];
+            },
+            Relation::CONTAINS => function ($value) {
+                return [ '$regex' => "$value" ];
+            },
+            Relation::IN => function ($value) {
+                return [ '$in' => $value ];
+            },
+            Relation::NOT_IN => function ($value) {
+                return [ '$nin' => $value ];
+            },
+        ];
+
 
         foreach ($filter->getRawFilters() as $itemFilter) {
             $name = $itemFilter[1];
@@ -171,37 +219,10 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
                 throw new InvalidArgumentException('MongoDBDriver does not support filtering the same field twice');
             }
 
-            $data = [
-                Relation::EQUAL => function ($value) {
-                    return $value;
-                },
-                Relation::GREATER_THAN => function ($value) {
-                    return [ '$gt' => $value ];
-                },
-                Relation::LESS_THAN => function ($value) {
-                    return [ '$lt' => $value ];
-                },
-                Relation::GREATER_OR_EQUAL_THAN => function ($value) {
-                    return [ '$gte' => $value ];
-                },
-                Relation::LESS_OR_EQUAL_THAN => function ($value) {
-                    return [ '$lte' => $value ];
-                },
-                Relation::NOT_EQUAL => function ($value) {
-                    return [ '$ne' => $value ];
-                },
-                Relation::STARTS_WITH => function ($value) {
-                    return [ '$regex' => "^$value" ];
-                },
-                Relation::CONTAINS => function ($value) {
-                    return [ '$regex' => "$value" ];
-                },
-            ];
-            
             $result[$name] = $data[$relation]($value);
         }
 
-        return new Query($result);
+        return $result;
     }
 
     public function deleteDocumentById($idDocument, $collection = null)
@@ -219,9 +240,27 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         }
 
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
-        $bulkWrite = new BulkWrite();
 
-        $bulkWrite->delete($this->getMongoFilterArray($filter));
+        $query = $this->getMongoFilterArray($filter);
+        $bulkWrite = new BulkWrite();
+        $bulkWrite->delete($query);
+        $this->mongoManager->executeBulkWrite(
+            $this->database . '.' . $collection,
+            $bulkWrite,
+            $writeConcern
+        );
+    }
+
+    public function updateDocuments(IteratorFilter $filter, $data, $collection = null)
+    {
+        if (empty($collection)) {
+            throw new InvalidArgumentException('Collection is mandatory for MongoDB');
+        }
+
+        $query = $this->getMongoFilterArray($filter);
+        $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
+        $bulkWrite = new BulkWrite();
+        $bulkWrite->update($query, ["\$set" => $data], ["multi" => 1]);
         $this->mongoManager->executeBulkWrite(
             $this->database . '.' . $collection,
             $bulkWrite,
@@ -251,10 +290,10 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $idDocument = $data['_id'] ?? null;
         }
 
-        $data['updated'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
+        $data['updatedAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
             $data['_id'] = $idDocument = new ObjectID();
-            $data['created'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
+            $data['createdAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
             $data['_id'] = $idDocument;

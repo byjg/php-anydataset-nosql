@@ -13,6 +13,8 @@ interface KeyValueInterface
      */
     public function getIterator($options = []);
 
+    public function has($key, $options = []);
+
     public function get($key, $options = []);
 
     public function put($key, $value, $options = []);
@@ -34,5 +36,7 @@ interface KeyValueInterface
     public function removeBatch($keys, $options = []);
 
     public function getDbConnection();
+
+    public function rename($oldKey, $newKey);
 
 }

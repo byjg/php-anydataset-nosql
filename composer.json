@@ -6,6 +6,11 @@
       "ByJG\\AnyDataset\\NoSql\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
@@ -24,6 +29,9 @@
   "suggest": {
     "ext-mongodb": "*",
     "byjg/cache-engine": "4.9.*"
+  },
+  "provide": {
+    "byjg/anydataset-implementation": "1.0"
   },
   "license": "MIT"
 }
