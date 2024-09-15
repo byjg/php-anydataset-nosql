@@ -12,11 +12,13 @@ interface KeyValueInterface
      */
     public function getIterator(array $options = []): GenericIterator;
 
-    public function has(string $key, array $options = []): bool;
+    public function has(string|int|object $key, array $options = []): bool;
 
-    public function get(string $key, array $options = []): mixed;
+    public function get(string|int|object $key, array $options = []): mixed;
 
-    public function put(string $key, mixed $value, array $options = []): mixed;
+    public function put(string|int|object $key, mixed $value, array $options = []): mixed;
+
+    public function getChunk(string|int|object $key, array $options = [], int $size = 1024, int $offset = 0): mixed;
 
     /**
      * @param KeyValueDocument[] $keyValueArray
@@ -25,7 +27,7 @@ interface KeyValueInterface
      */
     public function putBatch(array $keyValueArray, array $options = []): mixed;
 
-    public function remove(string $key, array $options = []): mixed;
+    public function remove(string|int|object $key, array $options = []): mixed;
 
     /**
      * @param object[] $keys
@@ -36,6 +38,6 @@ interface KeyValueInterface
 
     public function getDbConnection(): mixed;
 
-    public function rename(string $oldKey, string $newKey): void;
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void;
 
 }

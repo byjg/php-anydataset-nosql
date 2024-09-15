@@ -24,7 +24,7 @@ class Factory
         /** @var RegistrableInterface $class */
         if (empty($class::schema())) {
             throw new InvalidArgumentException(
-                "The class '$class' must implement the static method schema()"
+                "The class must implement the static method schema()"
             );
         }
 

@@ -116,7 +116,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return (new ArrayDataset($contents))->getIterator();
     }
 
-    public function get(string $key, array $options = []): mixed
+    public function get(string|int|object $key, array $options = []): mixed
     {
         $data = array_merge(
             [
@@ -131,7 +131,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $result["Body"]->getContents();
     }
 
-    public function put(string $key, mixed $value, array $options = []): Result
+    public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         $data = array_merge(
             [
@@ -153,7 +153,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $this->s3Client->putObject($data);
     }
 
-    public function remove(string $key, array $options = []): bool
+    public function remove(string|int|object $key, array $options = []): bool
     {
         $data = array_merge(
             [
@@ -172,7 +172,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $this->s3Client;
     }
 
-    public function getChunk($key, $options = [], $size = 1024, $offset = 0)
+    public function getChunk(string|int|object $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         $part = ($offset * $size);
 
@@ -220,7 +220,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return ["s3"];
     }
 
-    public function rename(string $oldKey, string $newKey): void
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         $data = [
             'Bucket' => $this->bucket,
@@ -232,7 +232,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         $this->remove($oldKey);
     }
 
-    public function has($key, $options = []): bool
+    public function has(string|int|object $key, $options = []): bool
     {
         return $this->s3Client->doesObjectExistV2($this->bucket, $key, false, $options);
     }

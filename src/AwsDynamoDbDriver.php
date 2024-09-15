@@ -136,7 +136,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $result;
     }
 
-    public function get(string $key, array $options = []): ?array
+    public function get(string|int|object $key, array $options = []): ?array
     {
         $this->validateOptions($options);
 
@@ -159,12 +159,12 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param string $key
+     * @param string|int|object $key
      * @param mixed $value
      * @param array $options
      * @return Result
      */
-    public function put(string $key, mixed $value, array $options = []): Result
+    public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         if (is_object($value)) {
             $value = Serialize::from($value)->toArray();
@@ -194,7 +194,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return null;
     }
 
-    public function remove(string $key, array $options = []): Result
+    public function remove(string|int|object $key, array $options = []): Result
     {
         $this->validateOptions($options);
 
@@ -248,14 +248,19 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @throws NotImplementedException
      */
-    public function rename(string $oldKey, string $newKey): void
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("DynamoDB cannot rename");
     }
 
-    public function has($key, $options = []): bool
+    public function has(string|int|object $key, $options = []): bool
     {
         $value = $this->get($key, $options);
         return !empty($value);
+    }
+
+    public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
+    {
+        throw new NotImplementedException("DynamoDB cannot getChunk");
     }
 }

@@ -10,11 +10,11 @@ use PHPUnit\Framework\TestCase;
 class AwsDynamoDbDriverTest extends TestCase
 {
     /**
-     * @var AwsDynamoDbDriver
+     * @var AwsDynamoDbDriver|null
      */
-    protected $object;
+    protected ?AwsDynamoDbDriver $object = null;
 
-    protected $options =
+    protected array $options =
         [
             "KeyName" => "key",
             "Types" =>
@@ -23,12 +23,12 @@ class AwsDynamoDbDriverTest extends TestCase
                 ]
         ];
 
-    protected $scanOptions =
+    protected array $scanOptions =
         [
             "ScanFilter" => []
         ];
 
-    protected $queryOptions =
+    protected array $queryOptions =
         [
             "KeyConditions" => [
                 "key" => [
@@ -44,6 +44,7 @@ class AwsDynamoDbDriverTest extends TestCase
     {
         $awsConnection = getenv("DYNAMODB_CONNECTION");
         if (!empty($awsConnection)) {
+            /** @psalm-suppress InvalidPropertyAssignmentValue */
             $this->object = Factory::getInstance($awsConnection);
 
             $this->createTable();

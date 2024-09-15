@@ -2,6 +2,7 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
+use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\Serialize;
@@ -41,14 +42,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param string $key
+     * @param string|int|object $key
      * @param array $options
      * @return string
      * @throws MessageException
      * @throws NetworkException
      * @throws RequestException
      */
-    public function get(string $key, array $options = []): string
+    public function get(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("get");
@@ -57,7 +58,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param string $key
+     * @param string|int|object $key
      * @param mixed $value
      * @param array $options
      * @return mixed
@@ -66,7 +67,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    public function put(string $key, mixed $value, array $options = []): mixed
+    public function put(string|int|object $key, mixed $value, array $options = []): mixed
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("put")
@@ -99,14 +100,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param string $key
+     * @param string|int|object $key
      * @param array $options
      * @return string
      * @throws MessageException
      * @throws NetworkException
      * @throws RequestException
      */
-    public function remove(string $key, array $options = []): string
+    public function remove(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("delete");
@@ -223,14 +224,18 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return ["kv"];
     }
 
-    public function rename(string $oldKey, string $newKey): void
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
-        // TODO: Implement rename() method.
+        throw new NotImplementedException("Not implemented");
     }
 
-    public function has($key, $options = []): bool
+    public function has(string|int|object $key, $options = []): bool
     {
-        // TODO: Implement has() method.
-        return false;
+        throw new NotImplementedException("Not implemented");
+    }
+
+    public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
+    {
+        throw new NotImplementedException("Not implemented");
     }
 }

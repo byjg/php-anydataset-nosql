@@ -39,10 +39,10 @@ class NoSqlDocument
     }
 
     /**
-     * @param string|null $idDocument
+     * @param string|object|null $idDocument
      * @return $this
      */
-    public function setIdDocument(?string $idDocument): self
+    public function setIdDocument(string|object|null $idDocument): self
     {
         $this->idDocument = $idDocument;
         return $this;

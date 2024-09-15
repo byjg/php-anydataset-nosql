@@ -11,7 +11,7 @@ use InvalidArgumentException;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\Javascript;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\BulkWrite;
@@ -27,10 +27,6 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      */
     private array $excludeMongoClass;
 
-    /**
-     *
-     * @var Manager|null;
-     */
     protected ?Manager $mongoManager = null;
 
     /**
@@ -57,7 +53,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             Binary::class,
             Decimal128::class,
             Javascript::class,
-            ObjectID::class,
+            ObjectId::class,
             Timestamp::class,
             UTCDateTime::class,
         ];
@@ -111,15 +107,15 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     }
 
     /**
-     * @param string $idDocument
-     * @param null $collection
+     * @param string|object $idDocument
+     * @param mixed $collection
      * @return NoSqlDocument|null
      * @throws Exception
      */
-    public function getDocumentById(string $idDocument, mixed $collection = null): ?NoSqlDocument
+    public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
-        $filter->and('_id', Relation::EQUAL, new ObjectID($idDocument));
+        $filter->and('_id', Relation::EQUAL, new ObjectId($idDocument));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -131,7 +127,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
     /**
      * @param IteratorFilter $filter
-     * @param null $collection
+     * @param mixed|null $collection
      * @return NoSqlDocument[]|null
      * @throws Exception
      */
@@ -290,12 +286,12 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
         $data['updatedAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
-            $data['_id'] = $idDocument = new ObjectID();
+            $data['_id'] = $idDocument = new ObjectId();
             $data['createdAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
-            if (!($idDocument instanceof ObjectID)) {
-                $idDocument = new ObjectID($idDocument);
+            if (!($idDocument instanceof ObjectId)) {
+                $idDocument = new ObjectId($idDocument);
             }
             $data['_id'] = $idDocument;
             $bulkWrite->update(['_id' => $idDocument], ['$set' => $data], ['multi' => false, 'upsert' => true]);

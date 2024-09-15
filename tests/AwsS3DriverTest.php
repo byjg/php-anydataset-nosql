@@ -2,17 +2,17 @@
 
 namespace Tests;
 
-use ByJG\AnyDataset\NoSql\AwsS3Driver;
 use ByJG\AnyDataset\NoSql\Factory;
+use ByJG\AnyDataset\NoSql\KeyValueInterface;
 use ByJG\Util\Uri;
 use PHPUnit\Framework\TestCase;
 
 class AwsS3DriverTest extends TestCase
 {
     /**
-     * @var AwsS3Driver
+     * @var KeyValueInterface|null
      */
-    protected $object;
+    protected ?KeyValueInterface $object = null;
 
     protected function setUp(): void
     {

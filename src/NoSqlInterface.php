@@ -10,18 +10,18 @@ interface NoSqlInterface
     /**
      * Return a NoSqlDocument or null if not found
      *
-     * @param mixed $idDocument
+     * @param string|object $idDocument
      * @param mixed $collection
      * @return NoSqlDocument|null
      */
-    public function getDocumentById(string $idDocument, mixed $collection = null): ?NoSqlDocument;
+    public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument;
 
     /**
      * @param IteratorFilter $filter
-     * @param null $collection
-     * @return NoSqlDocument[]|null
+     * @param mixed|null $collection
+     * @return array|null
      */
-    public function getDocuments(IteratorFilter $filter, $collection = null): array|null;
+    public function getDocuments(IteratorFilter $filter, mixed $collection = null): array|null;
 
     /**
      * @param NoSqlDocument $document
@@ -38,7 +38,7 @@ interface NoSqlInterface
 
     /**
      * @param IteratorFilter $filter
-     * @param null $collection
+     * @param mixed|null $collection
      * @return void
      */
     public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void;
