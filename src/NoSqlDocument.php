@@ -3,6 +3,7 @@
 namespace ByJG\AnyDataset\NoSql;
 
 use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\ObjectCopy;
 
 class NoSqlDocument
 {
@@ -20,9 +21,9 @@ class NoSqlDocument
      *
      * @param string|null $idDocument
      * @param string|null $collection
-     * @param array $document
+     * @param mixed $document
      */
-    public function __construct(?string $idDocument = null, ?string $collection = null, array $document = [])
+    public function __construct(?string $idDocument = null, ?string $collection = null, mixed $document = [])
     {
         $this->idDocument = $idDocument;
         $this->collection = $collection;
@@ -68,25 +69,25 @@ class NoSqlDocument
 
 
     /**
-     * @return array|object
+     * @return mixed
      */
-    public function getDocument($entityClass = null): array
+    public function getDocument(mixed $entityClass = null): mixed
     {
         if (is_null($entityClass)) {
             return $this->document;
         }
 
         $entity = new $entityClass();
-        BinderObject::bind($this->document, $entity);
+        ObjectCopy::copy($this->document, $entity);
 
         return $entity;
     }
 
     /**
-     * @param array $document
+     * @param mixed $document
      * @return $this
      */
-    public function setDocument(array $document): self
+    public function setDocument(mixed $document): self
     {
         $this->document = $document;
         return $this;

@@ -168,39 +168,39 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $result;
     }
 
-    protected function getMongoFilterArray(IteratorFilter $filter): Query
+    protected function getMongoFilterArray(IteratorFilter $filter): array
     {
         $result = [];
 
         $data = [
-            Relation::EQUAL => function ($value) {
+            Relation::EQUAL->name => function ($value) {
                 return $value;
             },
-            Relation::GREATER_THAN => function ($value) {
+            Relation::GREATER_THAN->name => function ($value) {
                 return [ '$gt' => $value ];
             },
-            Relation::LESS_THAN => function ($value) {
+            Relation::LESS_THAN->name => function ($value) {
                 return [ '$lt' => $value ];
             },
-            Relation::GREATER_OR_EQUAL_THAN => function ($value) {
+            Relation::GREATER_OR_EQUAL_THAN->name => function ($value) {
                 return [ '$gte' => $value ];
             },
-            Relation::LESS_OR_EQUAL_THAN => function ($value) {
+            Relation::LESS_OR_EQUAL_THAN->name => function ($value) {
                 return [ '$lte' => $value ];
             },
-            Relation::NOT_EQUAL => function ($value) {
+            Relation::NOT_EQUAL->name => function ($value) {
                 return [ '$ne' => $value ];
             },
-            Relation::STARTS_WITH => function ($value) {
+            Relation::STARTS_WITH->name => function ($value) {
                 return [ '$regex' => "^$value" ];
             },
-            Relation::CONTAINS => function ($value) {
+            Relation::CONTAINS->name => function ($value) {
                 return [ '$regex' => "$value" ];
             },
-            Relation::IN => function ($value) {
+            Relation::IN->name => function ($value) {
                 return [ '$in' => $value ];
             },
-            Relation::NOT_IN => function ($value) {
+            Relation::NOT_IN->name => function ($value) {
                 return [ '$nin' => $value ];
             },
         ];
@@ -219,7 +219,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
                 throw new InvalidArgumentException('MongoDBDriver does not support filtering the same field twice');
             }
 
-            $result[$name] = $data[$relation]($value);
+            $result[$name] = $data[$relation->name]($value);
         }
 
         return $result;
@@ -250,6 +250,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $bulkWrite,
             $writeConcern
         );
+
+        return null;
     }
 
     public function updateDocuments(IteratorFilter $filter, $data, $collection = null)

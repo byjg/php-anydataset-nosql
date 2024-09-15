@@ -109,7 +109,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $array;
     }
 
-    protected function extractRecord($awsResult): array
+    protected function extractRecord($awsResult): ?array
     {
         $result = [];
 
@@ -136,7 +136,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $result;
     }
 
-    public function get(string $key, array $options = []): array
+    public function get(string $key, array $options = []): ?array
     {
         $this->validateOptions($options);
 
