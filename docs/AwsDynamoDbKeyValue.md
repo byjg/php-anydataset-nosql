@@ -12,7 +12,7 @@ dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
 You can add any extra arguments supported by the DynamoDB api. You can get a full list here:
- - https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct
+ - [https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct)
 
 One of the most populars is the parameter `endpoint` where we can set a custom endpoint to access 
 an DynamoDB compatible interface. 
@@ -140,10 +140,20 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
+### Check if a key exists
+
+```php
+<?php
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+if ($dynamodb->has(1201)) {
+    echo "exist!";
+}
+```
+
 ## Further reading
 
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html]()
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html]()
+- [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
+- [https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html](https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html)
 
 ----
 [Open source ByJG](http://opensource.byjg.com)

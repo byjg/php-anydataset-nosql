@@ -32,7 +32,7 @@ class MongoDbDriverTest extends TestCase
             new NoSqlDocument(
                 null,
                 self::TEST_COLLECTION,
-                ['name' => 'Hilux', 'brand' => 'Toyota', 'price' => 120000]
+                new Document('Hilux', 'Toyota', 120000)
             )
         );
         $this->dbDriver->save(
@@ -75,7 +75,8 @@ class MongoDbDriverTest extends TestCase
     public function tearDown(): void
     {
         if (!empty($this->dbDriver)) {
-            $this->dbDriver->deleteDocuments(new IteratorFilter(), self::TEST_COLLECTION);
+            $filter = new IteratorFilter();
+            $this->dbDriver->deleteDocuments($filter, self::TEST_COLLECTION);
         }
     }
 
@@ -99,11 +100,12 @@ class MongoDbDriverTest extends TestCase
         // Check if the default fields are here
         $data = $document[0]->getDocument();
         $this->assertNotEmpty($data['_id']);
-        $this->assertNotEmpty($data['created']);
-        $this->assertArrayNotHasKey('updated', $data);
+        $this->assertNotEmpty($data['createdAt']);
+        $this->assertNotEmpty($data['updatedAt']);
+        $this->assertEquals($data['createdAt']->toDatetime(), $data['updatedAt']->toDatetime());
         unset($data['_id']);
-        unset($data['created']);
-        unset($data['updated']);
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
 
         // Check if the context is the expected
         $this->assertEquals(
@@ -123,19 +125,77 @@ class MongoDbDriverTest extends TestCase
         // Get the saved document
         $documentFromDb = $this->dbDriver->getDocumentById($document[0]->getIdDocument(), self::TEST_COLLECTION);
 
-        // Check if the document have the same ID (Update) and Have the updated data
+        // Check if the document have the same ID (Update) and Have the updatedAt data
         $data = $documentFromDb->getDocument();
         $this->assertEquals($documentSaved->getIdDocument(), $document[0]->getIdDocument());
         $this->assertEquals($data['_id'], $document[0]->getIdDocument());
-        $this->assertNotEmpty($data['created']);
-        $this->assertNotEmpty($data['updated']);
-        $this->assertNotEquals($data['created']->toDatetime(), $data['updated']->toDatetime());
+        $this->assertNotEmpty($data['createdAt']);
+        $this->assertNotEmpty($data['updatedAt']);
+        $this->assertNotEquals($data['createdAt']->toDatetime(), $data['updatedAt']->toDatetime());
         unset($data['_id']);
-        unset($data['created']);
-        unset($data['updated']);
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
         $this->assertEquals(
             ['name' => 'Hilux', 'brand' => 'Toyota', 'price' => 150000],
             $data
+        );
+    }
+
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
+    public function testSaveDocumentEntity()
+    {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
+        // Get the Object to test
+        $filter = new IteratorFilter();
+        $filter->addRelation('name', Relation::EQUAL, 'Hilux');
+        $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+
+        // Check if returns one document
+        $this->assertCount(1, $document);
+
+        // Check if the default fields are here
+        $entity = $document[0]->getDocument(Document::class);
+        $this->assertInstanceOf(Document::class, $entity);
+        $this->assertNotEmpty($entity->get_id());
+        $this->assertNotEmpty($entity->getCreatedAt());
+        $this->assertNotEmpty($entity->getUpdatedAt());
+        $this->assertEquals($entity->getCreatedAt()->toDatetime(), $entity->getCreatedAt()->toDatetime());
+
+        // Check if the context is the expected
+        $this->assertEquals(
+            ['Hilux', 'Toyota', 120000],
+            [$entity->getName(), $entity->getBrand(), $entity->getPrice()]
+        );
+
+        $entity->setPrice(150000);
+
+        // Create a new document with a partial field to update
+        $documentToUpdate = new NoSqlDocument(
+            $document[0]->getIdDocument(),
+            self::TEST_COLLECTION,
+            $entity
+        );
+        sleep(1); // Just to force a new Update DateTime
+        $documentSaved = $this->dbDriver->save($documentToUpdate);
+
+        // Get the saved document
+        $documentFromDb = $this->dbDriver->getDocumentById($document[0]->getIdDocument(), self::TEST_COLLECTION);
+
+        // Check if the document have the same ID (Update) and Have the updatedAt data
+        $updEntity = $documentFromDb->getDocument(Document::class);
+        $this->assertEquals($documentSaved->getIdDocument(), $document[0]->getIdDocument());
+        $this->assertEquals($updEntity->get_id(), $document[0]->getIdDocument());
+        $this->assertNotEmpty($updEntity->getCreatedAt());
+        $this->assertNotEmpty($updEntity->getUpdatedAt());
+        $this->assertEquals($updEntity->getCreatedAt()->toDatetime(), $updEntity->getCreatedAt()->toDatetime());
+        $this->assertEquals(
+            ['Hilux', 'Toyota', 150000],
+            [$updEntity->getName(), $updEntity->getBrand(), $updEntity->getPrice()]
         );
     }
 
@@ -160,6 +220,12 @@ class MongoDbDriverTest extends TestCase
         // Check if object do not exist
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertEmpty($document);
+
+        // Check if other objects weren't deleted
+        $filter = new IteratorFilter();
+        $filter->addRelation('name', Relation::EQUAL, 'Hilux');
+        $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(1, $document);
     }
 
     /**
@@ -227,5 +293,40 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('Cobalt', $documents[0]->getDocument()['name']);
         $this->assertEquals('Chevrolet', $documents[0]->getDocument()['brand']);
         $this->assertEquals('60000', $documents[0]->getDocument()['price']);
+    }
+
+    /**
+     * @throws \MongoDB\Driver\Exception\Exception
+     */
+    public function testBulkUpdate()
+    {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
+        // Get the Object to test
+        $filter = new IteratorFilter();
+        $filter->addRelation('brand', Relation::IN, ['Toyota', 'Audi']);
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(3, $documentList);
+        foreach ($documentList as $document) {
+            $this->assertNotEquals('30000', $document->getDocument()['price']);
+        }
+
+        // Delete
+        $this->dbDriver->updateDocuments($filter, ["price" => 30000], self::TEST_COLLECTION);
+
+        // Check if object do not exist
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(3, $documentList);
+        foreach ($documentList as $document) {
+            $this->assertEquals('30000', $document->getDocument()['price']);
+        }
+
+        // Check if other objects weren't deleted
+        $filter = new IteratorFilter();
+        $filter->addRelation('name', Relation::EQUAL, 'Hilux');
+        $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
+        $this->assertCount(1, $documentList);
     }
 }

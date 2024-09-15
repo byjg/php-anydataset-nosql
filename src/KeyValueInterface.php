@@ -12,6 +12,8 @@ interface KeyValueInterface
      */
     public function getIterator(array $options = []): GenericIterator;
 
+    public function has(string $key, array $options = []);
+
     public function get(string $key, array $options = []): mixed;
 
     public function put(string $key, mixed $value, array $options = []): mixed;
@@ -33,5 +35,7 @@ interface KeyValueInterface
     public function removeBatch(array $keys, array $options = []): mixed;
 
     public function getDbConnection(): mixed;
+
+    public function rename($oldKey, $newKey);
 
 }

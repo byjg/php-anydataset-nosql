@@ -44,6 +44,14 @@ interface NoSqlInterface
     public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): mixed;
 
     /**
+     * @param IteratorFilter $filter
+     * @param array $data
+     * @param null $collection
+     * @return mixed
+     */
+    public function updateDocuments(IteratorFilter $filter, $data, $collection = null);
+
+    /**
      * @return mixed
      */
     public function getDbConnection(): mixed;

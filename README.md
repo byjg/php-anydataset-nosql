@@ -30,10 +30,10 @@ See below the current implemented drivers:
 
 | Datasource                                  | Connection String                                        |
 |---------------------------------------------|----------------------------------------------------------|
-| [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
-| [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
-| [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
-| [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
+| [MongoDB](MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
+| [Cloudflare KV](CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
+| [S3](AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
+| [AWS DynamoDB](AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
 
 ## Examples

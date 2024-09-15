@@ -4,6 +4,7 @@ namespace ByJG\AnyDataset\NoSql;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Result;
+use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\SerializerObject;
@@ -115,6 +116,10 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         $raw = $awsResult;
         if ($awsResult instanceof Result) {
             $raw = $awsResult["Item"];
+        }
+
+        if (empty($raw)) {
+            return null;
         }
 
         array_walk($raw, function($val, $key) use (&$result) {
@@ -238,5 +243,16 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     public static function schema(): array
     {
         return ["dynamo", "dynamodb"];
+    }
+
+    public function rename($oldKey, $newKey)
+    {
+        throw new NotImplementedException("DynamoDB cannot rename");
+    }
+
+    public function has($key, $options = [])
+    {
+        $value = $this->get($key, $options);
+        return !empty($value);
     }
 }

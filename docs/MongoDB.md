@@ -99,5 +99,19 @@ foreach ($result as $document)
 }
 ```
 
+
+### Full Connection String
+
+```text
+mongodb://username:password@server:27017/dbname?uri.option1=value1&driver.option2=value2
+```
+
+The list of parameters can be found in the [PHP MongoDB Driver documentation](https://www.php.net/manual/en/mongodb-driver-manager.construct.php).
+
+Parameters started with `uri.` are passed to the MongoDB URI connection string.
+Parameters started with `driver.` are passed to the MongoDB driver connection string.
+Any other parameters will throw an exception.
+
+
 ----
 [Open source ByJG](http://opensource.byjg.com)
