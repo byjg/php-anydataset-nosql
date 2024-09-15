@@ -2,7 +2,6 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\Serializer\BinderObject;
 use ByJG\Serializer\ObjectCopy;
 
 class NoSqlDocument
@@ -69,6 +68,7 @@ class NoSqlDocument
 
 
     /**
+     * @param mixed|null $entityClass
      * @return mixed
      */
     public function getDocument(mixed $entityClass = null): mixed

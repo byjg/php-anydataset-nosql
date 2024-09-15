@@ -30,7 +30,7 @@ interface NoSqlInterface
     public function save(NoSqlDocument $document): mixed;
 
     /**
-     * @param $idDocument
+     * @param string $idDocument
      * @param null $collection
      * @return mixed
      */
@@ -39,17 +39,17 @@ interface NoSqlInterface
     /**
      * @param IteratorFilter $filter
      * @param null $collection
-     * @return mixed
+     * @return void
      */
-    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): mixed;
+    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void;
 
     /**
      * @param IteratorFilter $filter
      * @param array $data
-     * @param null $collection
-     * @return mixed
+     * @param mixed|null $collection
+     * @return void
      */
-    public function updateDocuments(IteratorFilter $filter, $data, $collection = null);
+    public function updateDocuments(IteratorFilter $filter, array $data, mixed $collection = null): void;
 
     /**
      * @return mixed

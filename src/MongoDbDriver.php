@@ -42,8 +42,6 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
     protected string $database;
 
-    protected $idField;
-
     /**
      * Creates a new MongoDB connection.
      *
@@ -74,9 +72,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $uriOptions = [];
         $driverOptions = [];
         foreach ($options as $key => $value) {
-            if (strpos($key, 'uri.') === 0) {
+            if (str_starts_with($key, 'uri.')) {
                 $options[$key] = $value;
-            } elseif (strpos($key, 'driver.') === 0) {
+            } elseif (str_starts_with($key, 'driver.')) {
                 $driverOptions[$key] = $value;
             } else {
                 throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
@@ -121,7 +119,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function getDocumentById(string $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
-        $filter->addRelation('_id', Relation::EQUAL, new ObjectID($idDocument));
+        $filter->and('_id', Relation::EQUAL, new ObjectID($idDocument));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -148,11 +146,10 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             new Query($this->getMongoFilterArray($filter))
         );
 
-        if (empty($dataCursor)) {
+        $data = $dataCursor->toArray();
+        if (empty($data)) {
             return null;
         }
-
-        $data = $dataCursor->toArray();
 
         $result = [];
         foreach ($data as $item) {
@@ -228,13 +225,13 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
-        $filter->addRelation('_id', Relation::EQUAL, $idDocument);
+        $filter->and('_id', Relation::EQUAL, $idDocument);
         $this->deleteDocuments($filter, $collection);
         return null;
     }
 
 
-    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): mixed
+    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -250,11 +247,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $bulkWrite,
             $writeConcern
         );
-
-        return null;
     }
 
-    public function updateDocuments(IteratorFilter $filter, $data, $collection = null)
+    public function updateDocuments(IteratorFilter $filter, array $data, mixed $collection = null): void
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -269,7 +264,6 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $bulkWrite,
             $writeConcern
         );
-        return null;
     }
 
     /**

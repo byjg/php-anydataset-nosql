@@ -4,7 +4,7 @@ namespace ByJG\AnyDataset\NoSql;
 
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\SerializerObject;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Exception\CurlException;
 use ByJG\Util\Exception\MessageException;
 use ByJG\Util\Exception\NetworkException;
@@ -91,7 +91,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         $request = $this->request("/bulk", $options)
             ->withMethod("put")
             ->withHeader("Content-Type", "application/json")
-            ->withBody(new MemoryStream(json_encode(SerializerObject::instance($keyValueArray)->serialize())));
+            ->withBody(new MemoryStream(json_encode(Serialize::from($keyValueArray)->toArray())));
 
         return $this->checkResult(
             $this->send($request)
@@ -148,7 +148,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param $endpoint
+     * @param string $endpoint
      * @param array $options
      * @return Request
      * @throws MessageException
@@ -223,13 +223,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return ["kv"];
     }
 
-    public function rename($oldKey, $newKey)
+    public function rename(string $oldKey, string $newKey): void
     {
         // TODO: Implement rename() method.
     }
 
-    public function has($key, $options = [])
+    public function has($key, $options = []): bool
     {
         // TODO: Implement has() method.
+        return false;
     }
 }

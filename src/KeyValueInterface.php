@@ -12,7 +12,7 @@ interface KeyValueInterface
      */
     public function getIterator(array $options = []): GenericIterator;
 
-    public function has(string $key, array $options = []);
+    public function has(string $key, array $options = []): bool;
 
     public function get(string $key, array $options = []): mixed;
 
@@ -21,7 +21,7 @@ interface KeyValueInterface
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @return void
+     * @return mixed
      */
     public function putBatch(array $keyValueArray, array $options = []): mixed;
 
@@ -30,12 +30,12 @@ interface KeyValueInterface
     /**
      * @param object[] $keys
      * @param array $options
-     * @return void
+     * @return mixed
      */
     public function removeBatch(array $keys, array $options = []): mixed;
 
     public function getDbConnection(): mixed;
 
-    public function rename($oldKey, $newKey);
+    public function rename(string $oldKey, string $newKey): void;
 
 }

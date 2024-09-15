@@ -7,7 +7,7 @@ use Aws\Result;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\SerializerObject;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use InvalidArgumentException;
 
@@ -160,14 +160,14 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 
     /**
      * @param string $key
-     * @param $value
+     * @param mixed $value
      * @param array $options
      * @return Result
      */
     public function put(string $key, mixed $value, array $options = []): Result
     {
         if (is_object($value)) {
-            $value = SerializerObject::instance($value)->serialize();
+            $value = Serialize::from($value)->toArray();
         }
 
         $this->validateOptions($options);
@@ -245,12 +245,15 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return ["dynamo", "dynamodb"];
     }
 
-    public function rename($oldKey, $newKey)
+    /**
+     * @throws NotImplementedException
+     */
+    public function rename(string $oldKey, string $newKey): void
     {
         throw new NotImplementedException("DynamoDB cannot rename");
     }
 
-    public function has($key, $options = [])
+    public function has($key, $options = []): bool
     {
         $value = $this->get($key, $options);
         return !empty($value);

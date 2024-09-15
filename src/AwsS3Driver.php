@@ -220,7 +220,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return ["s3"];
     }
 
-    public function rename($oldKey, $newKey)
+    public function rename(string $oldKey, string $newKey): void
     {
         $data = [
             'Bucket' => $this->bucket,
@@ -232,7 +232,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         $this->remove($oldKey);
     }
 
-    public function has($key, $options = [])
+    public function has($key, $options = []): bool
     {
         return $this->s3Client->doesObjectExistV2($this->bucket, $key, false, $options);
     }
