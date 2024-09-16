@@ -6,14 +6,14 @@ use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\Serialize;
-use ByJG\Util\Exception\CurlException;
-use ByJG\Util\Exception\MessageException;
-use ByJG\Util\Exception\NetworkException;
-use ByJG\Util\Exception\RequestException;
-use ByJG\Util\HttpClient;
-use ByJG\Util\Psr7\MemoryStream;
-use ByJG\Util\Psr7\Request;
 use ByJG\Util\Uri;
+use ByJG\WebRequest\Exception\CurlException;
+use ByJG\WebRequest\Exception\MessageException;
+use ByJG\WebRequest\Exception\NetworkException;
+use ByJG\WebRequest\Exception\RequestException;
+use ByJG\WebRequest\HttpClient;
+use ByJG\WebRequest\Psr7\MemoryStream;
+use ByJG\WebRequest\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 
 class CloudflareKV implements KeyValueInterface, RegistrableInterface
