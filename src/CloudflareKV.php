@@ -2,29 +2,30 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\AnyDataset\Core\IteratorInterface;
+use ByJG\AnyDataset\Core\Exception\NotImplementedException;
+use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\SerializerObject;
-use ByJG\Util\Exception\CurlException;
-use ByJG\Util\Exception\MessageException;
-use ByJG\Util\HttpClient;
-use ByJG\Util\Psr7\MemoryStream;
-use ByJG\Util\Psr7\Message;
-use ByJG\Util\Psr7\Request;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
-use Psr\Http\Message\MessageInterface;
+use ByJG\WebRequest\Exception\CurlException;
+use ByJG\WebRequest\Exception\MessageException;
+use ByJG\WebRequest\Exception\NetworkException;
+use ByJG\WebRequest\Exception\RequestException;
+use ByJG\WebRequest\HttpClient;
+use ByJG\WebRequest\Psr7\MemoryStream;
+use ByJG\WebRequest\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 
 class CloudflareKV implements KeyValueInterface, RegistrableInterface
 {
-    protected $username;
-    protected $password;
-    protected $accountId;
-    protected $namespaceId;
+    protected string $username;
+    protected string $password;
+    protected string $accountId;
+    protected string $namespaceId;
 
-    private $kvUri;
+    private string $kvUri;
 
-    private $lastCursor;
+    private array $lastCursor;
 
     public function __construct($connectionString)
     {
@@ -41,13 +42,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param $key
+     * @param string|int|object $key
      * @param array $options
      * @return string
-     * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function get($key, $options = [])
+    public function get(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("get");
@@ -56,14 +58,16 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string|int|object $key
+     * @param mixed $value
      * @param array $options
      * @return mixed
      * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function put($key, $value, $options = [])
+    public function put(string|int|object $key, mixed $value, array $options = []): mixed
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("put")
@@ -77,16 +81,18 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @return mixed|void
+     * @return mixed
      * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function putBatch($keyValueArray, $options = [])
+    public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
             ->withMethod("put")
             ->withHeader("Content-Type", "application/json")
-            ->withBody(new MemoryStream(json_encode(SerializerObject::instance($keyValueArray)->serialize())));
+            ->withBody(new MemoryStream(json_encode(Serialize::from($keyValueArray)->toArray())));
 
         return $this->checkResult(
             $this->send($request)
@@ -94,13 +100,14 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param $key
+     * @param string|int|object $key
      * @param array $options
      * @return string
-     * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function remove($key, $options = [])
+    public function remove(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
             ->withMethod("delete");
@@ -114,8 +121,10 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @return mixed
      * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function removeBatch($keys, $options = [])
+    public function removeBatch(array $keys, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
             ->withMethod("delete")
@@ -130,22 +139,22 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     /**
      * @param RequestInterface $request
      * @return string
-     * @throws CurlException
-     * @throws MessageException
+     * @throws RequestException
+     * @throws NetworkException
      */
-    protected function send(RequestInterface $request)
+    protected function send(RequestInterface $request): string
     {
         return HttpClient::getInstance()
             ->sendRequest($request)->getBody()->getContents();
     }
 
     /**
-     * @param $endpoint
+     * @param string $endpoint
      * @param array $options
-     * @return Message|Request|MessageInterface
+     * @return Request
      * @throws MessageException
      */
-    protected function request($endpoint, $options = [])
+    protected function request(string $endpoint, array $options = []): Request
     {
         $uri = Uri::getInstanceFromString($this->kvUri . $endpoint)
             ->withQuery(http_build_query($options));
@@ -160,11 +169,13 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      *   prefix: ""
      *
      * @param array $options
-     * @return IteratorInterface
+     * @return GenericIterator
      * @throws CurlException
      * @throws MessageException
+     * @throws NetworkException
+     * @throws RequestException
      */
-    public function getIterator($options = [])
+    public function getIterator(array $options = []): GenericIterator
     {
         $request = $this->request("/keys", $options)
             ->withMethod("get");
@@ -180,12 +191,12 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $arrayDataset->getIterator();
     }
 
-    public function getLastCursor()
+    public function getLastCursor(): array
     {
         return $this->lastCursor;
     }
 
-    public function getDbConnection()
+    public function getDbConnection(): mixed
     {
         return null;
     }
@@ -195,10 +206,10 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @return mixed
      * @throws CurlException
      */
-    protected function checkResult($str)
+    protected function checkResult($str): array
     {
         $array = json_decode($str, true);
-        if (isset($array["success"]) && !$array["success"]) {
+        if (isset($array["errors"]) && !$array["success"]) {
             $errorMsg = "";
             foreach ($array["errors"] as $error) {
                 $errorMsg .= "[{$error["code"]}] {$error["message"]}\n";
@@ -208,18 +219,23 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $array;
     }
 
-    public static function schema()
+    public static function schema(): array
     {
-        return "kv";
+        return ["kv"];
     }
 
-    public function rename($oldKey, $newKey)
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
-        // TODO: Implement rename() method.
+        throw new NotImplementedException("Not implemented");
     }
 
-    public function has($key, $options = [])
+    public function has(string|int|object $key, $options = []): bool
     {
-        // TODO: Implement has() method.
+        throw new NotImplementedException("Not implemented");
+    }
+
+    public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
+    {
+        throw new NotImplementedException("Not implemented");
     }
 }

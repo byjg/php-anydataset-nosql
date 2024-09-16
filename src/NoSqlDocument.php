@@ -2,27 +2,27 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
-use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\ObjectCopy;
 
 class NoSqlDocument
 {
-    protected $idDocument;
+    protected ?string $idDocument;
 
-    protected $collection;
+    protected ?string $collection;
 
-    protected $document;
+    protected mixed $document;
 
-    protected $subDocument = [];
+    protected array $subDocument = [];
 
 
     /**
      * NoSqlDocument constructor.
      *
-     * @param $idDocument
-     * @param $collection
-     * @param array $document
+     * @param string|null $idDocument
+     * @param string|null $collection
+     * @param mixed $document
      */
-    public function __construct($idDocument = null, $collection = null, $document = [])
+    public function __construct(?string $idDocument = null, ?string $collection = null, mixed $document = [])
     {
         $this->idDocument = $idDocument;
         $this->collection = $collection;
@@ -31,27 +31,27 @@ class NoSqlDocument
     }
 
     /**
-     * @return null
+     * @return string|null
      */
-    public function getIdDocument()
+    public function getIdDocument(): ?string
     {
         return $this->idDocument;
     }
 
     /**
-     * @param null $idDocument
+     * @param string|object|null $idDocument
      * @return $this
      */
-    public function setIdDocument($idDocument)
+    public function setIdDocument(string|object|null $idDocument): self
     {
         $this->idDocument = $idDocument;
         return $this;
     }
 
     /**
-     * @return null
+     * @return string|null
      */
-    public function getCollection()
+    public function getCollection(): ?string
     {
         return $this->collection;
     }
@@ -60,7 +60,7 @@ class NoSqlDocument
      * @param null $collection
      * @return $this
      */
-    public function setCollection($collection)
+    public function setCollection(mixed $collection): self
     {
         $this->collection = $collection;
         return $this;
@@ -68,31 +68,32 @@ class NoSqlDocument
 
 
     /**
-     * @return array|object
+     * @param mixed|null $entityClass
+     * @return mixed
      */
-    public function getDocument($entityClass = null)
+    public function getDocument(mixed $entityClass = null): mixed
     {
         if (is_null($entityClass)) {
             return $this->document;
         }
 
         $entity = new $entityClass();
-        BinderObject::bind($this->document, $entity);
+        ObjectCopy::copy($this->document, $entity);
 
         return $entity;
     }
 
     /**
-     * @param array $document
+     * @param mixed $document
      * @return $this
      */
-    public function setDocument($document)
+    public function setDocument(mixed $document): self
     {
         $this->document = $document;
         return $this;
     }
 
-    public function addSubDocument(NoSqlDocument $document)
+    public function addSubDocument(NoSqlDocument $document): void
     {
         $this->subDocument[] = $document;
     }

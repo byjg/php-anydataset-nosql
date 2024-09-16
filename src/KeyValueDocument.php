@@ -6,9 +6,9 @@ namespace ByJG\AnyDataset\NoSql;
 
 class KeyValueDocument
 {
-    protected $key;
+    protected string $key;
 
-    protected $value;
+    protected mixed $value;
 
     /**
      * KeyValueDocument constructor.
@@ -22,9 +22,9 @@ class KeyValueDocument
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -32,7 +32,7 @@ class KeyValueDocument
     /**
      * @param mixed $key
      */
-    public function setKey($key)
+    public function setKey(string $key): void
     {
         $this->key = $key;
     }
@@ -40,7 +40,7 @@ class KeyValueDocument
     /**
      * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
@@ -48,7 +48,7 @@ class KeyValueDocument
     /**
      * @param mixed $value
      */
-    public function setValue($value)
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }

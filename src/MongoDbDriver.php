@@ -4,14 +4,14 @@ namespace ByJG\AnyDataset\NoSql;
 
 use ByJG\AnyDataset\Core\Enum\Relation;
 use ByJG\AnyDataset\Core\IteratorFilter;
-use ByJG\Serializer\SerializerObject;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use DateTime;
 use InvalidArgumentException;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\Javascript;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Timestamp;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Driver\BulkWrite;
@@ -25,24 +25,18 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * @var array
      */
-    private $excludeMongoClass;
+    private array $excludeMongoClass;
 
-    /**
-     *
-     * @var Manager;
-     */
-    protected $mongoManager = null;
+    protected ?Manager $mongoManager = null;
 
     /**
      * Enter description here...
      *
      * @var Uri
      */
-    protected $connectionUri;
+    protected Uri $connectionUri;
 
-    protected $database;
-
-    protected $idField;
+    protected string $database;
 
     /**
      * Creates a new MongoDB connection.
@@ -59,7 +53,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             Binary::class,
             Decimal128::class,
             Javascript::class,
-            ObjectID::class,
+            ObjectId::class,
             Timestamp::class,
             UTCDateTime::class,
         ];
@@ -74,9 +68,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $uriOptions = [];
         $driverOptions = [];
         foreach ($options as $key => $value) {
-            if (strpos($key, 'uri.') === 0) {
+            if (str_starts_with($key, 'uri.')) {
                 $options[$key] = $value;
-            } elseif (strpos($key, 'driver.') === 0) {
+            } elseif (str_starts_with($key, 'driver.')) {
                 $driverOptions[$key] = $value;
             } else {
                 throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
@@ -105,23 +99,23 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * Gets the instance of MongoDB; You do not need uses this directly.
      * If you have to, probably something is missing in this class
-     * @return Manager
+     * @return Manager|null
      */
-    public function getDbConnection()
+    public function getDbConnection(): ?Manager
     {
         return $this->mongoManager;
     }
 
     /**
-     * @param $idDocument
-     * @param null $collection
+     * @param string|object $idDocument
+     * @param mixed $collection
      * @return NoSqlDocument|null
      * @throws Exception
      */
-    public function getDocumentById($idDocument, $collection = null)
+    public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
-        $filter->addRelation('_id', Relation::EQUAL, $idDocument);
+        $filter->and('_id', Relation::EQUAL, new ObjectId($idDocument));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -133,11 +127,11 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
     /**
      * @param IteratorFilter $filter
-     * @param null $collection
+     * @param mixed|null $collection
      * @return NoSqlDocument[]|null
      * @throws Exception
      */
-    public function getDocuments(IteratorFilter $filter, $collection = null)
+    public function getDocuments(IteratorFilter $filter, mixed $collection = null): ?array
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -148,20 +142,19 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             new Query($this->getMongoFilterArray($filter))
         );
 
-        if (empty($dataCursor)) {
+        $data = $dataCursor->toArray();
+        if (empty($data)) {
             return null;
         }
-
-        $data = $dataCursor->toArray();
 
         $result = [];
         foreach ($data as $item) {
             $result[] = new NoSqlDocument(
                 $item->_id,
                 $collection,
-                SerializerObject::instance($item)
+                Serialize::from($item)
                     ->withDoNotParse($this->excludeMongoClass)
-                    ->serialize()
+                    ->toArray()
             );
         }
 
@@ -173,34 +166,34 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $result = [];
 
         $data = [
-            Relation::EQUAL => function ($value) {
+            Relation::EQUAL->name => function ($value) {
                 return $value;
             },
-            Relation::GREATER_THAN => function ($value) {
+            Relation::GREATER_THAN->name => function ($value) {
                 return [ '$gt' => $value ];
             },
-            Relation::LESS_THAN => function ($value) {
+            Relation::LESS_THAN->name => function ($value) {
                 return [ '$lt' => $value ];
             },
-            Relation::GREATER_OR_EQUAL_THAN => function ($value) {
+            Relation::GREATER_OR_EQUAL_THAN->name => function ($value) {
                 return [ '$gte' => $value ];
             },
-            Relation::LESS_OR_EQUAL_THAN => function ($value) {
+            Relation::LESS_OR_EQUAL_THAN->name => function ($value) {
                 return [ '$lte' => $value ];
             },
-            Relation::NOT_EQUAL => function ($value) {
+            Relation::NOT_EQUAL->name => function ($value) {
                 return [ '$ne' => $value ];
             },
-            Relation::STARTS_WITH => function ($value) {
+            Relation::STARTS_WITH->name => function ($value) {
                 return [ '$regex' => "^$value" ];
             },
-            Relation::CONTAINS => function ($value) {
+            Relation::CONTAINS->name => function ($value) {
                 return [ '$regex' => "$value" ];
             },
-            Relation::IN => function ($value) {
+            Relation::IN->name => function ($value) {
                 return [ '$in' => $value ];
             },
-            Relation::NOT_IN => function ($value) {
+            Relation::NOT_IN->name => function ($value) {
                 return [ '$nin' => $value ];
             },
         ];
@@ -219,21 +212,22 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
                 throw new InvalidArgumentException('MongoDBDriver does not support filtering the same field twice');
             }
 
-            $result[$name] = $data[$relation]($value);
+            $result[$name] = $data[$relation->name]($value);
         }
 
         return $result;
     }
 
-    public function deleteDocumentById($idDocument, $collection = null)
+    public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
-        $filter->addRelation('_id', Relation::EQUAL, $idDocument);
+        $filter->and('_id', Relation::EQUAL, $idDocument);
         $this->deleteDocuments($filter, $collection);
+        return null;
     }
 
 
-    public function deleteDocuments(IteratorFilter $filter, $collection = null)
+    public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -251,7 +245,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         );
     }
 
-    public function updateDocuments(IteratorFilter $filter, $data, $collection = null)
+    public function updateDocuments(IteratorFilter $filter, array $data, mixed $collection = null): void
     {
         if (empty($collection)) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -272,7 +266,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @param NoSqlDocument $document
      * @return NoSqlDocument
      */
-    public function save(NoSqlDocument $document)
+    public function save(NoSqlDocument $document): NoSqlDocument
     {
         if (empty($document->getCollection())) {
             throw new InvalidArgumentException('Collection is mandatory for MongoDB');
@@ -281,9 +275,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 100);
         $bulkWrite = new BulkWrite();
 
-        $data = SerializerObject::instance($document->getDocument())
+        $data = Serialize::from($document->getDocument())
             ->withDoNotParse($this->excludeMongoClass)
-            ->serialize();
+            ->toArray();
 
         $idDocument = $document->getIdDocument();
         if (empty($idDocument)) {
@@ -292,12 +286,15 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
         $data['updatedAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
         if (empty($idDocument)) {
-            $data['_id'] = $idDocument = new ObjectID();
+            $data['_id'] = $idDocument = new ObjectId();
             $data['createdAt'] = new UTCDateTime((new DateTime())->getTimestamp()*1000);
             $bulkWrite->insert($data);
         } else {
+            if (!($idDocument instanceof ObjectId)) {
+                $idDocument = new ObjectId($idDocument);
+            }
             $data['_id'] = $idDocument;
-            $bulkWrite->update(['_id' => $idDocument], ["\$set" => $data]);
+            $bulkWrite->update(['_id' => $idDocument], ['$set' => $data], ['multi' => false, 'upsert' => true]);
         }
 
         $this->mongoManager->executeBulkWrite(
@@ -312,8 +309,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $document;
     }
 
-    public static function schema()
+    public static function schema(): array
     {
-        return "mongodb";
+        return ["mongodb", "mongo"];
     }
 }
