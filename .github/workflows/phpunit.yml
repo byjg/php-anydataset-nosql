@@ -25,6 +25,8 @@ jobs:
         image: mongo:7
         env:
           TZ: America/Winnipeg
+          MONGO_INITDB_ROOT_USERNAME: rootuser
+          MONGO_INITDB_ROOT_PASSWORD: rootpass
         ports:
           - 27017:27017
 
