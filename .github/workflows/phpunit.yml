@@ -22,7 +22,7 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:3
+        image: mongo:7
         env:
           TZ: America/Winnipeg
         ports:
