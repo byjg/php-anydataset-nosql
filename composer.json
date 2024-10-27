@@ -14,7 +14,7 @@
   "prefer-stable": true,
   "minimum-stability": "dev",
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.1 <8.4",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
     "byjg/anydataset": "^5.0",
