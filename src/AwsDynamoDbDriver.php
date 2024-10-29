@@ -7,7 +7,7 @@ use Aws\Result;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\Lists\ArrayDataset;
-use ByJG\Serializer\SerializerObject;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use InvalidArgumentException;
 
@@ -17,12 +17,12 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @var DynamoDbClient
      */
-    protected $dynamoDbClient;
+    protected DynamoDbClient $dynamoDbClient;
 
     /**
-     * @var string
+     * @var string|array|null
      */
-    protected $table;
+    protected string|array|null $table;
 
     /**
      * AwsS3Driver constructor.
@@ -31,7 +31,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      *
      * @param string $connectionString
      */
-    public function __construct($connectionString)
+    public function __construct(string $connectionString)
     {
         $uri = new Uri($connectionString);
 
@@ -58,7 +58,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return GenericIterator
      */
-    public function getIterator($options = [])
+    public function getIterator(array $options = []): GenericIterator
     {
         $data = array_merge(
             [
@@ -88,7 +88,8 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return (new ArrayDataset($result))->getIterator();
     }
 
-    protected function validateOptions($options) {
+    protected function validateOptions($options): void
+    {
         if (!isset($options["KeyName"])) {
             throw new InvalidArgumentException("KeyName is required in \$options");
         }
@@ -108,7 +109,8 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $array;
     }
 
-    protected function extractRecord($awsResult) {
+    protected function extractRecord($awsResult): ?array
+    {
         $result = [];
 
         $raw = $awsResult;
@@ -134,7 +136,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $result;
     }
 
-    public function get($key, $options = [])
+    public function get(string|int|object $key, array $options = []): ?array
     {
         $this->validateOptions($options);
 
@@ -157,15 +159,15 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string|int|object $key
+     * @param mixed $value
      * @param array $options
      * @return Result
      */
-    public function put($key, $value, $options = [])
+    public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         if (is_object($value)) {
-            $value = SerializerObject::instance($value)->serialize();
+            $value = Serialize::from($value)->toArray();
         }
 
         $this->validateOptions($options);
@@ -184,14 +186,15 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @param KeyValueDocument[] $keyValueArray
      * @param array $options
-     * @return void
+     * @return mixed
      */
-    public function putBatch($keyValueArray, $options = [])
+    public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         // TODO: Implement putBatch() method.
+        return null;
     }
 
-    public function remove($key, $options = [])
+    public function remove(string|int|object $key, array $options = []): Result
     {
         $this->validateOptions($options);
 
@@ -211,7 +214,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $this->dynamoDbClient->deleteItem($data);
     }
 
-    public function getDbConnection()
+    public function getDbConnection(): DynamoDbClient
     {
         return $this->dynamoDbClient;
     }
@@ -219,34 +222,45 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @param object[] $keys
      * @param array $options
-     * @return void
+     * @return mixed
      */
-    public function removeBatch($keys, $options = [])
+    public function removeBatch(array $keys, array $options = []): mixed
     {
         // TODO: Implement removeBatch() method.
+        return null;
     }
 
-    public function getTablename() {
+    public function getTablename(): array|string|null
+    {
         return $this->table;
     }
 
-    public function client() {
+    public function client(): DynamoDbClient
+    {
         return $this->dynamoDbClient;
     }
 
-    public static function schema()
+    public static function schema(): array
     {
         return ["dynamo", "dynamodb"];
     }
 
-    public function rename($oldKey, $newKey)
+    /**
+     * @throws NotImplementedException
+     */
+    public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("DynamoDB cannot rename");
     }
 
-    public function has($key, $options = [])
+    public function has(string|int|object $key, $options = []): bool
     {
         $value = $this->get($key, $options);
         return !empty($value);
+    }
+
+    public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
+    {
+        throw new NotImplementedException("DynamoDB cannot getChunk");
     }
 }
