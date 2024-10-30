@@ -17,6 +17,7 @@
     "php": ">=8.1 <8.4",
     "ext-curl": "*",
     "aws/aws-sdk-php": "3.*",
+    "byjg/cache-engine": "^5.0",
     "byjg/anydataset": "^5.0",
     "byjg/anydataset-array": "^5.0",
     "byjg/serializer": "^5.0",

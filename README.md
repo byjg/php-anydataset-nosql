@@ -30,11 +30,18 @@ See below the current implemented drivers:
 
 | Datasource                                  | Connection String                                        |
 |---------------------------------------------|----------------------------------------------------------|
-| [MongoDB](MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
-| [Cloudflare KV](CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
-| [S3](AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
-| [AWS DynamoDB](AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
+| [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
+| [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
+| [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
+| [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
+
+## PSR-16 Cache Interface
+
+This package provides a PSR-16 cache implementation for the Key-Value store and it is compatible with any class
+use the PSR-16 interface.
+
+For more details see: [Cache Inteface for Key Value](docs/cache.md)
 
 ## Examples
 
@@ -94,6 +101,7 @@ flowchart TD
    byjg/anydataset-nosql --> byjg/anydataset-array
    byjg/anydataset-nosql --> byjg/serializer
    byjg/anydataset-nosql --> byjg/webrequest
+   byjg/anydataset-nosql --> byjg/cache-engine
    byjg/anydataset-nosql --> ext-json
 ```
 
