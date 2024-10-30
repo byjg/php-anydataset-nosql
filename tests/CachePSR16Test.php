@@ -167,7 +167,7 @@ class CachePSR16Test extends TestCase
             $this->assertNull($item);
 
             // Set object
-            $model = new \Tests\Document(10, 20, 30);
+            $model = new \Tests\Document("name", "brand", 30);
             $cacheEngine->set('chave', $model);
 
             $item2 = $cacheEngine->get('chave');
