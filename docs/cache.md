@@ -1,5 +1,9 @@
 # Cache Interface
 
+The class `KeyValueCacheEngine` adds a cache layer on top of the KeyValueStore.
+
+It allows you to cache the results locally and avoid unnecessary calls to the KeyValueStore.
+
 This package provides a PSR-16 cache implementation for the Key-Value store.
 
 To use as a cache store you just need to:

@@ -9,9 +9,9 @@
 Anydataset NoSQL standardize the access to non-relational databases/repositories and treat them as Key/Value.
 The implementation can work with:
 
+- S3-Like Storage
 - MongoDB
 - Cloudflare KV
-- S3
 - DynamoDB
 
 Anydataset is an agnostic data source abstraction layer in PHP. See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
@@ -36,16 +36,14 @@ See below the current implemented drivers:
 | [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
 
-## PSR-16 Cache Interface
+## Topics
 
-This package provides a PSR-16 cache implementation for the Key-Value store and it is compatible with any class
-use the PSR-16 interface.
-
-For more details see: [Cache Inteface for Key Value](docs/cache.md)
-
-## Examples
-
-Check implementation examples on [https://opensource.byjg.com/php/anydataset-nosql](https://opensource.byjg.com/php/anydataset-nosql)
+- [S3-Like Storage](docs/AwsS3KeyValue.md)
+- [MongoDB](docs/MongoDB.md)
+- [Cloudflare KV](docs/CloudFlareKV.md)
+- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md)
+- [Cache Store](docs/cache.md)
+- [Running Tests](docs/tests.md)
 
 ## Install
 
@@ -54,42 +52,6 @@ Just type:
 ```bash
 composer require "byjg/anydataset-nosql"
 ```
-
-## Running Unit tests
-
-```bash
-docker-compose up -d
-export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
-export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:4566"
-export DYNAMODB_CONNECTION="dynamodb://accesskey:secretkey@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
-vendor/bin/phpunit
-```
-
-
-### Setup MongoDB for the unit test
-
-Set the environment variable:
-
-- MONGODB_CONNECTION = "mongodb://127.0.0.1/test"
-
-### Setup AWS DynamoDb for the unit test
-
-Set the environment variable:
- 
-- DYNAMODB_CONNECTION = "dynamodb://accesskey:secretkey@region/tablename"
-
-### Setup AWS S3 for the unit test
-
-Set the environment variable:
- 
-- S3_CONNECTION = "s3://accesskey:secretkey@region/bucketname"
-
-
-### Cloudflare KV
-
-Set the environment variable:
- 
-- CLOUDFLAREKV_CONNECTION = "kv://email:authkey@accountid/namespaceid"
 
 ## Dependencies
 
