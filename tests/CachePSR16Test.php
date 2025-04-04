@@ -6,13 +6,14 @@ use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\Cache\Psr16\BaseCacheEngine;
 use ByJG\Cache\Psr16\NoCacheEngine;
 use ByJG\Util\Uri;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CachePSR16Test extends TestCase
 {
     protected ?BaseCacheEngine $cacheEngine = null;
 
-    public function CachePoolProvider()
+    public static function CachePoolProvider()
     {
         $result = [];
         $awsConnection = getenv("S3_CONNECTION");
@@ -28,6 +29,7 @@ class CachePSR16Test extends TestCase
         return $result;
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (empty($this->cacheEngine)) {
@@ -38,11 +40,7 @@ class CachePSR16Test extends TestCase
     }
 
 
-    /**
-     * @dataProvider CachePoolProvider
-     * @param BaseCacheEngine $cacheEngine
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
+    #[DataProvider('CachePoolProvider')]
     public function testGetOneItem(BaseCacheEngine $cacheEngine)
     {
         $this->cacheEngine = $cacheEngine;
@@ -74,11 +72,7 @@ class CachePSR16Test extends TestCase
         }
     }
 
-    /**
-     * @dataProvider CachePoolProvider
-     * @param BaseCacheEngine $cacheEngine
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
+    #[DataProvider('CachePoolProvider')]
     public function testGetMultipleItems(BaseCacheEngine $cacheEngine)
     {
         $this->cacheEngine = $cacheEngine;
@@ -115,11 +109,7 @@ class CachePSR16Test extends TestCase
         }
     }
 
-    /**
-     * @dataProvider CachePoolProvider
-     * @param BaseCacheEngine $cacheEngine
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
+    #[DataProvider('CachePoolProvider')]
     public function testTtl(BaseCacheEngine $cacheEngine)
     {
         $this->cacheEngine = $cacheEngine;
@@ -152,11 +142,7 @@ class CachePSR16Test extends TestCase
         }
     }
 
-    /**
-     * @dataProvider CachePoolProvider
-     * @param BaseCacheEngine $cacheEngine
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
+    #[DataProvider('CachePoolProvider')]
     public function testCacheObject(BaseCacheEngine $cacheEngine)
     {
         $this->cacheEngine = $cacheEngine;

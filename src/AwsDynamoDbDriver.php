@@ -62,6 +62,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @throws FileException
      * @throws XmlUtilException
      */
+    #[\Override]
     public function getIterator(array $options = []): GenericIterator
     {
         $data = array_merge(
@@ -140,6 +141,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $result;
     }
 
+    #[\Override]
     public function get(string|int|object $key, array $options = []): ?array
     {
         $this->validateOptions($options);
@@ -168,6 +170,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return Result
      */
+    #[\Override]
     public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         if (is_object($value)) {
@@ -192,12 +195,14 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
+    #[\Override]
     public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         // TODO: Implement putBatch() method.
         return null;
     }
 
+    #[\Override]
     public function remove(string|int|object $key, array $options = []): Result
     {
         $this->validateOptions($options);
@@ -218,6 +223,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $this->dynamoDbClient->deleteItem($data);
     }
 
+    #[\Override]
     public function getDbConnection(): DynamoDbClient
     {
         return $this->dynamoDbClient;
@@ -228,6 +234,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
+    #[\Override]
     public function removeBatch(array $keys, array $options = []): mixed
     {
         // TODO: Implement removeBatch() method.
@@ -244,6 +251,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $this->dynamoDbClient;
     }
 
+    #[\Override]
     public static function schema(): array
     {
         return ["dynamo", "dynamodb"];
@@ -252,17 +260,20 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @throws NotImplementedException
      */
+    #[\Override]
     public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("DynamoDB cannot rename");
     }
 
+    #[\Override]
     public function has(string|int|object $key, $options = []): bool
     {
         $value = $this->get($key, $options);
         return !empty($value);
     }
 
+    #[\Override]
     public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         throw new NotImplementedException("DynamoDB cannot getChunk");

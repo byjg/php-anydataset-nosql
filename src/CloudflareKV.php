@@ -2,9 +2,9 @@
 
 namespace ByJG\AnyDataset\NoSql;
 
+use ByJG\AnyDataset\Core\AnyDataset;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
-use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use ByJG\WebRequest\Exception\CurlException;
@@ -49,6 +49,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function get(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
@@ -67,6 +68,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function put(string|int|object $key, mixed $value, array $options = []): mixed
     {
         $request = $this->request("/values/$key", $options)
@@ -87,6 +89,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
@@ -107,6 +110,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function remove(string|int|object $key, array $options = []): string
     {
         $request = $this->request("/values/$key", $options)
@@ -124,6 +128,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function removeBatch(array $keys, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
@@ -175,6 +180,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
+    #[\Override]
     public function getIterator(array $options = []): GenericIterator
     {
         $request = $this->request("/keys", $options)
@@ -186,7 +192,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         $this->lastCursor = $options;
         $this->lastCursor["cursor"] = $result["result_info"]["cursor"];
 
-        $arrayDataset = new ArrayDataset($result["result"]);
+        $arrayDataset = new AnyDataset($result["result"]);
 
         return $arrayDataset->getIterator();
     }
@@ -196,6 +202,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $this->lastCursor;
     }
 
+    #[\Override]
     public function getDbConnection(): mixed
     {
         return null;
@@ -219,21 +226,25 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $array;
     }
 
+    #[\Override]
     public static function schema(): array
     {
         return ["kv"];
     }
 
+    #[\Override]
     public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("Not implemented");
     }
 
+    #[\Override]
     public function has(string|int|object $key, $options = []): bool
     {
         throw new NotImplementedException("Not implemented");
     }
 
+    #[\Override]
     public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         throw new NotImplementedException("Not implemented");

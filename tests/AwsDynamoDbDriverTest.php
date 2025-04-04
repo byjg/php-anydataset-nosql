@@ -40,6 +40,7 @@ class AwsDynamoDbDriverTest extends TestCase
             ]
         ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $awsConnection = getenv("DYNAMODB_CONNECTION");
@@ -82,6 +83,7 @@ class AwsDynamoDbDriverTest extends TestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (!empty($this->object)) {
@@ -146,7 +148,7 @@ class AwsDynamoDbDriverTest extends TestCase
 
         // Check new elements
         $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertEquals(0, $iterator->count());
+        $this->assertFalse($iterator->valid());
     }
 
 //    public function testGetChunk()

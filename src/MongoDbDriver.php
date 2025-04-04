@@ -101,6 +101,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * If you have to, probably something is missing in this class
      * @return Manager|null
      */
+    #[\Override]
     public function getDbConnection(): ?Manager
     {
         return $this->mongoManager;
@@ -112,6 +113,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @return NoSqlDocument|null
      * @throws Exception
      */
+    #[\Override]
     public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
@@ -131,6 +133,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @return NoSqlDocument[]|null
      * @throws Exception
      */
+    #[\Override]
     public function getDocuments(IteratorFilter $filter, mixed $collection = null): ?array
     {
         if (empty($collection)) {
@@ -218,6 +221,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $result;
     }
 
+    #[\Override]
     public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
@@ -227,6 +231,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     }
 
 
+    #[\Override]
     public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void
     {
         if (empty($collection)) {
@@ -245,6 +250,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         );
     }
 
+    #[\Override]
     public function updateDocuments(IteratorFilter $filter, array $data, mixed $collection = null): void
     {
         if (empty($collection)) {
@@ -266,6 +272,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @param NoSqlDocument $document
      * @return NoSqlDocument
      */
+    #[\Override]
     public function save(NoSqlDocument $document): NoSqlDocument
     {
         if (empty($document->getCollection())) {
@@ -309,6 +316,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $document;
     }
 
+    #[\Override]
     public static function schema(): array
     {
         return ["mongodb", "mongo"];

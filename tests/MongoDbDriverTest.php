@@ -18,6 +18,7 @@ class MongoDbDriverTest extends TestCase
     
     const TEST_COLLECTION = 'collectionTest';
 
+    #[\Override]
     public function setUp(): void
     {
         $mongodbConnection = getenv("MONGODB_CONNECTION");
@@ -72,6 +73,7 @@ class MongoDbDriverTest extends TestCase
         );
     }
     
+    #[\Override]
     public function tearDown(): void
     {
         if (!empty($this->dbDriver)) {

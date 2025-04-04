@@ -39,6 +39,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function has(string $key): bool
     {
         $key = $this->getKeyFromContainer($key);
@@ -62,6 +63,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
      */
+    #[\Override]
     public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
@@ -87,6 +89,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
      *
      *   MUST be thrown if the $key string is not a legal value.
      */
+    #[\Override]
     public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         $key = $this->getKeyFromContainer($key);
@@ -101,6 +104,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
         return true;
     }
 
+    #[\Override]
     public function clear(): bool
     {
         return false;
@@ -112,6 +116,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @param string $key
      * @return bool
      */
+    #[\Override]
     public function delete(string $key): bool
     {
         $key = $this->getKeyFromContainer($key);
@@ -121,6 +126,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
         return true;
     }
 
+    #[\Override]
     public function isAvailable(): bool
     {
         return true;
