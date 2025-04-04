@@ -4,11 +4,13 @@ namespace ByJG\AnyDataset\NoSql;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Result;
+use ByJG\AnyDataset\Core\AnyDataset;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
-use ByJG\AnyDataset\Lists\ArrayDataset;
 use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
+use ByJG\XmlUtil\Exception\FileException;
+use ByJG\XmlUtil\Exception\XmlUtilException;
 use InvalidArgumentException;
 
 class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
@@ -57,6 +59,8 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @param array $options
      * @return GenericIterator
+     * @throws FileException
+     * @throws XmlUtilException
      */
     public function getIterator(array $options = []): GenericIterator
     {
@@ -85,7 +89,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
             $result[] = $this->extractRecord($item);
         }
 
-        return (new ArrayDataset($result))->getIterator();
+        return (new AnyDataset($result))->getIterator();
     }
 
     protected function validateOptions($options): void

@@ -102,7 +102,7 @@ class AwsDynamoDbDriverTest extends TestCase
 
         // Get current bucket
         $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertEquals(0, $iterator->count());
+        $this->assertFalse($iterator->valid());
 
         // Add an element
         $this->assertFalse($this->object->has(1, $this->options));
@@ -114,15 +114,13 @@ class AwsDynamoDbDriverTest extends TestCase
 
         // Check new elements
         $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertEquals(1, $iterator->count());
+        $this->assertTrue($iterator->valid());
         $this->assertEquals(
             [
                 [
-                    "name" => "John",
-                    "surname" => "Doe",
+                    "Name" => "John",
+                    "SurName" => "Doe",
                     "key" => 1,
-                    '__id' => 0,
-                    '__key' => 0
                 ]
             ],
             $iterator->toArray()

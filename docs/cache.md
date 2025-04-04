@@ -1,3 +1,7 @@
+---
+sidebar_position: 5
+---
+
 # Cache Interface
 
 The class `KeyValueCacheEngine` adds a cache layer on top of the KeyValueStore.
