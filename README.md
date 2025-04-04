@@ -23,6 +23,7 @@ Anydataset is an agnostic data source abstraction layer in PHP. See more about A
 - Key/Value stores accessed through `KeyValueInterface`
 - Unified connection string format based on URIs
 - Built-in caching capabilities with PSR-16 compatibility
+- Type-safe DynamoDB attribute definitions using enums
 
 ## Connection Based on URI
 
@@ -41,7 +42,7 @@ See below the current implemented drivers:
 ## Topics
 
 - [MongoDB](docs/MongoDB.md)
-- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md)
+- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) - Now with type-safe attribute definitions using `DynamoDbAttributeType` enum
 - [S3-Like Storage](docs/AwsS3KeyValue.md)
 - [Cloudflare KV](docs/CloudFlareKV.md)
 - [Cache Store](docs/cache.md)

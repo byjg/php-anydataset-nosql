@@ -7,6 +7,7 @@ use Aws\Result;
 use ByJG\AnyDataset\Core\AnyDataset;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use ByJG\XmlUtil\Exception\FileException;
@@ -100,20 +101,36 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         }
     }
 
+    /**
+     * Prepares data for sending to DynamoDB by converting values to DynamoDB attribute format
+     * 
+     * @param array $array The data to prepare
+     * @param array $options The options containing type definitions
+     * @return array The prepared data in DynamoDB format
+     */
     protected function prepareToSend($array, $options) {
         array_walk($array, function(&$val, $key) use ($options) {
             if (!is_array($val)) {
                 $val = "".$val;
             }
 
+            // Get the attribute type
+            $attributeType = $options['Types'][$key] ?? DynamoDbAttributeType::STRING->value;
+            
             $val = [
-                $options['Types'][$key] ?? "S" => $val
+                $attributeType => $val
             ];
         });
 
         return $array;
     }
 
+    /**
+     * Extracts a record from DynamoDB response format to regular array
+     * 
+     * @param mixed $awsResult The result from AWS
+     * @return array|null The extracted record
+     */
     protected function extractRecord($awsResult): ?array
     {
         $result = [];
@@ -129,10 +146,10 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 
         array_walk($raw, function($val, $key) use (&$result) {
             $value = null;
-            if (isset($val["N"])) {
-                $value = intval($val["N"]);
-            } else if (isset($val["S"])) {
-                $value = $val["S"];
+            if (isset($val[DynamoDbAttributeType::NUMBER->value])) {
+                $value = intval($val[DynamoDbAttributeType::NUMBER->value]);
+            } else if (isset($val[DynamoDbAttributeType::STRING->value])) {
+                $value = $val[DynamoDbAttributeType::STRING->value];
             }
 
             $result[$key] = $value;

@@ -34,7 +34,6 @@ Example with a custom endpoint:
 dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://localhost:8000
 ```
 
-
 ## DynamoDB Data Structure
 
 DynamoDB stores information using a specific attribute format that differs from typical object structures.
@@ -61,26 +60,44 @@ This library abstracts this format to let you use a more familiar representation
 ]
 ```
 
+## Type Definitions
+
 When using the put/get/remove methods, you need to provide type information through the `options` parameter to define the data model.
 
-The options array requires two keys:
-- `KeyName`: The primary key name (currently only supports tables with a single key)
-- `Types`: Defines field names and their DynamoDB types (N = number, S = string, etc.)
-
-Example options:
+This library provides a `DynamoDbAttributeType` enum for defining attribute types, making your code more maintainable and less error-prone:
 
 ```php
 <?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+
+// Example of options using the enum
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => "N",     // Number
-        "time" => "N",   // Number
-        "error" => "S",  // String
-        "message" => "S" // String
+        "id" => DynamoDbAttributeType::NUMBER->value,     // 'N'
+        "time" => DynamoDbAttributeType::NUMBER->value,   // 'N'
+        "error" => DynamoDbAttributeType::STRING->value,  // 'S'
+        "message" => DynamoDbAttributeType::STRING->value // 'S'
     ]
 ];
 ```
+
+### Available Attribute Types
+
+The `DynamoDbAttributeType` enum provides the following types:
+
+| Enum Case  | Value  | Description                            |
+|------------|--------|----------------------------------------|
+| NUMBER     | 'N'    | Represents a number                    |
+| STRING     | 'S'    | Represents a string                    |
+| BINARY     | 'B'    | Represents binary data                 |
+| BOOLEAN    | 'BOOL' | Represents a boolean value             |
+| NULL       | 'NULL' | Represents a null value                |
+| MAP        | 'M'    | Represents a map (nested attributes)   |
+| LIST       | 'L'    | Represents a list (ordered collection) |
+| STRING_SET | 'SS'   | Represents a set of strings            |
+| NUMBER_SET | 'NS'   | Represents a set of numbers            |
+| BINARY_SET | 'BS'   | Represents a set of binary values      |
 
 ## Basic Operations
 
@@ -88,7 +105,22 @@ $options = [
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+// Define types using the enum
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER->value,
+        "time" => DynamoDbAttributeType::NUMBER->value,
+        "error" => DynamoDbAttributeType::STRING->value,
+        "message" => DynamoDbAttributeType::STRING->value
+    ]
+];
+
 $dynamodb->put(
     1201,  // Primary key value
     [
@@ -104,7 +136,18 @@ $dynamodb->put(
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER->value,
+    ]
+];
+
 $value = $dynamodb->get(1201, $options);
 
 /* Returns:
@@ -121,7 +164,18 @@ $value = $dynamodb->get(1201, $options);
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER->value,
+    ]
+];
+
 if ($dynamodb->has(1201, $options)) {
     echo "Key exists!";
 }
@@ -131,7 +185,18 @@ if ($dynamodb->has(1201, $options)) {
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER->value,
+    ]
+];
+
 $dynamodb->remove(1201, $options);
 ```
 
@@ -143,22 +208,25 @@ To get a list of objects, you need to use either `KeyConditions` (for queries on
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
 
 $options = [
    "KeyConditions" => [
        "id" => [
            "AttributeValueList" => [
-               ["N" => "1201"]
+               [DynamoDbAttributeType::NUMBER->value => "1201"]
            ],
            "ComparisonOperator" => "EQ"
        ]
    ],
    "Types" => [
-       "id" => "N",
-       "time" => "N",
-       "error" => "S",
-       "message" => "S"
+       "id" => DynamoDbAttributeType::NUMBER->value,
+       "time" => DynamoDbAttributeType::NUMBER->value,
+       "error" => DynamoDbAttributeType::STRING->value,
+       "message" => DynamoDbAttributeType::STRING->value
    ]
 ];
 
@@ -170,22 +238,25 @@ print_r($iterator->toArray());
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
 
 $options = [
    "ScanFilter" => [
        "error" => [
            "AttributeValueList" => [
-               ["S" => "Executive overflow"]
+               [DynamoDbAttributeType::STRING->value => "Executive overflow"]
            ],
            "ComparisonOperator" => "EQ"
        ]
    ],
    "Types" => [
-       "id" => "N",
-       "time" => "N",
-       "error" => "S",
-       "message" => "S"
+       "id" => DynamoDbAttributeType::NUMBER->value,
+       "time" => DynamoDbAttributeType::NUMBER->value,
+       "error" => DynamoDbAttributeType::STRING->value,
+       "message" => DynamoDbAttributeType::STRING->value
    ]
 ];
 
