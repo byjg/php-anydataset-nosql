@@ -6,21 +6,23 @@
 [![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-anydataset-nosql.svg)](https://github.com/byjg/php-anydataset-nosql/releases/)
 
-Anydataset NoSQL standardize the access to non-relational databases/repositories and treat them as Key/Value.
-The implementation can work with:
+Anydataset NoSQL standardizes the access to non-relational databases/repositories and provides a consistent interface for both NoSQL document databases and Key/Value stores.
+The implementation supports:
 
-- S3-Like Storage
-- MongoDB
-- Cloudflare KV
-- DynamoDB
+- MongoDB (document-based)
+- AWS DynamoDB (key/value)
+- S3-Like Storage (key/value)
+- Cloudflare KV (key/value)
 
 Anydataset is an agnostic data source abstraction layer in PHP. See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
 
 ## Features
 
-- Access as Key/Value repositories different datasource
-- Allow put and get data
-- Simplified way to connect to the datasources
+- Access both document-based and key/value repositories with consistent interfaces
+- NoSQL document-based databases accessed through `NoSqlInterface`
+- Key/Value stores accessed through `KeyValueInterface`
+- Unified connection string format based on URIs
+- Built-in caching capabilities with PSR-16 compatibility
 
 ## Connection Based on URI
 

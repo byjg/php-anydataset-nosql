@@ -4,35 +4,42 @@ sidebar_position: 2
 
 # AWS DynamoDB
 
+AWS DynamoDB is a managed NoSQL database service that provides fast and predictable performance with seamless scalability.
+
 ```php
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://access_key:secret_key@region/tablename');
 ```
 
-The full connection string can be:
+The full connection string format:
+
+```
+dynamodb://access_key:secret_key@region/tablename?option1=value1&option2=value2
+```
+
+Example:
 
 ```
 dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
-You can add any extra arguments supported by the DynamoDB api. You can get a full list here:
- - [https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct)
+You can add any extra arguments supported by the DynamoDB API. You can get a full list here:
+- [AWS SDK for PHP Client Configuration](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct)
 
-One of the most populars is the parameter `endpoint` where we can set a custom endpoint to access 
-an DynamoDB compatible interface. 
+One of the most common parameters is `endpoint`, which allows you to set a custom endpoint to access a DynamoDB compatible interface, such as DynamoDB Local for development or testing.
 
-An example can be: 
+Example with a custom endpoint: 
 
 ```
-s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/tablename?endpoint=http://localhost:8000
+dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://localhost:8000
 ```
 
 
-## Preparing to use DynamoDb
+## DynamoDB Data Structure
 
-DynamoDb stores the information slightly different from a model dto structure.
+DynamoDB stores information using a specific attribute format that differs from typical object structures.
 
-Here an example how DynamoDb requires a model:
+For example, a DynamoDB native representation looks like this:
 
 ```
 [
@@ -43,7 +50,7 @@ Here an example how DynamoDb requires a model:
 ]
 ```
 
-and a definition more usual is to have :
+This library abstracts this format to let you use a more familiar representation:
 
 ```
 [
@@ -54,28 +61,28 @@ and a definition more usual is to have :
 ]
 ```
 
-We will use the second definition. However, every put/get/remove method we will need to set up 
-a list of options to define this data model. 
+When using the put/get/remove methods, you need to provide type information through the `options` parameter to define the data model.
 
-basically we have to create an array with 2 keys:
-- KeyName: Contains the key hame (Currently supports table with only one key)
-- Types: Defines the field names and type
+The options array requires two keys:
+- `KeyName`: The primary key name (currently only supports tables with a single key)
+- `Types`: Defines field names and their DynamoDB types (N = number, S = string, etc.)
 
-Example:
+Example options:
 
 ```php
 <?php
-
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => "N",
-        "time" => "N"
+        "id" => "N",     // Number
+        "time" => "N",   // Number
+        "error" => "S",  // String
+        "message" => "S" // String
     ]
 ];
 ```
 
-The examples below will use this definition.
+## Basic Operations
 
 ### Inserting/Updating data
 
@@ -83,47 +90,56 @@ The examples below will use this definition.
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $dynamodb->put(
-    1201,
+    1201,  // Primary key value
     [
         "time" => 1234567899,
         "error" => 'Executive overflow',
-        "Message" => "No Vacant Areas"
+        "message" => "No Vacant Areas"
     ],
-    $options  // See above
+    $options  // Type definitions
 );
 ```
 
-### Retrieve a value
+### Retrieving a value
 
 ```php
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
 $value = $dynamodb->get(1201, $options);
 
-/* Should Return:
+/* Returns:
 [
     'id'      => 1201,
-    'time'    => $time,
+    'time'    => 1234567899,
     'error'   => 'Executive overflow',
-    'message' => 'no vacant areas'
+    'message' => 'No Vacant Areas'
 ]
 */
 ```
 
-### Remove a value
+### Checking if a key exists
 
 ```php
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
-$dynamodb->remove(1201);
+if ($dynamodb->has(1201, $options)) {
+    echo "Key exists!";
+}
 ```
 
+### Removing a value
 
-## Listing objects
+```php
+<?php
+$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+$dynamodb->remove(1201, $options);
+```
 
-To get a list of the objects you need to pass an array of options with the keys `KeyConditions` or `ScanFilter`.
+## Querying Data
 
-Example:
+To get a list of objects, you need to use either `KeyConditions` (for queries on the primary key) or `ScanFilter` (for scanning the entire table) in the options array.
+
+### Query using KeyConditions
 
 ```php
 <?php
@@ -137,6 +153,12 @@ $options = [
            ],
            "ComparisonOperator" => "EQ"
        ]
+   ],
+   "Types" => [
+       "id" => "N",
+       "time" => "N",
+       "error" => "S",
+       "message" => "S"
    ]
 ];
 
@@ -144,20 +166,37 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-### Check if a key exists
+### Scan using ScanFilter
 
 ```php
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
-if ($dynamodb->has(1201)) {
-    echo "exist!";
-}
+
+$options = [
+   "ScanFilter" => [
+       "error" => [
+           "AttributeValueList" => [
+               ["S" => "Executive overflow"]
+           ],
+           "ComparisonOperator" => "EQ"
+       ]
+   ],
+   "Types" => [
+       "id" => "N",
+       "time" => "N",
+       "error" => "S",
+       "message" => "S"
+   ]
+];
+
+$iterator = $dynamodb->getIterator($options);
+print_r($iterator->toArray());
 ```
 
-## Further reading
+## Further Reading
 
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html](https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html)
+- [AWS SDK for PHP - DynamoDB Documentation](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
+- [DynamoDB Client API Reference](https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html)
 
 ----
 [Open source ByJG](http://opensource.byjg.com)
