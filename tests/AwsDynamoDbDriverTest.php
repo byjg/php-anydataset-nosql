@@ -2,9 +2,10 @@
 
 namespace Tests;
 
-use Aws\DynamoDb\Exception\DynamoDbException;
 use ByJG\AnyDataset\NoSql\AwsDynamoDbDriver;
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 use ByJG\AnyDataset\NoSql\Factory;
+use Override;
 use PHPUnit\Framework\TestCase;
 
 class AwsDynamoDbDriverTest extends TestCase
@@ -12,162 +13,168 @@ class AwsDynamoDbDriverTest extends TestCase
     /**
      * @var AwsDynamoDbDriver|null
      */
-    protected ?AwsDynamoDbDriver $object = null;
+    protected AwsDynamoDbDriver|null $object = null;
 
-    protected array $options =
-        [
-            "KeyName" => "key",
-            "Types" =>
-                [
-                    "key" => "N"
-                ]
-        ];
-
-    protected array $scanOptions =
-        [
-            "ScanFilter" => []
-        ];
-
-    protected array $queryOptions =
-        [
-            "KeyConditions" => [
-                "key" => [
-                    "AttributeValueList" => [
-                        ["N" => "1"]
-                    ],
-                    "ComparisonOperator" => "EQ"
-                ]
-            ]
-        ];
-
-    #[\Override]
+    /**
+     * @var string
+     */
+    protected string $testTable = 'dynamodb-test';
+    
+    #[Override]
     protected function setUp(): void
     {
         $awsConnection = getenv("DYNAMODB_CONNECTION");
-        if (!empty($awsConnection)) {
-            /** @psalm-suppress InvalidPropertyAssignmentValue */
-            $this->object = Factory::getInstance($awsConnection);
-
-            $this->createTable();
-
-            $this->object->remove(1, $this->options);
-            $this->object->remove(2, $this->options);
+        if (empty($awsConnection)) {
+            $this->markTestSkipped("In order to test DynamoDB you must define DYNAMODB_CONNECTION");
+            return;
         }
+
+        /** @psalm-suppress InvalidPropertyAssignmentValue */
+        $this->object = Factory::getInstance($awsConnection);
+        
+        $this->ensureTableExists();
     }
 
-    protected function createTable()
+    protected function ensureTableExists()
     {
-        try {
-            $this->object->client()->describeTable(['TableName' => $this->object->getTablename()]);
-        } catch (DynamoDbException $ex) {
-            // table doesn't exist, create it below
-            $this->object->client()->createTable([
-                'TableName' => $this->object->getTablename(),
-                'KeySchema' => [
-                    [
-                        'AttributeName' => 'key',
-                        'KeyType' => 'HASH'
-                    ]
-                ],
-                'AttributeDefinitions' => [
-                    [
-                        'AttributeName' => 'key',
-                        'AttributeType' => 'N'
-                    ],
-                ],
-                'ProvisionedThroughput' => [
-                    'ReadCapacityUnits' => 10,
-                    'WriteCapacityUnits' => 10
+        $this->object->client()->createTable([
+            'TableName' => $this->testTable,
+            'KeySchema' => [
+                [
+                    'AttributeName' => 'id',
+                    'KeyType' => 'HASH'
                 ]
-            ]);
-        }
+            ],
+            'AttributeDefinitions' => [
+                [
+                    'AttributeName' => 'id',
+                    'AttributeType' => DynamoDbAttributeType::NUMBER->value
+                ],
+            ],
+            'ProvisionedThroughput' => [
+                'ReadCapacityUnits' => 5,
+                'WriteCapacityUnits' => 5
+            ]
+        ]);
+
+        // Wait for table to be created
+        $this->object->client()->waitUntil('TableExists', [
+            'TableName' => $this->testTable
+        ]);
     }
 
-    #[\Override]
+    #[Override]
     protected function tearDown(): void
     {
-        if (!empty($this->object)) {
-            $this->object->remove(1, $this->options);
-            $this->object->remove(2, $this->options);
-            $this->object = null;
-        }
+        // No cleanup needed for this test
+        $this->object->client()->deleteTable(['TableName' => $this->testTable]);
+        $this->object = null;
     }
 
     /**
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
      */
     public function testDynamoDbOperations()
     {
         if (empty($this->object)) {
-            $this->markTestIncomplete("In order to test DynamoDB you must define DYNAMODB_CONNECTION");
+            $this->markTestSkipped("In order to test DynamoDB you must define DYNAMODB_CONNECTION");
         }
 
-        // Get current bucket
-        $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertFalse($iterator->valid());
+        // Define options with table name and key schema
+        $options = [
+            'KeyName' => 'id',
+            'TableName' => $this->testTable,
+            'Types' => [
+                'id' => DynamoDbAttributeType::NUMBER,
+                'Name' => DynamoDbAttributeType::STRING,
+                'SurName' => DynamoDbAttributeType::STRING,
+                'Active' => DynamoDbAttributeType::BOOLEAN,
+                "Tags" => DynamoDbAttributeType::STRING_SET,
+                "CatIds" => DynamoDbAttributeType::NUMBER_SET,
+                "details" => DynamoDbAttributeType::MAP,
+            ]
+        ];
 
-        // Add an element
-        $this->assertFalse($this->object->has(1, $this->options));
-        $this->assertFalse($this->object->has(2, $this->options));
-        $this->object->put(1, ["Name" => "John", "SurName" => "Doe"], $this->options);
-        $this->object->put(2, ["Name" => "Jane", "SurName" => "Smith"], $this->options);
-        $this->assertTrue($this->object->has(1, $this->options));
-        $this->assertTrue($this->object->has(2, $this->options));
+        // Test has() method on non-existent keys
+        $this->assertFalse($this->object->has(1, $options));
+        $this->assertFalse($this->object->has(2, $options));
 
-        // Check new elements
-        $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertTrue($iterator->valid());
-        $this->assertEquals(
+        // Add records
+        $this->object->put(
+            1,
             [
-                [
-                    "Name" => "John",
-                    "SurName" => "Doe",
-                    "key" => 1,
+                "Name" => "John",
+                "SurName" => "Doe",
+                "Active" => true,
+                "Tags" => ["tag1", "tag2"],
+                "CatIds" => [1, 2],
+                "details" => [
+                    "name" => "Product Name",
+                    "price" => 99.99,
+                    "inStock" => true
                 ]
             ],
-            $iterator->toArray()
+            $options
+        );
+        $this->object->put(
+            2,
+            [
+                "Name" => "Jane",
+                "SurName" => "Smith",
+                "Active" => false,
+                "Tags" => ["tag3", "tag4"],
+                "CatIds" => [3, 4],
+                "details" => [
+                    "name" => "Other Product",
+                    "price" => 250,
+                    "inStock" => false
+                ]
+            ],
+            $options
         );
 
-        // Get elements
-        $elem1 = $this->object->get(1, $this->options);
+        // Test has() method on existing keys
+        $this->assertTrue($this->object->has(1, $options));
+        $this->assertTrue($this->object->has(2, $options));
+
+        // Test get() method
+        $elem1 = $this->object->get(1, $options);
+        $this->assertNotNull($elem1, "Failed to retrieve record with ID test1");
         $this->assertEquals([
             "Name" => "John",
             "SurName" => "Doe",
-            "key" => 1
+            "Active" => true,
+            "Tags" => ["tag1", "tag2"],
+            "CatIds" => [1, 2],
+            "details" => [
+                "name" => "Product Name",
+                "price" => 99.99,
+                "inStock" => true
+            ],
+            "id" => 1
         ], $elem1);
-        $elem2 = $this->object->get(2, $this->options);
+
+        $elem2 = $this->object->get(2, $options);
+        $this->assertNotNull($elem2, "Failed to retrieve record with ID test2");
         $this->assertEquals([
             "Name" => "Jane",
             "SurName" => "Smith",
-            "key" => 2
+            "Active" => false,
+            "Tags" => ["tag3", "tag4"],
+            "CatIds" => [3, 4],
+            "details" => [
+                "name" => "Other Product",
+                "price" => 250,
+                "inStock" => false
+            ],
+            "id" => 2
         ], $elem2);
 
-        // Remove elements
-        $this->object->remove(1, $this->options);
-        $this->object->remove(2, $this->options);
+        // Test remove() method
+        $this->object->remove(1, $options);
+        $this->object->remove(2, $options);
 
-        // Check new elements
-        $iterator = $this->object->getIterator($this->queryOptions);
-        $this->assertFalse($iterator->valid());
+        // Verify records were removed
+        $this->assertFalse($this->object->has(1, $options), "Record with ID test1 was not removed");
+        $this->assertFalse($this->object->has(2, $options), "Record with ID test2 was not removed");
     }
-
-//    public function testGetChunk()
-//    {
-//        if (empty($this->object)) {
-//            $this->markTestIncomplete("In order to test DynamoDB you must define DYNAMODB_CONNECTION");
-//        }
-//
-//        $this->object->put(
-//            "KEY",
-//            str_repeat("0", 256) . str_repeat("1", 256) . str_repeat("2", 250)
-//        );
-//
-//        $part1 = $this->object->getChunk("KEY", [], 256, 0);
-//        $part2 = $this->object->getChunk("KEY", [], 256, 1);
-//        $part3 = $this->object->getChunk("KEY", [], 256, 2);
-//
-//        $this->assertEquals(str_repeat("0", 256), $part1);
-//        $this->assertEquals(str_repeat("1", 256), $part2);
-//        $this->assertEquals(str_repeat("2", 250), $part3);
-//    }
 }

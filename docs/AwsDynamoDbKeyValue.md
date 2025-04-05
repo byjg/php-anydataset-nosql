@@ -74,13 +74,31 @@ use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER->value,     // 'N'
-        "time" => DynamoDbAttributeType::NUMBER->value,   // 'N'
-        "error" => DynamoDbAttributeType::STRING->value,  // 'S'
-        "message" => DynamoDbAttributeType::STRING->value // 'S'
+        "id" => DynamoDbAttributeType::NUMBER,
+        "time" => DynamoDbAttributeType::NUMBER,
+        "error" => DynamoDbAttributeType::STRING,
+        "message" => DynamoDbAttributeType::STRING
     ]
 ];
 ```
+
+### Key Attribute Type Matching
+
+⚠️ **IMPORTANT**: The attribute type you define for your primary key in the `options` array MUST match the attribute type defined in your DynamoDB table schema. Mismatching these types will result in a `ValidationException: Type mismatch for key` error.
+
+For example, if your DynamoDB table defines the `id` attribute as type `NUMBER` (`N`), you must use:
+
+```php
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER, // This must match the table schema
+        // other attributes...
+    ]
+];
+```
+
+Similarly, if your table defines the key as `STRING` (`S`), you must use `DynamoDbAttributeType::STRING`.
 
 ### Available Attribute Types
 
@@ -114,10 +132,10 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER->value,
-        "time" => DynamoDbAttributeType::NUMBER->value,
-        "error" => DynamoDbAttributeType::STRING->value,
-        "message" => DynamoDbAttributeType::STRING->value
+        "id" => DynamoDbAttributeType::NUMBER,
+        "time" => DynamoDbAttributeType::NUMBER,
+        "error" => DynamoDbAttributeType::STRING,
+        "message" => DynamoDbAttributeType::STRING
     ]
 ];
 
@@ -132,6 +150,8 @@ $dynamodb->put(
 );
 ```
 
+Note that the key value (1201) is passed as the first parameter to the `put` method. You don't need to include this value in the data array as the library will automatically add it for you.
+
 ### Retrieving a value
 
 ```php
@@ -144,7 +164,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER->value,
+        "id" => DynamoDbAttributeType::NUMBER,
     ]
 ];
 
@@ -172,7 +192,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER->value,
+        "id" => DynamoDbAttributeType::NUMBER,
     ]
 ];
 
@@ -193,7 +213,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER->value,
+        "id" => DynamoDbAttributeType::NUMBER,
     ]
 ];
 
@@ -214,6 +234,7 @@ use ByJG\AnyDataset\NoSql\Factory;
 $dynamodb = Factory::getInstance('dynamodb://....');
 
 $options = [
+   "TableName" => "mytable", // Table name is required
    "KeyConditions" => [
        "id" => [
            "AttributeValueList" => [
@@ -223,16 +244,18 @@ $options = [
        ]
    ],
    "Types" => [
-       "id" => DynamoDbAttributeType::NUMBER->value,
-       "time" => DynamoDbAttributeType::NUMBER->value,
-       "error" => DynamoDbAttributeType::STRING->value,
-       "message" => DynamoDbAttributeType::STRING->value
+       "id" => DynamoDbAttributeType::NUMBER,
+       "time" => DynamoDbAttributeType::NUMBER,
+       "error" => DynamoDbAttributeType::STRING,
+       "message" => DynamoDbAttributeType::STRING
    ]
 ];
 
 $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
+
+Note that when using the query operation, the key must match the key used in the table schema, and the type must also match.
 
 ### Scan using ScanFilter
 
@@ -244,6 +267,7 @@ use ByJG\AnyDataset\NoSql\Factory;
 $dynamodb = Factory::getInstance('dynamodb://....');
 
 $options = [
+   "TableName" => "mytable", // Table name is required 
    "ScanFilter" => [
        "error" => [
            "AttributeValueList" => [
@@ -253,16 +277,165 @@ $options = [
        ]
    ],
    "Types" => [
-       "id" => DynamoDbAttributeType::NUMBER->value,
-       "time" => DynamoDbAttributeType::NUMBER->value,
-       "error" => DynamoDbAttributeType::STRING->value,
-       "message" => DynamoDbAttributeType::STRING->value
+       "id" => DynamoDbAttributeType::NUMBER,
+       "time" => DynamoDbAttributeType::NUMBER,
+       "error" => DynamoDbAttributeType::STRING,
+       "message" => DynamoDbAttributeType::STRING
    ]
 ];
 
 $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
+
+The Scan operation will search through the entire table, which can be slower but allows you to filter on non-key attributes.
+
+## Working with Complex Data Types
+
+The AWS DynamoDB driver in this library can handle complex data types automatically. You just need to specify the correct type in the options and pass the data in a normal PHP format.
+
+### Boolean Values
+
+Boolean values should be actual PHP booleans:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "isActive" => DynamoDbAttributeType::BOOLEAN
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'user123',
+    [
+        "isActive" => true  // Use actual boolean, not string
+    ],
+    $options
+);
+```
+
+### Lists
+
+For LIST types, you can use a regular PHP array:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "items" => DynamoDbAttributeType::LIST
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'order123',
+    [
+        "items" => ["item1", "item2", "item3"]  // Regular PHP array
+    ],
+    $options
+);
+```
+
+### Maps
+
+MAP types can also use a regular PHP associative array:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "details" => DynamoDbAttributeType::MAP
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'product123',
+    [
+        "details" => [
+            "name" => "Product Name",
+            "price" => 99.99,
+            "inStock" => true
+        ]
+    ],
+    $options
+);
+```
+
+### NULL Values
+
+NULL types in DynamoDB can be represented by PHP null:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "optional" => DynamoDbAttributeType::NULL
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'record123',
+    [
+        "optional" => null  // Use PHP null
+    ],
+    $options
+);
+```
+
+### Set Types
+
+For SET types (STRING_SET, NUMBER_SET, BINARY_SET), use regular PHP arrays:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "tags" => DynamoDbAttributeType::STRING_SET,
+        "ratings" => DynamoDbAttributeType::NUMBER_SET
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'post123',
+    [
+        "tags" => ["php", "aws", "dynamodb"],  // String set
+        "ratings" => [4, 5, 3, 5]              // Number set
+    ],
+    $options
+);
+```
+
+The DynamoDB driver in this library handles the conversion to and from DynamoDB attribute format automatically, making it easier to work with complex types.
 
 ## Further Reading
 

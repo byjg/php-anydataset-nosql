@@ -1,11 +1,13 @@
 <?php
 
+namespace Tests;
 
 use ByJG\AnyDataset\NoSql\Cache\KeyValueCacheEngine;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\Cache\Psr16\BaseCacheEngine;
 use ByJG\Cache\Psr16\NoCacheEngine;
 use ByJG\Util\Uri;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +31,7 @@ class CachePSR16Test extends TestCase
         return $result;
     }
 
-    #[\Override]
+    #[Override]
     protected function tearDown(): void
     {
         if (empty($this->cacheEngine)) {
@@ -153,7 +155,7 @@ class CachePSR16Test extends TestCase
             $this->assertNull($item);
 
             // Set object
-            $model = new \Tests\Document("name", "brand", 30);
+            $model = new Document("name", "brand", 30);
             $cacheEngine->set('chave', $model);
 
             $item2 = $cacheEngine->get('chave');
