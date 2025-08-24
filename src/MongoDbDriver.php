@@ -19,6 +19,7 @@ use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\WriteConcern;
+use Override;
 
 class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 {
@@ -101,7 +102,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * If you have to, probably something is missing in this class
      * @return Manager|null
      */
-    #[\Override]
+    #[Override]
     public function getDbConnection(): ?Manager
     {
         return $this->mongoManager;
@@ -113,7 +114,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @return NoSqlDocument|null
      * @throws Exception
      */
-    #[\Override]
+    #[Override]
     public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
@@ -133,7 +134,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @return NoSqlDocument[]|null
      * @throws Exception
      */
-    #[\Override]
+    #[Override]
     public function getDocuments(IteratorFilter $filter, mixed $collection = null): ?array
     {
         if (empty($collection)) {
@@ -221,7 +222,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $result;
     }
 
-    #[\Override]
+    #[Override]
     public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
@@ -231,7 +232,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     }
 
 
-    #[\Override]
+    #[Override]
     public function deleteDocuments(IteratorFilter $filter, mixed $collection = null): void
     {
         if (empty($collection)) {
@@ -246,11 +247,11 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $this->mongoManager->executeBulkWrite(
             $this->database . '.' . $collection,
             $bulkWrite,
-            $writeConcern
+            ['writeConcern' => $writeConcern]
         );
     }
 
-    #[\Override]
+    #[Override]
     public function updateDocuments(IteratorFilter $filter, array $data, mixed $collection = null): void
     {
         if (empty($collection)) {
@@ -264,7 +265,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $this->mongoManager->executeBulkWrite(
             $this->database . '.' . $collection,
             $bulkWrite,
-            $writeConcern
+            ['writeConcern' => $writeConcern]
         );
     }
 
@@ -272,7 +273,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      * @param NoSqlDocument $document
      * @return NoSqlDocument
      */
-    #[\Override]
+    #[Override]
     public function save(NoSqlDocument $document): NoSqlDocument
     {
         if (empty($document->getCollection())) {
@@ -307,7 +308,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $this->mongoManager->executeBulkWrite(
             $this->database . "." . $document->getCollection(),
             $bulkWrite,
-            $writeConcern
+            ['writeConcern' => $writeConcern]
         );
 
         $document->setDocument($data);
@@ -316,7 +317,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         return $document;
     }
 
-    #[\Override]
+    #[Override]
     public static function schema(): array
     {
         return ["mongodb", "mongo"];

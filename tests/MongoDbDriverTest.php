@@ -10,6 +10,7 @@ use ByJG\AnyDataset\NoSql\NoSqlDocument;
 use MongoDB\Driver\Exception\Exception;
 use Override;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class MongoDbDriverTest extends TestCase
 {
@@ -31,13 +32,18 @@ class MongoDbDriverTest extends TestCase
 
         $this->dbDriver = Factory::getInstance($mongodbConnection);
 
-        $this->dbDriver->save(
-            new NoSqlDocument(
-                null,
-                self::TEST_COLLECTION,
-                new Document('Hilux', 'Toyota', 120000)
-            )
-        );
+        try {
+            $this->dbDriver->save(
+                new NoSqlDocument(
+                    null,
+                    self::TEST_COLLECTION,
+                    new Document('Hilux', 'Toyota', 120000)
+                )
+            );
+        } catch (Throwable $e) {
+            $this->markTestIncomplete("In order to test MongoDB you must run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
+            return;
+        }
         $this->dbDriver->save(
             new NoSqlDocument(
                 null,

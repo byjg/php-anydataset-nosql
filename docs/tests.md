@@ -12,7 +12,7 @@ A Docker Compose configuration is provided to set up local testing environments:
 
 ```bash
 # Start the test infrastructure (MongoDB, MinIO for S3, DynamoDB Local)
-docker-compose up -d
+docker compose up -d
 
 # Set environment variables for connecting to the local services
 export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
