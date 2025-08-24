@@ -13,6 +13,7 @@ use ByJG\Util\Uri;
 use ByJG\XmlUtil\Exception\FileException;
 use ByJG\XmlUtil\Exception\XmlUtilException;
 use InvalidArgumentException;
+use Override;
 
 class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 {
@@ -63,7 +64,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @throws FileException
      * @throws XmlUtilException
      */
-    #[\Override]
+    #[Override]
     public function getIterator(array $options = []): GenericIterator
     {
         $data = array_merge(
@@ -110,122 +111,112 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      */
     protected function prepareToSend($array, $options) {
         $result = [];
-        
         foreach ($array as $key => $val) {
-            // Get the attribute type
-            $attributeType = $options['Types'][$key] ?? DynamoDbAttributeType::STRING->value;
-            
-            // Convert enum to its value if it's an enum instance
-            if ($attributeType instanceof DynamoDbAttributeType) {
-                $attributeType = $attributeType->value;
-            }
-            
-            // Handle special types
-            switch ($attributeType) {
-                case DynamoDbAttributeType::BOOLEAN->value:
-                    // DynamoDB expects actual boolean values for BOOL type
-                    $result[$key] = [
-                        $attributeType => (bool)$val
-                    ];
-                    break;
-                    
-                case DynamoDbAttributeType::NULL->value:
-                    // DynamoDB expects true for NULL type
-                    $result[$key] = [
-                        $attributeType => true
-                    ];
-                    break;
-                    
-                case DynamoDbAttributeType::LIST->value:
-                    // Format items in the list with proper types
-                    $formattedList = [];
-                    foreach ($val as $item) {
-                        if (is_array($item) && (isset($item['S']) || isset($item['N']) || isset($item['B']) || isset($item['BOOL']))) {
-                            $formattedList[] = $item;
-                        } else if (is_string($item)) {
-                            $formattedList[] = ['S' => $item];
-                        } else if (is_numeric($item)) {
-                            $formattedList[] = ['N' => (string)$item];
-                        } else if (is_bool($item)) {
-                            $formattedList[] = ['BOOL' => $item];
-                        } else if (is_null($item)) {
-                            $formattedList[] = ['NULL' => true];
-                        } else {
-                            $formattedList[] = ['S' => (string)$item]; // Default to string
-                        }
-                    }
-                    $result[$key] = [
-                        $attributeType => $formattedList
-                    ];
-                    break;
-                    
-                case DynamoDbAttributeType::MAP->value:
-                    // Format map items with proper types
-                    if (is_array($val)) {
-                        $formattedMap = [];
-                        foreach ($val as $mapKey => $mapValue) {
-                            if (is_array($mapValue) && (isset($mapValue['S']) || isset($mapValue['N']) || isset($mapValue['B']) || isset($mapValue['BOOL']))) {
-                                $formattedMap[$mapKey] = $mapValue;
-                            } else if (is_string($mapValue)) {
-                                $formattedMap[$mapKey] = ['S' => $mapValue];
-                            } else if (is_numeric($mapValue)) {
-                                $formattedMap[$mapKey] = ['N' => (string)$mapValue];
-                            } else if (is_bool($mapValue)) {
-                                $formattedMap[$mapKey] = ['BOOL' => $mapValue];
-                            } else if (is_null($mapValue)) {
-                                $formattedMap[$mapKey] = ['NULL' => true];
-                            } else {
-                                $formattedMap[$mapKey] = ['S' => (string)$mapValue]; // Default to string
-                            }
-                        }
-                        $result[$key] = [
-                            $attributeType => $formattedMap
-                        ];
-                    } else {
-                        $result[$key] = [
-                            'S' => (string)$val
-                        ];
-                    }
-                    break;
-                    
-                case DynamoDbAttributeType::STRING_SET->value:
-                    // Convert to array of strings
-                    $stringSet = [];
-                    foreach ($val as $item) {
-                        $stringSet[] = (string)$item;
-                    }
-                    $result[$key] = [
-                        $attributeType => $stringSet
-                    ];
-                    break;
-                    
-                case DynamoDbAttributeType::NUMBER_SET->value:
-                    // Convert to array of string numbers
-                    $numberSet = [];
-                    foreach ($val as $item) {
-                        $numberSet[] = (string)$item;
-                    }
-                    $result[$key] = [
-                        $attributeType => $numberSet
-                    ];
-                    break;
-                
-                case DynamoDbAttributeType::NUMBER->value:
-                    // Convert to string number
-                    $result[$key] = [
-                        $attributeType => (string)$val
-                    ];
-                    break;
-                    
-                default:
-                    // For scalar types, convert to string
-                    $result[$key] = [
-                        $attributeType => (string)$val
-                    ];
+            $attributeType = $this->getAttributeType($options, $key);
+            $result[$key] = match ($attributeType) {
+                DynamoDbAttributeType::BOOLEAN->value => $this->prepareBooleanType($val),
+                DynamoDbAttributeType::NULL->value => $this->prepareNullType(),
+                DynamoDbAttributeType::LIST->value => $this->prepareListType($val),
+                DynamoDbAttributeType::MAP->value => $this->prepareMapType($val),
+                DynamoDbAttributeType::STRING_SET->value => $this->prepareStringSetType($val),
+                DynamoDbAttributeType::NUMBER_SET->value => $this->prepareNumberSetType($val),
+                DynamoDbAttributeType::NUMBER->value => $this->prepareNumberType($val),
+                default => $this->prepareDefaultType($val, $attributeType),
+            };
+        }
+        return $result;
+    }
+
+    protected function getAttributeType(array $options, string|int $key): string
+    {
+        $attributeType = $options['Types'][$key] ?? DynamoDbAttributeType::STRING->value;
+        if ($attributeType instanceof DynamoDbAttributeType) {
+            $attributeType = $attributeType->value;
+        }
+        return $attributeType;
+    }
+
+    protected function prepareBooleanType(mixed $val): array
+    {
+        return [DynamoDbAttributeType::BOOLEAN->value => (bool)$val];
+    }
+
+    protected function prepareNullType(): array
+    {
+        return [DynamoDbAttributeType::NULL->value => true];
+    }
+
+    protected function prepareListType(mixed $val): array
+    {
+        $formattedList = [];
+        foreach ($val as $item) {
+            if (is_array($item) && (isset($item['S']) || isset($item['N']) || isset($item['B']) || isset($item['BOOL']))) {
+                $formattedList[] = $item;
+            } elseif (is_string($item)) {
+                $formattedList[] = ['S' => $item];
+            } elseif (is_numeric($item)) {
+                $formattedList[] = ['N' => (string)$item];
+            } elseif (is_bool($item)) {
+                $formattedList[] = ['BOOL' => $item];
+            } elseif (is_null($item)) {
+                $formattedList[] = ['NULL' => true];
+            } else {
+                $formattedList[] = ['S' => (string)$item];
             }
         }
+        return [DynamoDbAttributeType::LIST->value => $formattedList];
+    }
 
-        return $result;
+    protected function prepareMapType(mixed $val): array
+    {
+        if (is_array($val)) {
+            $formattedMap = [];
+            foreach ($val as $mapKey => $mapValue) {
+                if (is_array($mapValue) && (isset($mapValue['S']) || isset($mapValue['N']) || isset($mapValue['B']) || isset($mapValue['BOOL']))) {
+                    $formattedMap[$mapKey] = $mapValue;
+                } elseif (is_string($mapValue)) {
+                    $formattedMap[$mapKey] = ['S' => $mapValue];
+                } elseif (is_numeric($mapValue)) {
+                    $formattedMap[$mapKey] = ['N' => (string)$mapValue];
+                } elseif (is_bool($mapValue)) {
+                    $formattedMap[$mapKey] = ['BOOL' => $mapValue];
+                } elseif (is_null($mapValue)) {
+                    $formattedMap[$mapKey] = ['NULL' => true];
+                } else {
+                    $formattedMap[$mapKey] = ['S' => (string)$mapValue];
+                }
+            }
+            return [DynamoDbAttributeType::MAP->value => $formattedMap];
+        }
+        return ['S' => (string)$val];
+    }
+
+    protected function prepareStringSetType(mixed $val): array
+    {
+        $stringSet = [];
+        foreach ($val as $item) {
+            $stringSet[] = (string)$item;
+        }
+        return [DynamoDbAttributeType::STRING_SET->value => $stringSet];
+    }
+
+    protected function prepareNumberSetType(mixed $val): array
+    {
+        $numberSet = [];
+        foreach ($val as $item) {
+            $numberSet[] = (string)$item;
+        }
+        return [DynamoDbAttributeType::NUMBER_SET->value => $numberSet];
+    }
+
+    protected function prepareNumberType(mixed $val): array
+    {
+        return [DynamoDbAttributeType::NUMBER->value => (string)$val];
+    }
+
+    protected function prepareDefaultType(mixed $val, string $attributeType): array
+    {
+        return [$attributeType => (string)$val];
     }
 
     /**
@@ -340,7 +331,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $result;
     }
 
-    #[\Override]
+    #[Override]
     public function get(string|int|object $key, array $options = []): ?array
     {
         $this->validateOptions($options);
@@ -376,7 +367,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return Result
      */
-    #[\Override]
+    #[Override]
     public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         if (is_object($value)) {
@@ -413,14 +404,14 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
-    #[\Override]
+    #[Override]
     public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         // TODO: Implement putBatch() method.
         return null;
     }
 
-    #[\Override]
+    #[Override]
     public function remove(string|int|object $key, array $options = []): Result
     {
         $this->validateOptions($options);
@@ -448,7 +439,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $this->dynamoDbClient->deleteItem($data);
     }
 
-    #[\Override]
+    #[Override]
     public function getDbConnection(): DynamoDbClient
     {
         return $this->dynamoDbClient;
@@ -459,7 +450,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
-    #[\Override]
+    #[Override]
     public function removeBatch(array $keys, array $options = []): mixed
     {
         // TODO: Implement removeBatch() method.
@@ -476,7 +467,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         return $this->dynamoDbClient;
     }
 
-    #[\Override]
+    #[Override]
     public static function schema(): array
     {
         return ["dynamo", "dynamodb"];
@@ -485,20 +476,20 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     /**
      * @throws NotImplementedException
      */
-    #[\Override]
+    #[Override]
     public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("DynamoDB cannot rename");
     }
 
-    #[\Override]
+    #[Override]
     public function has(string|int|object $key, $options = []): bool
     {
         $value = $this->get($key, $options);
         return !empty($value);
     }
 
-    #[\Override]
+    #[Override]
     public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         throw new NotImplementedException("DynamoDB cannot getChunk");
