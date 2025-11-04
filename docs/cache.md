@@ -1,12 +1,20 @@
 ---
 sidebar_position: 5
+title: Cache Store
+description: PSR-16 compatible cache layer for Key/Value stores
 ---
 
-# Cache Interface
+# Cache Store
 
-The class `KeyValueCacheEngine` adds a cache layer on top of any KeyValueStore, implementing the PSR-16 cache interface.
+The `KeyValueCacheEngine` class adds a PSR-16 compatible cache layer on top of any KeyValueStore.
 
-It allows you to cache the results locally and avoid unnecessary calls to the KeyValueStore.
+:::info PSR-16 Compliance
+This cache implementation follows
+the [PSR-16: Common Interface for Caching Libraries](https://www.php-fig.org/psr/psr-16/) standard, ensuring
+compatibility with any PSR-16 compatible application.
+:::
+
+It allows you to cache results locally and avoid unnecessary calls to the underlying KeyValueStore.
 
 ## Basic Usage
 
@@ -75,13 +83,18 @@ The `KeyValueCacheEngine` stores values in the underlying KeyValueStore with the
 - Values are serialized before storage
 - TTL is stored as a Unix timestamp
 
-Note that the `clear()` method to clear all cache entries is not implemented (returns false) as it would require listing all keys in the KeyValueStore.
+:::caution Limitation
+The `clear()` method to clear all cache entries is not implemented (returns `false`) as it would require listing all
+keys in the KeyValueStore, which may not be efficient or supported by all backends.
+:::
 
 ## Available Methods
 
-- `get(string $key, mixed $default = null): mixed` - Fetches a value from the cache
-- `set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool` - Stores a value in the cache
-- `delete(string $key): bool` - Removes a value from the cache
-- `has(string $key): bool` - Determines if a cache key exists and is not expired
-- `clear(): bool` - Not implemented, always returns false
-- `isAvailable(): bool` - Checks if the cache is available, always returns true 
+| Method                                                                       | Description                                             |
+|------------------------------------------------------------------------------|---------------------------------------------------------|
+| `get(string $key, mixed $default = null): mixed`                             | Fetches a value from the cache                          |
+| `set(string $key, mixed $value, null\|int\|\DateInterval $ttl = null): bool` | Stores a value in the cache                             |
+| `delete(string $key): bool`                                                  | Removes a value from the cache                          |
+| `has(string $key): bool`                                                     | Determines if a cache key exists and is not expired     |
+| `clear(): bool`                                                              | Not implemented, always returns `false`                 |
+| `isAvailable(): bool`                                                        | Checks if the cache is available, always returns `true` | 

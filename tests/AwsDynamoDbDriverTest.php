@@ -26,7 +26,6 @@ class AwsDynamoDbDriverTest extends TestCase
         $awsConnection = getenv("DYNAMODB_CONNECTION");
         if (empty($awsConnection)) {
             $this->markTestSkipped("In order to test DynamoDB you must define DYNAMODB_CONNECTION");
-            return;
         }
 
         /** @psalm-suppress InvalidPropertyAssignmentValue */

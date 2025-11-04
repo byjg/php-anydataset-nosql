@@ -1,5 +1,7 @@
 ---
 sidebar_position: 1
+title: MongoDB
+description: Document-based NoSQL database driver for AnyDataset
 ---
 
 # MongoDB
@@ -9,9 +11,9 @@ sidebar_position: 1
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 ```
 
-The full connection string can be:
+The full connection string format:
 
-```
+```text
 mongodb://username:password@server1,server2,server3/dbname?uri.param1=value1&driver.param2=value2
 ```
 
@@ -34,8 +36,10 @@ $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
 $mongo->save($document);
 ```
 
-When a document is inserted, the fields 'created' and 'updated' are automatically added with the current date.
+:::info
+When a document is inserted, the fields `created` and `updated` are automatically added with the current date.
 Because there is no ID (first parameter) provided, this is treated as an INSERT operation.
+:::
 
 ## Updating a document
 
@@ -54,8 +58,10 @@ $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
 $mongo->save($document);
 ```
 
-When updating a document, the field 'updated' is automatically updated with the current date.
+:::info
+When updating a document, the field `updated` is automatically updated with the current date.
 Because an ID (first parameter) is provided, this is treated as an UPDATE operation.
+:::
 
 
 ## Querying the collection
@@ -74,7 +80,9 @@ if (!empty($document)) {
 }
 ```
 
-Note that the collection name is required as the second parameter.
+:::note
+The collection name is required as the second parameter.
+:::
 
 ### Retrieve all data
 
@@ -106,17 +114,20 @@ foreach ($result as $document)
 }
 ```
 
-The MongoDbDriver supports the following relations:
-- EQUAL
-- GREATER_THAN
-- LESS_THAN
-- GREATER_OR_EQUAL_THAN
-- LESS_OR_EQUAL_THAN
-- NOT_EQUAL
-- STARTS_WITH
-- CONTAINS
-- IN
-- NOT_IN
+:::tip Supported Relations
+The MongoDbDriver supports the following filter relations:
+
+- `EQUAL`
+- `GREATER_THAN`
+- `LESS_THAN`
+- `GREATER_OR_EQUAL_THAN`
+- `LESS_OR_EQUAL_THAN`
+- `NOT_EQUAL`
+- `STARTS_WITH`
+- `CONTAINS`
+- `IN`
+- `NOT_IN`
+  :::
 
 ### Deleting Documents
 
@@ -152,13 +163,17 @@ $mongo->updateDocuments($filter, $data, 'mycollection');
 mongodb://username:password@server:27017/dbname?uri.option1=value1&driver.option2=value2
 ```
 
-The list of parameters can be found in the [PHP MongoDB Driver documentation](https://www.php.net/manual/en/mongodb-driver-manager.construct.php).
-
+:::info Connection Parameters
 Parameters must be prefixed with:
-- `uri.` - passed to the MongoDB URI connection string.
-- `driver.` - passed to the MongoDB driver connection string.
+
+- `uri.` - Passed to the MongoDB URI connection string
+- `driver.` - Passed to the MongoDB driver options
 
 Any other parameters will throw an exception.
+
+For the complete list of available parameters, see
+the [PHP MongoDB Driver documentation](https://www.php.net/manual/en/mongodb-driver-manager.construct.php).
+:::
 
 
 ----

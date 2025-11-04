@@ -1,10 +1,13 @@
 ---
 sidebar_position: 6
+title: Running Tests
+description: How to run the test suite for AnyDataset NoSQL
 ---
 
-# Running Unit Tests
+# Running Tests
 
-This library includes comprehensive tests for all supported drivers. You can run the tests using Docker for local testing or configure connections to actual services.
+This library includes comprehensive tests for all supported drivers. You can run the tests using Docker for local
+testing or configure connections to actual cloud services.
 
 ## Using Docker for Local Testing
 
@@ -54,7 +57,10 @@ vendor/bin/phpunit --group cloudflare
 
 ## Skipping Tests
 
-If you don't have access to a specific service, you can skip the corresponding tests by not setting the environment variable:
+:::tip Selective Testing
+If you don't have access to a specific service, you can skip the corresponding tests by not setting the environment
+variable. Tests for services without configured environment variables will be skipped automatically.
+:::
 
 ```bash
 # Only run MongoDB and S3 tests
@@ -62,5 +68,3 @@ export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
 export S3_CONNECTION="s3://accesskey:secretkey@us-east-1/bucketname?create=true"
 vendor/bin/phpunit
 ```
-
-The tests for services without configured environment variables will be skipped automatically.

@@ -1,10 +1,13 @@
 ---
 sidebar_position: 2
+title: AWS DynamoDB
+description: AWS DynamoDB Key/Value driver with type-safe attribute definitions
 ---
 
 # AWS DynamoDB
 
-AWS DynamoDB is a managed NoSQL database service that provides fast and predictable performance with seamless scalability.
+AWS DynamoDB is a managed NoSQL database service that provides fast and predictable performance with seamless
+scalability. This driver provides a Key/Value interface for DynamoDB.
 
 ```php
 <?php
@@ -23,14 +26,17 @@ Example:
 dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
-You can add any extra arguments supported by the DynamoDB API. You can get a full list here:
-- [AWS SDK for PHP Client Configuration](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct)
+## Connection Options
 
-One of the most common parameters is `endpoint`, which allows you to set a custom endpoint to access a DynamoDB compatible interface, such as DynamoDB Local for development or testing.
+You can add any extra arguments supported by the DynamoDB API to the query string. For a comprehensive list, refer to
+the [AWS SDK for PHP Client Configuration](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct).
 
-Example with a custom endpoint: 
+### Custom Endpoint
 
-```
+One of the most common parameters is `endpoint`, which allows you to set a custom endpoint for DynamoDB Local (for
+development/testing):
+
+```text
 dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://localhost:8000
 ```
 
@@ -40,7 +46,7 @@ DynamoDB stores information using a specific attribute format that differs from 
 
 For example, a DynamoDB native representation looks like this:
 
-```
+```php
 [
     'id'      => ['N' => '1201'],
     'time'    => ['N' => $time],
@@ -49,9 +55,10 @@ For example, a DynamoDB native representation looks like this:
 ]
 ```
 
-This library abstracts this format to let you use a more familiar representation:
+:::tip Simplified Format
+This library abstracts the DynamoDB format to let you use a more familiar representation:
 
-```
+```php
 [
     'id'      => 1201,
     'time'    => $time,
@@ -59,6 +66,8 @@ This library abstracts this format to let you use a more familiar representation
     'message' => 'no vacant areas'
 ]
 ```
+
+:::
 
 ## Type Definitions
 
@@ -84,7 +93,10 @@ $options = [
 
 ### Key Attribute Type Matching
 
-⚠️ **IMPORTANT**: The attribute type you define for your primary key in the `options` array MUST match the attribute type defined in your DynamoDB table schema. Mismatching these types will result in a `ValidationException: Type mismatch for key` error.
+:::warning Important
+The attribute type you define for your primary key in the `options` array **MUST** match the attribute type defined in
+your DynamoDB table schema. Mismatching these types will result in a `ValidationException: Type mismatch for key` error.
+:::
 
 For example, if your DynamoDB table defines the `id` attribute as type `NUMBER` (`N`), you must use:
 
@@ -150,7 +162,10 @@ $dynamodb->put(
 );
 ```
 
-Note that the key value (1201) is passed as the first parameter to the `put` method. You don't need to include this value in the data array as the library will automatically add it for you.
+:::note
+The key value (1201) is passed as the first parameter to the `put` method. You don't need to include this value in the
+data array as the library will automatically add it for you.
+:::
 
 ### Retrieving a value
 
@@ -255,7 +270,9 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-Note that when using the query operation, the key must match the key used in the table schema, and the type must also match.
+:::info
+When using the query operation, the key must match the key used in the table schema, and the type must also match.
+:::
 
 ### Scan using ScanFilter
 
@@ -288,11 +305,17 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-The Scan operation will search through the entire table, which can be slower but allows you to filter on non-key attributes.
+:::caution Performance
+The Scan operation searches through the entire table, which can be slower but allows you to filter on non-key
+attributes. For production use with large tables, prefer Query operations when possible.
+:::
 
 ## Working with Complex Data Types
 
-The AWS DynamoDB driver in this library can handle complex data types automatically. You just need to specify the correct type in the options and pass the data in a normal PHP format.
+:::tip Automatic Type Conversion
+The AWS DynamoDB driver handles complex data types automatically. You just need to specify the correct type in the
+options and pass the data in normal PHP format.
+:::
 
 ### Boolean Values
 
@@ -435,7 +458,10 @@ $dynamodb->put(
 );
 ```
 
-The DynamoDB driver in this library handles the conversion to and from DynamoDB attribute format automatically, making it easier to work with complex types.
+:::info
+The DynamoDB driver handles the conversion to and from DynamoDB attribute format automatically, making it easier to work
+with complex types.
+:::
 
 ## Further Reading
 

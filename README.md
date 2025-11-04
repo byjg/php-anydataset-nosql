@@ -38,15 +38,22 @@ See below the current implemented drivers:
 | [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
 | [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
+## Documentation
 
-## Topics
+### NoSQL Drivers
 
-- [MongoDB](docs/MongoDB.md)
-- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) - Now with type-safe attribute definitions using `DynamoDbAttributeType` enum
-- [S3-Like Storage](docs/AwsS3KeyValue.md)
-- [Cloudflare KV](docs/CloudFlareKV.md)
-- [Cache Store](docs/cache.md)
-- [Running Tests](docs/tests.md)
+- [MongoDB](docs/MongoDB.md) - Document-based NoSQL database
+
+### Key/Value Drivers
+
+- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) - Key/Value store with type-safe attribute definitions
+- [AWS S3](docs/AwsS3KeyValue.md) - Object storage as Key/Value store
+- [Cloudflare KV](docs/CloudFlareKV.md) - Cloudflare Workers KV storage
+
+### Additional Features
+
+- [Cache Store](docs/cache.md) - PSR-16 compatible cache layer for Key/Value stores
+- [Running Tests](docs/tests.md) - How to run the test suite
 
 ## Install
 

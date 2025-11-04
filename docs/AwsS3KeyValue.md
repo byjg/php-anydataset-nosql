@@ -1,10 +1,14 @@
 ---
 sidebar_position: 3
+title: AWS S3
+description: AWS S3 and S3-compatible storage as a Key/Value store
 ---
 
 # AWS S3
 
-Amazon S3 (Simple Storage Service) is an object storage service that offers industry-leading scalability, data availability, security, and performance. This driver allows you to interact with S3 or S3-compatible storage services through a KeyValue interface.
+Amazon S3 (Simple Storage Service) is an object storage service that offers industry-leading scalability, data
+availability, security, and performance. This driver allows you to interact with S3 and S3-compatible storage services (
+like MinIO, Ceph) through a KeyValue interface.
 
 ```php
 <?php
@@ -13,13 +17,13 @@ $s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://access_key:secret_key@re
 
 The full connection string format:
 
-```
+```text
 s3://access_key:secret_key@region/bucket?option1=value1&option2=value2
 ```
 
 Example:
 
-```
+```text
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket
 ```
 
@@ -33,21 +37,24 @@ You can add any additional parameters supported by the S3 API to the query strin
 
 One common parameter is `endpoint`, which allows you to set a custom endpoint for working with S3-compatible services like MinIO, Ceph, or a local test environment:
 
-```
+```text
 s3://access_key:secret_key@us-east-1/mybucket?endpoint=http://localhost:9000
 ```
 
 ### Bucket Creation
 
+:::tip Auto-create Bucket
 The library provides a special parameter `create` that will automatically create the bucket if it doesn't exist:
 
-```
+```text
 s3://access_key:secret_key@us-east-1/mybucket?create=true
 ```
 
+:::
+
 You can combine multiple parameters:
 
-```
+```text
 s3://access_key:secret_key@us-east-1/mybucket?create=true&endpoint=http://localhost:9000
 ```
 

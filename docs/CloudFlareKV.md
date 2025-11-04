@@ -1,17 +1,21 @@
 ---
 sidebar_position: 4
+title: Cloudflare KV
+description: Cloudflare Workers KV storage driver
 ---
 
-# CloudFlare KV
+# Cloudflare KV
 
-CloudFlare KV provides a key-value storage solution through the CloudFlare API.
+Cloudflare KV provides a global, low-latency key-value storage solution accessible through the Cloudflare API.
 
 ```php
 <?php
 $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://auth_email:auth_key@account_id/namespace');
 ```
 
-## List all objects
+## Basic Operations
+
+### List all objects
 
 You can list all objects in the namespace:
 
@@ -38,7 +42,11 @@ $iterator = $kv->getIterator($kv->getLastCursor());
 print_r($iterator->toArray());
 ```
 
-## Check if a key exists
+:::tip Pagination
+Use `getLastCursor()` to retrieve the cursor for the next page of results when working with large datasets.
+:::
+
+### Check if a key exists
 
 ```php
 <?php
@@ -48,7 +56,7 @@ if ($kv->has("object_name")) {
 }
 ```
 
-## Inserting/Updating data
+### Inserting/Updating data
 
 Put a single value:
 
@@ -70,7 +78,7 @@ $bulk = [
 $kv->putBatch($bulk);
 ```
 
-## Retrieve a value
+### Retrieve a value
 
 ```php
 <?php
@@ -78,7 +86,7 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $value = $kv->get("object_name");
 ```
 
-## Get a portion of a value
+### Get a portion of a value
 
 For large objects, you can retrieve just a portion:
 
@@ -89,7 +97,7 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $chunk = $kv->getChunk("object_name", [], 1024, 0);
 ```
 
-## Remove a value
+### Remove a value
 
 Remove a single key:
 
@@ -107,7 +115,7 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $kv->removeBatch(["key1", "key2"]);
 ```
 
-## Rename a key
+### Rename a key
 
 ```php
 <?php
