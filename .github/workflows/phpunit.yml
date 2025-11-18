@@ -12,7 +12,9 @@ on:
 jobs:
   Build:
     runs-on: 'ubuntu-latest'
-    container: 'byjg/php:${{ matrix.php-version }}-cli'
+    container:
+      image: 'byjg/php:${{ matrix.php-version }}-cli'
+      options: --user root --privileged
     strategy:
       matrix:
         php-version:
@@ -60,7 +62,7 @@ jobs:
       DYNAMODB_CONNECTION: "dynamodb://aaa:123456@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: composer install
       - run: ./vendor/bin/psalm
       - run: ./vendor/bin/phpunit

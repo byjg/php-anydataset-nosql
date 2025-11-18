@@ -25,6 +25,11 @@ and open the template in the editor.
     <ini name="display_errors" value="On"/>
     <ini name="display_startup_errors" value="On"/>
     <ini name="error_reporting" value="E_ALL"/>
+      <env name="DYNAMODB_CONNECTION"
+           value="dynamodb://DUMMYKEY:DUMMYSECRET@localhost/tablename?endpoint=http://127.0.0.1:8000"/>
+      <env name="MONGODB_CONNECTION" value="mongodb://rootuser:rootpass@127.0.0.1/test"/>
+      <env name="S3_CONNECTION"
+           value="s3://aaa:12345678@us-east-1/mybucket?create=true&amp;endpoint=http://localhost:4566"/>
   </php>
 
   <source>
