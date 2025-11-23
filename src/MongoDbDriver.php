@@ -28,7 +28,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
      */
     private array $excludeMongoClass;
 
-    protected ?Manager $mongoManager = null;
+    protected Manager $mongoManager;
 
     /**
      * Enter description here...
@@ -61,8 +61,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
 
         $hosts = $this->connectionUri->getHost();
         $port = $this->connectionUri->getPort() == '' ? 27017 : $this->connectionUri->getPort();
+        $port = $port ?? 27017;
         $path = preg_replace('~^/~', '', $this->connectionUri->getPath());
-        $database = $path;
+        $database = $path ?? '';
         $username = $this->connectionUri->getUsername();
         $password = $this->connectionUri->getPassword();
         parse_str($this->connectionUri->getQuery(), $options);
@@ -100,10 +101,10 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     /**
      * Gets the instance of MongoDB; You do not need uses this directly.
      * If you have to, probably something is missing in this class
-     * @return Manager|null
+     * @return Manager
      */
     #[Override]
-    public function getDbConnection(): ?Manager
+    public function getDbConnection(): Manager
     {
         return $this->mongoManager;
     }
@@ -118,7 +119,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function getDocumentById(string|object $idDocument, mixed $collection = null): ?NoSqlDocument
     {
         $filter = new IteratorFilter();
-        $filter->and('_id', Relation::EQUAL, new ObjectId($idDocument));
+        /** @psalm-suppress InvalidCast */
+        $idStr = is_object($idDocument) ? (string)$idDocument : $idDocument;
+        $filter->and('_id', Relation::EQUAL, new ObjectId($idStr));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {

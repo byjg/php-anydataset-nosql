@@ -15,7 +15,8 @@ class Factory
      */
     public static function registerDriver(string $class): void
     {
-        if (!in_array(RegistrableInterface::class, class_implements($class))) {
+        $implements = class_implements($class);
+        if ($implements === false || !in_array(RegistrableInterface::class, $implements)) {
             throw new InvalidArgumentException(
                 "The class '$class' is not a valid instance"
             );
@@ -37,6 +38,7 @@ class Factory
     /**
      * @param $connectionUri Uri|string
      * @return NoSqlInterface|KeyValueInterface
+     * @psalm-suppress MixedMethodCall
      */
     public static function getInstance(Uri|string $connectionUri): NoSqlInterface|KeyValueInterface
     {
@@ -59,6 +61,8 @@ class Factory
 
         $class = self::$config[$scheme];
 
-        return new $class($connectionUri);
+        /** @var NoSqlInterface|KeyValueInterface $instance */
+        $instance = new $class($connectionUri);
+        return $instance;
     }
 }

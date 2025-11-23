@@ -14,6 +14,7 @@ use ByJG\WebRequest\Exception\RequestException;
 use ByJG\WebRequest\HttpClient;
 use ByJG\WebRequest\Psr7\MemoryStream;
 use ByJG\WebRequest\Psr7\Request;
+use Override;
 use Psr\Http\Message\RequestInterface;
 
 class CloudflareKV implements KeyValueInterface, RegistrableInterface
@@ -31,8 +32,8 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
     {
         $uri = new Uri($connectionString);
 
-        $this->username = $uri->getUsername();
-        $this->password = $uri->getPassword();
+        $this->username = $uri->getUsername() ?? '';
+        $this->password = $uri->getPassword() ?? '';
         $this->accountId = $uri->getHost();
         $this->namespaceId = $uri->getPath();
 
@@ -49,10 +50,12 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function get(string|int|object $key, array $options = []): string
     {
-        $request = $this->request("/values/$key", $options)
+        /** @psalm-suppress InvalidCast */
+        $keyStr = is_object($key) ? (string)$key : $key;
+        $request = $this->request("/values/$keyStr", $options)
             ->withMethod("get");
 
         return $this->send($request);
@@ -68,10 +71,12 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function put(string|int|object $key, mixed $value, array $options = []): mixed
     {
-        $request = $this->request("/values/$key", $options)
+        /** @psalm-suppress InvalidCast */
+        $keyStr = is_object($key) ? (string)$key : $key;
+        $request = $this->request("/values/$keyStr", $options)
             ->withMethod("put")
             ->withBody(new MemoryStream($value));
 
@@ -89,7 +94,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
@@ -110,10 +115,12 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function remove(string|int|object $key, array $options = []): string
     {
-        $request = $this->request("/values/$key", $options)
+        /** @psalm-suppress InvalidCast */
+        $keyStr = is_object($key) ? (string)$key : $key;
+        $request = $this->request("/values/$keyStr", $options)
             ->withMethod("delete");
 
         return $this->send($request);
@@ -128,7 +135,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function removeBatch(array $keys, array $options = []): mixed
     {
         $request = $this->request("/bulk", $options)
@@ -180,7 +187,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      * @throws NetworkException
      * @throws RequestException
      */
-    #[\Override]
+    #[Override]
     public function getIterator(array $options = []): GenericIterator
     {
         $request = $this->request("/keys", $options)
@@ -202,7 +209,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $this->lastCursor;
     }
 
-    #[\Override]
+    #[Override]
     public function getDbConnection(): mixed
     {
         return null;
@@ -226,25 +233,25 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
         return $array;
     }
 
-    #[\Override]
+    #[Override]
     public static function schema(): array
     {
         return ["kv"];
     }
 
-    #[\Override]
+    #[Override]
     public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
         throw new NotImplementedException("Not implemented");
     }
 
-    #[\Override]
+    #[Override]
     public function has(string|int|object $key, $options = []): bool
     {
         throw new NotImplementedException("Not implemented");
     }
 
-    #[\Override]
+    #[Override]
     public function getChunk(object|int|string $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         throw new NotImplementedException("Not implemented");

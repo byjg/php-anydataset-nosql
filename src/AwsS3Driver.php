@@ -8,6 +8,7 @@ use Aws\S3\S3Client;
 use ByJG\AnyDataset\Core\AnyDataset;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\Util\Uri;
+use Override;
 
 class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 {
@@ -73,7 +74,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 
         $this->s3Client = new S3Client($s3Parameters);
 
-        $this->bucket = preg_replace('~^/~', '', $uri->getPath());
+        $this->bucket = preg_replace('~^/~', '', $uri->getPath()) ?? '';
 
         try {
             $this->s3Client->headBucket([
@@ -98,7 +99,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return GenericIterator
      */
-    #[\Override]
+    #[Override]
     public function getIterator(array $options = []): GenericIterator
     {
         $data = array_merge(
@@ -117,7 +118,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return (new AnyDataset($contents))->getIterator();
     }
 
-    #[\Override]
+    #[Override]
     public function get(string|int|object $key, array $options = []): mixed
     {
         $data = array_merge(
@@ -130,10 +131,10 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 
         $result = $this->s3Client->getObject($data);
 
-        return $result["Body"]->getContents();
+        return $result["Body"]?->getContents() ?? '';
     }
 
-    #[\Override]
+    #[Override]
     public function put(string|int|object $key, mixed $value, array $options = []): Result
     {
         $data = array_merge(
@@ -156,7 +157,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $this->s3Client->putObject($data);
     }
 
-    #[\Override]
+    #[Override]
     public function remove(string|int|object $key, array $options = []): bool
     {
         $data = array_merge(
@@ -171,13 +172,13 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return true;
     }
 
-    #[\Override]
+    #[Override]
     public function getDbConnection(): S3Client
     {
         return $this->s3Client;
     }
 
-    #[\Override]
+    #[Override]
     public function getChunk(string|int|object $key, array $options = [], int $size = 1024, int $offset = 0): mixed
     {
         $part = ($offset * $size);
@@ -199,7 +200,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
-    #[\Override]
+    #[Override]
     public function putBatch(array $keyValueArray, array $options = []): mixed
     {
         // TODO: Implement putBatch() method.
@@ -211,7 +212,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
      * @param array $options
      * @return mixed
      */
-    #[\Override]
+    #[Override]
     public function removeBatch(array $keys, array $options = []): mixed
     {
         // TODO: Implement removeBatch() method.
@@ -223,26 +224,29 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
         return $this->s3Client;
     }
 
-    #[\Override]
+    #[Override]
     public static function schema(): array
     {
         return ["s3"];
     }
 
-    #[\Override]
+    #[Override]
     public function rename(string|int|object $oldKey, string|int|object $newKey): void
     {
+        /** @psalm-suppress InvalidCast */
+        $oldKeyStr = is_object($oldKey) ? (string)$oldKey : $oldKey;
+
         $data = [
             'Bucket' => $this->bucket,
             'Key'    => $newKey,
-            'CopySource' => "{$this->bucket}/{$oldKey}",
+            'CopySource' => "{$this->bucket}/{$oldKeyStr}",
         ];
 
         $this->s3Client->copyObject($data);
         $this->remove($oldKey);
     }
 
-    #[\Override]
+    #[Override]
     public function has(string|int|object $key, $options = []): bool
     {
         return $this->s3Client->doesObjectExistV2($this->bucket, $key, false, $options);

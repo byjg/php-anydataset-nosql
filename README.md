@@ -1,5 +1,6 @@
-# AnyDataset-NoSql
+# NoSQL Database Abstraction
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml)
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-anydataset-nosql/)
@@ -70,7 +71,6 @@ flowchart TD
    byjg/anydataset-nosql --> ext-curl
    byjg/anydataset-nosql --> aws/aws-sdk-php
    byjg/anydataset-nosql --> byjg/anydataset
-   byjg/anydataset-nosql --> byjg/anydataset-array
    byjg/anydataset-nosql --> byjg/serializer
    byjg/anydataset-nosql --> byjg/webrequest
    byjg/anydataset-nosql --> byjg/cache-engine
