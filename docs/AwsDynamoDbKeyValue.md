@@ -1,36 +1,52 @@
+---
+sidebar_position: 2
+title: AWS DynamoDB
+description: AWS DynamoDB Key/Value driver with type-safe attribute definitions
+---
+
 # AWS DynamoDB
+
+AWS DynamoDB is a managed NoSQL database service that provides fast and predictable performance with seamless
+scalability. This driver provides a Key/Value interface for DynamoDB.
 
 ```php
 <?php
 $dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://access_key:secret_key@region/tablename');
 ```
 
-The full connection string can be:
+The full connection string format:
+
+```
+dynamodb://access_key:secret_key@region/tablename?option1=value1&option2=value2
+```
+
+Example:
 
 ```
 dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
-You can add any extra arguments supported by the DynamoDB api. You can get a full list here:
- - [https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct)
+## Connection Options
 
-One of the most populars is the parameter `endpoint` where we can set a custom endpoint to access 
-an DynamoDB compatible interface. 
+You can add any extra arguments supported by the DynamoDB API to the query string. For a comprehensive list, refer to
+the [AWS SDK for PHP Client Configuration](https://docs.aws.amazon.com/aws-sdk-php/v3/api/class-Aws.AwsClient.html#___construct).
 
-An example can be: 
+### Custom Endpoint
 
+One of the most common parameters is `endpoint`, which allows you to set a custom endpoint for DynamoDB Local (for
+development/testing):
+
+```text
+dynamodb://access_key:secret_key@us-east-1/tablename?endpoint=http://localhost:8000
 ```
-s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/tablename?endpoint=http://localhost:8000
-```
 
+## DynamoDB Data Structure
 
-## Preparing to use DynamoDb
+DynamoDB stores information using a specific attribute format that differs from typical object structures.
 
-DynamoDb stores the information slightly different from a model dto structure.
+For example, a DynamoDB native representation looks like this:
 
-Here an example how DynamoDb requires a model:
-
-```
+```php
 [
     'id'      => ['N' => '1201'],
     'time'    => ['N' => $time],
@@ -39,9 +55,10 @@ Here an example how DynamoDb requires a model:
 ]
 ```
 
-and a definition more usual is to have :
+:::tip Simplified Format
+This library abstracts the DynamoDB format to let you use a more familiar representation:
 
-```
+```php
 [
     'id'      => 1201,
     'time'    => $time,
@@ -50,89 +67,202 @@ and a definition more usual is to have :
 ]
 ```
 
-We will use the second definition. However, every put/get/remove method we will need to set up 
-a list of options to define this data model. 
+:::
 
-basically we have to create an array with 2 keys:
-- KeyName: Contains the key hame (Currently supports table with only one key)
-- Types: Defines the field names and type
+## Type Definitions
 
-Example:
+When using the put/get/remove methods, you need to provide type information through the `options` parameter to define the data model.
+
+This library provides a `DynamoDbAttributeType` enum for defining attribute types, making your code more maintainable and less error-prone:
 
 ```php
 <?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 
+// Example of options using the enum
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => "N",
-        "time" => "N"
+        "id" => DynamoDbAttributeType::NUMBER,
+        "time" => DynamoDbAttributeType::NUMBER,
+        "error" => DynamoDbAttributeType::STRING,
+        "message" => DynamoDbAttributeType::STRING
     ]
 ];
 ```
 
-The examples below will use this definition.
+### Key Attribute Type Matching
+
+:::warning Important
+The attribute type you define for your primary key in the `options` array **MUST** match the attribute type defined in
+your DynamoDB table schema. Mismatching these types will result in a `ValidationException: Type mismatch for key` error.
+:::
+
+For example, if your DynamoDB table defines the `id` attribute as type `NUMBER` (`N`), you must use:
+
+```php
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER, // This must match the table schema
+        // other attributes...
+    ]
+];
+```
+
+Similarly, if your table defines the key as `STRING` (`S`), you must use `DynamoDbAttributeType::STRING`.
+
+### Available Attribute Types
+
+The `DynamoDbAttributeType` enum provides the following types:
+
+| Enum Case  | Value  | Description                            |
+|------------|--------|----------------------------------------|
+| NUMBER     | 'N'    | Represents a number                    |
+| STRING     | 'S'    | Represents a string                    |
+| BINARY     | 'B'    | Represents binary data                 |
+| BOOLEAN    | 'BOOL' | Represents a boolean value             |
+| NULL       | 'NULL' | Represents a null value                |
+| MAP        | 'M'    | Represents a map (nested attributes)   |
+| LIST       | 'L'    | Represents a list (ordered collection) |
+| STRING_SET | 'SS'   | Represents a set of strings            |
+| NUMBER_SET | 'NS'   | Represents a set of numbers            |
+| BINARY_SET | 'BS'   | Represents a set of binary values      |
+
+## Basic Operations
 
 ### Inserting/Updating data
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+// Define types using the enum
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER,
+        "time" => DynamoDbAttributeType::NUMBER,
+        "error" => DynamoDbAttributeType::STRING,
+        "message" => DynamoDbAttributeType::STRING
+    ]
+];
+
 $dynamodb->put(
-    1201,
+    1201,  // Primary key value
     [
         "time" => 1234567899,
         "error" => 'Executive overflow',
-        "Message" => "No Vacant Areas"
+        "message" => "No Vacant Areas"
     ],
-    $options  // See above
+    $options  // Type definitions
 );
 ```
 
-### Retrieve a value
+:::note
+The key value (1201) is passed as the first parameter to the `put` method. You don't need to include this value in the
+data array as the library will automatically add it for you.
+:::
+
+### Retrieving a value
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER,
+    ]
+];
+
 $value = $dynamodb->get(1201, $options);
 
-/* Should Return:
+/* Returns:
 [
     'id'      => 1201,
-    'time'    => $time,
+    'time'    => 1234567899,
     'error'   => 'Executive overflow',
-    'message' => 'no vacant areas'
+    'message' => 'No Vacant Areas'
 ]
 */
 ```
 
-### Remove a value
+### Checking if a key exists
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
-$dynamodb->remove(1201);
-```
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
 
-
-## Listing objects
-
-To get a list of the objects you need to pass an array of options with the keys `KeyConditions` or `ScanFilter`.
-
-Example:
-
-```php
-<?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
+$dynamodb = Factory::getInstance('dynamodb://....');
 
 $options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER,
+    ]
+];
+
+if ($dynamodb->has(1201, $options)) {
+    echo "Key exists!";
+}
+```
+
+### Removing a value
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::NUMBER,
+    ]
+];
+
+$dynamodb->remove(1201, $options);
+```
+
+## Querying Data
+
+To get a list of objects, you need to use either `KeyConditions` (for queries on the primary key) or `ScanFilter` (for scanning the entire table) in the options array.
+
+### Query using KeyConditions
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+   "TableName" => "mytable", // Table name is required
    "KeyConditions" => [
        "id" => [
            "AttributeValueList" => [
-               ["N" => "1201"]
+               [DynamoDbAttributeType::NUMBER->value => "1201"]
            ],
            "ComparisonOperator" => "EQ"
        ]
+   ],
+   "Types" => [
+       "id" => DynamoDbAttributeType::NUMBER,
+       "time" => DynamoDbAttributeType::NUMBER,
+       "error" => DynamoDbAttributeType::STRING,
+       "message" => DynamoDbAttributeType::STRING
    ]
 ];
 
@@ -140,20 +270,203 @@ $iterator = $dynamodb->getIterator($options);
 print_r($iterator->toArray());
 ```
 
-### Check if a key exists
+:::info
+When using the query operation, the key must match the key used in the table schema, and the type must also match.
+:::
+
+### Scan using ScanFilter
 
 ```php
 <?php
-$dynamodb = \ByJG\AnyDataset\NoSql\Factory::getInstance('dynamodb://....');
-if ($dynamodb->has(1201)) {
-    echo "exist!";
-}
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+
+$options = [
+   "TableName" => "mytable", // Table name is required 
+   "ScanFilter" => [
+       "error" => [
+           "AttributeValueList" => [
+               [DynamoDbAttributeType::STRING->value => "Executive overflow"]
+           ],
+           "ComparisonOperator" => "EQ"
+       ]
+   ],
+   "Types" => [
+       "id" => DynamoDbAttributeType::NUMBER,
+       "time" => DynamoDbAttributeType::NUMBER,
+       "error" => DynamoDbAttributeType::STRING,
+       "message" => DynamoDbAttributeType::STRING
+   ]
+];
+
+$iterator = $dynamodb->getIterator($options);
+print_r($iterator->toArray());
 ```
 
-## Further reading
+:::caution Performance
+The Scan operation searches through the entire table, which can be slower but allows you to filter on non-key
+attributes. For production use with large tables, prefer Query operations when possible.
+:::
 
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
-- [https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html](https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html)
+## Working with Complex Data Types
+
+:::tip Automatic Type Conversion
+The AWS DynamoDB driver handles complex data types automatically. You just need to specify the correct type in the
+options and pass the data in normal PHP format.
+:::
+
+### Boolean Values
+
+Boolean values should be actual PHP booleans:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "isActive" => DynamoDbAttributeType::BOOLEAN
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'user123',
+    [
+        "isActive" => true  // Use actual boolean, not string
+    ],
+    $options
+);
+```
+
+### Lists
+
+For LIST types, you can use a regular PHP array:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "items" => DynamoDbAttributeType::LIST
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'order123',
+    [
+        "items" => ["item1", "item2", "item3"]  // Regular PHP array
+    ],
+    $options
+);
+```
+
+### Maps
+
+MAP types can also use a regular PHP associative array:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "details" => DynamoDbAttributeType::MAP
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'product123',
+    [
+        "details" => [
+            "name" => "Product Name",
+            "price" => 99.99,
+            "inStock" => true
+        ]
+    ],
+    $options
+);
+```
+
+### NULL Values
+
+NULL types in DynamoDB can be represented by PHP null:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "optional" => DynamoDbAttributeType::NULL
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'record123',
+    [
+        "optional" => null  // Use PHP null
+    ],
+    $options
+);
+```
+
+### Set Types
+
+For SET types (STRING_SET, NUMBER_SET, BINARY_SET), use regular PHP arrays:
+
+```php
+<?php
+use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
+use ByJG\AnyDataset\NoSql\Factory;
+
+$options = [
+    "KeyName" => "id",
+    "Types" => [
+        "id" => DynamoDbAttributeType::STRING,
+        "tags" => DynamoDbAttributeType::STRING_SET,
+        "ratings" => DynamoDbAttributeType::NUMBER_SET
+    ]
+];
+
+$dynamodb = Factory::getInstance('dynamodb://....');
+$dynamodb->put(
+    'post123',
+    [
+        "tags" => ["php", "aws", "dynamodb"],  // String set
+        "ratings" => [4, 5, 3, 5]              // Number set
+    ],
+    $options
+);
+```
+
+:::info
+The DynamoDB driver handles the conversion to and from DynamoDB attribute format automatically, making it easier to work
+with complex types.
+:::
+
+## Further Reading
+
+- [AWS SDK for PHP - DynamoDB Documentation](https://docs.aws.amazon.com/aws-sdk-php/v2/guide/service-dynamodb.html)
+- [DynamoDB Client API Reference](https://docs.aws.amazon.com/aws-sdk-php/v2/api/class-Aws.DynamoDb.DynamoDbClient.html)
 
 ----
 [Open source ByJG](http://opensource.byjg.com)

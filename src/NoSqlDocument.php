@@ -44,7 +44,8 @@ class NoSqlDocument
      */
     public function setIdDocument(string|object|null $idDocument): self
     {
-        $this->idDocument = $idDocument;
+        /** @psalm-suppress InvalidCast */
+        $this->idDocument = is_object($idDocument) ? (string)$idDocument : $idDocument;
         return $this;
     }
 

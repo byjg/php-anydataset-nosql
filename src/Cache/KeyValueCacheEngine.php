@@ -6,6 +6,7 @@ use ByJG\AnyDataset\NoSql\KeyValueInterface;
 use ByJG\Cache\Exception\InvalidArgumentException;
 use ByJG\Cache\Psr16\BaseCacheEngine;
 use DateInterval;
+use Override;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -15,15 +16,12 @@ class KeyValueCacheEngine extends BaseCacheEngine
 {
     protected KeyValueInterface $keyValue;
 
-    protected LoggerInterface|null $logger = null;
+    protected LoggerInterface $logger;
 
     public function __construct(KeyValueInterface $keyValue, LoggerInterface|null $logger = null)
     {
         $this->keyValue = $keyValue;
-        $this->logger = $logger;
-        if (is_null($logger)) {
-            $this->logger = new NullLogger();
-        }
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -39,12 +37,15 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    #[Override]
     public function has(string $key): bool
     {
         $key = $this->getKeyFromContainer($key);
+        /** @psalm-suppress InvalidCast */
+        $keyStr = (string)$key;
         if ($this->keyValue->has($key)) {
-            if ($this->keyValue->has("$key.ttl") && time() >= $this->keyValue->get("$key.ttl")) {
-                $this->delete($key);
+            if ($this->keyValue->has("$keyStr.ttl") && time() >= $this->keyValue->get("$keyStr.ttl")) {
+                $this->delete($keyStr);
                 return false;
             }
 
@@ -62,6 +63,7 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
      */
+    #[Override]
     public function get(string $key, mixed $default = null): mixed
     {
         if ($this->has($key)) {
@@ -87,20 +89,24 @@ class KeyValueCacheEngine extends BaseCacheEngine
      *
      *   MUST be thrown if the $key string is not a legal value.
      */
+    #[Override]
     public function set(string $key, mixed $value, DateInterval|int|null $ttl = null): bool
     {
         $key = $this->getKeyFromContainer($key);
+        /** @psalm-suppress InvalidCast */
+        $keyStr = (string)$key;
 
-        $this->logger->info("[KeyValueInterface] Set '$key' in Cache");
+        $this->logger->info("[KeyValueInterface] Set '$keyStr' in Cache");
 
         $this->keyValue->put($key, serialize($value));
         if (!empty($ttl)) {
-            $this->keyValue->put("$key.ttl", $this->addToNow($ttl));
+            $this->keyValue->put("$keyStr.ttl", $this->addToNow($ttl));
         }
 
         return true;
     }
 
+    #[Override]
     public function clear(): bool
     {
         return false;
@@ -112,15 +118,19 @@ class KeyValueCacheEngine extends BaseCacheEngine
      * @param string $key
      * @return bool
      */
+    #[Override]
     public function delete(string $key): bool
     {
         $key = $this->getKeyFromContainer($key);
+        /** @psalm-suppress InvalidCast */
+        $keyStr = (string)$key;
 
         $this->keyValue->remove($key);
-        $this->keyValue->remove("$key.ttl");
+        $this->keyValue->remove("$keyStr.ttl");
         return true;
     }
 
+    #[Override]
     public function isAvailable(): bool
     {
         return true;

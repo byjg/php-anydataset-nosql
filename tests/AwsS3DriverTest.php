@@ -14,6 +14,7 @@ class AwsS3DriverTest extends TestCase
      */
     protected ?KeyValueInterface $object = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $awsConnection = getenv("S3_CONNECTION");
@@ -26,6 +27,7 @@ class AwsS3DriverTest extends TestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         if (!empty($this->object)) {
@@ -43,7 +45,7 @@ class AwsS3DriverTest extends TestCase
 
         // Get current bucket
         $iterator = $this->object->getIterator();
-        $currentCount = $iterator->count();
+        $currentCount = count($iterator->toArray());
 
         // Add an element
         $this->object->put("KEY", "value");
@@ -51,7 +53,7 @@ class AwsS3DriverTest extends TestCase
 
         // Check new elements
         $iterator = $this->object->getIterator();
-        $this->assertEquals($currentCount + 2, $iterator->count());
+        $this->assertEquals($currentCount + 2, count($iterator->toArray()));
 
         // Get elements
         $elem1 = $this->object->get("KEY");
@@ -65,7 +67,7 @@ class AwsS3DriverTest extends TestCase
 
         // Check new elements
         $iterator = $this->object->getIterator();
-        $this->assertEquals($currentCount, $iterator->count());
+        $this->assertEquals($currentCount, count($iterator->toArray()));
     }
 
     public function testGetChunk()
@@ -96,14 +98,14 @@ class AwsS3DriverTest extends TestCase
 
         // Get current bucket
         $iterator = $this->object->getIterator();
-        $currentCount = $iterator->count();
+        $currentCount = count($iterator->toArray());
 
         // Add an element
         $this->object->put("KEY", "value");
 
         // Check new elements
         $iterator = $this->object->getIterator();
-        $this->assertEquals($currentCount + 1, $iterator->count());
+        $this->assertEquals($currentCount + 1, count($iterator->toArray()));
 
         // Get elements
         $elem1 = $this->object->get("KEY");
@@ -121,7 +123,7 @@ class AwsS3DriverTest extends TestCase
 
         // Check new elements
         $iterator = $this->object->getIterator();
-        $this->assertEquals($currentCount, $iterator->count());
+        $this->assertEquals($currentCount, count($iterator->toArray()));
 
     }
 

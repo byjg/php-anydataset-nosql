@@ -7,7 +7,10 @@ use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\AnyDataset\NoSql\MongoDbDriver;
 use ByJG\AnyDataset\NoSql\NoSqlDocument;
+use MongoDB\Driver\Exception\Exception;
+use Override;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class MongoDbDriverTest extends TestCase
 {
@@ -18,6 +21,7 @@ class MongoDbDriverTest extends TestCase
     
     const TEST_COLLECTION = 'collectionTest';
 
+    #[Override]
     public function setUp(): void
     {
         $mongodbConnection = getenv("MONGODB_CONNECTION");
@@ -28,13 +32,18 @@ class MongoDbDriverTest extends TestCase
 
         $this->dbDriver = Factory::getInstance($mongodbConnection);
 
-        $this->dbDriver->save(
-            new NoSqlDocument(
-                null,
-                self::TEST_COLLECTION,
-                new Document('Hilux', 'Toyota', 120000)
-            )
-        );
+        try {
+            $this->dbDriver->save(
+                new NoSqlDocument(
+                    null,
+                    self::TEST_COLLECTION,
+                    new Document('Hilux', 'Toyota', 120000)
+                )
+            );
+        } catch (Throwable $e) {
+            $this->markTestIncomplete("In order to test MongoDB you must run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
+            return;
+        }
         $this->dbDriver->save(
             new NoSqlDocument(
                 null,
@@ -72,6 +81,7 @@ class MongoDbDriverTest extends TestCase
         );
     }
     
+    #[Override]
     public function tearDown(): void
     {
         if (!empty($this->dbDriver)) {
@@ -81,7 +91,7 @@ class MongoDbDriverTest extends TestCase
     }
 
     /**
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function testSaveDocument()
     {
@@ -142,7 +152,7 @@ class MongoDbDriverTest extends TestCase
     }
 
     /**
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function testSaveDocumentEntity()
     {
@@ -200,7 +210,7 @@ class MongoDbDriverTest extends TestCase
     }
 
     /**
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function testDelete()
     {
@@ -229,7 +239,7 @@ class MongoDbDriverTest extends TestCase
     }
 
     /**
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function testGetDocuments()
     {
@@ -296,7 +306,7 @@ class MongoDbDriverTest extends TestCase
     }
 
     /**
-     * @throws \MongoDB\Driver\Exception\Exception
+     * @throws Exception
      */
     public function testBulkUpdate()
     {
