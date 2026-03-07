@@ -1,10 +1,4 @@
----
-tags: [php, anydataset, databases]
----
-
 # NoSQL Database Abstraction
-
-Anydataset NoSQL standardizes the access to non-relational databases/repositories and provides a consistent interface for both NoSQL document databases and Key/Value stores.
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml)
@@ -12,6 +6,8 @@ Anydataset NoSQL standardizes the access to non-relational databases/repositorie
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-anydataset-nosql/)
 [![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-anydataset-nosql.svg)](https://github.com/byjg/php-anydataset-nosql/releases/)
+
+Anydataset NoSQL standardizes the access to non-relational databases/repositories and provides a consistent interface for both NoSQL document databases and Key/Value stores.
 The implementation supports:
 
 - MongoDB (document-based)
@@ -38,27 +34,27 @@ See below the current implemented drivers:
 
 | Datasource                                  | Connection String                                        |
 |---------------------------------------------|----------------------------------------------------------|
-| [MongoDB](MongoDB)                  | mongodb://username:password@hostname:port/database       |
-| [S3](AwsS3KeyValue)                 | s3://accesskey:secretkey@region/bucket?params            |
-| [Cloudflare KV](CloudFlareKV)       | kv://username:password@accountid/namespaceid             |
-| [AWS DynamoDB](AwsDynamoDbKeyValue) | dynamodb://accesskey:secretkey@hostname/tablename?params |
+| [MongoDB](docs/MongoDB.md)                  | mongodb://username:password@hostname:port/database       |
+| [S3](docs/AwsS3KeyValue.md)                 | s3://accesskey:secretkey@region/bucket?params            |
+| [Cloudflare KV](docs/CloudFlareKV.md)       | kv://username:password@accountid/namespaceid             |
+| [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) | dynamodb://accesskey:secretkey@hostname/tablename?params |
 
 ## Documentation
 
 ### NoSQL Drivers
 
-- [MongoDB](MongoDB) - Document-based NoSQL database
+- [MongoDB](docs/MongoDB.md) - Document-based NoSQL database
 
 ### Key/Value Drivers
 
-- [AWS DynamoDB](AwsDynamoDbKeyValue) - Key/Value store with type-safe attribute definitions
-- [AWS S3](AwsS3KeyValue) - Object storage as Key/Value store
-- [Cloudflare KV](CloudFlareKV) - Cloudflare Workers KV storage
+- [AWS DynamoDB](docs/AwsDynamoDbKeyValue.md) - Key/Value store with type-safe attribute definitions
+- [AWS S3](docs/AwsS3KeyValue.md) - Object storage as Key/Value store
+- [Cloudflare KV](docs/CloudFlareKV.md) - Cloudflare Workers KV storage
 
 ### Additional Features
 
-- [Cache Store](cache) - PSR-16 compatible cache layer for Key/Value stores
-- [Running Tests](tests) - How to run the test suite
+- [Cache Store](docs/cache.md) - PSR-16 compatible cache layer for Key/Value stores
+- [Running Tests](docs/tests.md) - How to run the test suite
 
 ## Install
 
