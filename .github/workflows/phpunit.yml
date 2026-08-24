@@ -39,26 +39,21 @@ jobs:
           - 8000:8000
 
       s3:
-        image: localstack/localstack
+        image: minio/minio:edge-cicd
         ports:
-          - "4566:4566"
+          - "9000:9000"
         env:
-          SERVICES: s3
-          DEFAULT_REGION: us-west-1
-          AWS_DEFAULT_REGION: us-west-1
-          HOSTNAME: s3
-          HOSTNAME_EXTERNAL: s3
-          USE_SSL: false
-          DEBUG: 1
+          MINIO_ROOT_USER: aaa
+          MINIO_ROOT_PASSWORD: 12345678
         options: >-
-          --health-cmd "awslocal s3 ls"
+          --health-cmd "curl -sf http://localhost:9000/minio/health/live"
           --health-interval 5s
           --health-timeout 10s
           --health-retries 5
 
     env:
       MONGODB_CONNECTION: "mongodb://rootuser:rootpass@mongodb/test"
-      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:4566"
+      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:9000"
       DYNAMODB_CONNECTION: "dynamodb://aaa:123456@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
