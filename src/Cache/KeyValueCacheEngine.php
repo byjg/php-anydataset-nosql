@@ -100,7 +100,9 @@ class KeyValueCacheEngine extends BaseCacheEngine
 
         $this->keyValue->put($key, serialize($value));
         if (!empty($ttl)) {
-            $this->keyValue->put("$keyStr.ttl", $this->addToNow($ttl));
+            // Cast: the S3 driver hands the value straight to putObject() as the Body,
+            // and the AWS SDK rejects an int. Other drivers accept either.
+            $this->keyValue->put("$keyStr.ttl", (string)$this->addToNow($ttl));
         }
 
         return true;
