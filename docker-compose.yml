@@ -16,20 +16,9 @@ services:
     ports:
       - "8000:8000"
 
-#  s3:
-#    container_name: anydataset_nosql_s3
-#    image: minio/minio
-#    environment:
-#      MINIO_ACCESS_KEY: aaa
-#      MINIO_SECRET_KEY: 12345678
-##    command: ["server", "/data"]
-#    ports:
-#      - 9000:9000
-
   s3:
     container_name: anydataset_nosql_s3
-    image: minio/minio
-    command: ["server", "/data"]
+    image: rustfs/rustfs:1.0.0-rc.6
     ports:
       - "9000:9000"
     environment:

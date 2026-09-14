@@ -39,7 +39,7 @@ jobs:
           - 8000:8000
 
       s3:
-        image: minio/minio:edge-cicd
+        image: rustfs/rustfs:1.0.0-rc.6
         ports:
           - "9000:9000"
         env:
