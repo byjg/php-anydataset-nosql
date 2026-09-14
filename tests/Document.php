@@ -6,16 +6,16 @@ use MongoDB\BSON\UTCDateTime;
 
 class Document
 {
-    protected ?string $_id;
+    protected ?string $_id = null;
     protected ?string $name;
 
     protected ?string $brand;
 
     protected ?int $price;
 
-    protected ?UTCDateTime $createdAt;
+    protected ?UTCDateTime $createdAt = null;
 
-    protected ?UTCDateTime $updatedAt;
+    protected ?UTCDateTime $updatedAt = null;
 
     public function __construct(?string $name = null, ?string $brand = null, ?int $price = null)
     {
@@ -91,7 +91,7 @@ class Document
     /**
      * @return mixed|null
      */
-    public function getCreatedAt(): UTCDateTime
+    public function getCreatedAt(): ?UTCDateTime
     {
         return $this->createdAt;
     }

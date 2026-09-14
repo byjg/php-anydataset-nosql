@@ -7,10 +7,10 @@ use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\AnyDataset\NoSql\MongoDbDriver;
 use ByJG\AnyDataset\NoSql\NoSqlDocument;
+use MongoDB\Driver\Exception\ConnectionException;
 use MongoDB\Driver\Exception\Exception;
 use Override;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
 class MongoDbDriverTest extends TestCase
 {
@@ -40,8 +40,11 @@ class MongoDbDriverTest extends TestCase
                     new Document('Hilux', 'Toyota', 120000)
                 )
             );
-        } catch (Throwable $e) {
-            $this->markTestIncomplete("In order to test MongoDB you must run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
+        } catch (ConnectionException $e) {
+            // Only an unreachable server (or bad credentials) skips the tests. Any
+            // other error is a real failure: a catch-all here hid a broken fixture
+            // and kept these tests from running at all.
+            $this->markTestIncomplete("MongoDB is not reachable. Run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
             return;
         }
         $this->dbDriver->save(
