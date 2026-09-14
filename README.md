@@ -12,7 +12,7 @@ The implementation supports:
 [![Build Status](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-anydataset-nosql/actions/workflows/phpunit.yml)
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-anydataset-nosql/)
-[![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-nosql.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-anydataset-nosql.svg)](https://opensource.byjg.com/license/)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-anydataset-nosql.svg)](https://github.com/byjg/php-anydataset-nosql/releases/)
 
 - MongoDB (document-based)
@@ -67,19 +67,6 @@ Just type:
 
 ```bash
 composer require "byjg/anydataset-nosql"
-```
-
-## Dependencies
-
-```mermaid
-flowchart TD
-   byjg/anydataset-nosql --> ext-curl
-   byjg/anydataset-nosql --> aws/aws-sdk-php
-   byjg/anydataset-nosql --> byjg/anydataset
-   byjg/anydataset-nosql --> byjg/serializer
-   byjg/anydataset-nosql --> byjg/webrequest
-   byjg/anydataset-nosql --> byjg/cache-engine
-   byjg/anydataset-nosql --> ext-json
 ```
 
 ----
