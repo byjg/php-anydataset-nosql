@@ -19,7 +19,7 @@ and open the template in the editor.
          failOnDeprecation="true"
          failOnPhpunitDeprecation="true"
          stopOnFailure="false"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd">
 
   <php>
     <ini name="display_errors" value="On"/>
@@ -32,7 +32,9 @@ and open the template in the editor.
            value="s3://aaa:12345678@us-east-1/mybucket?create=true&amp;endpoint=http://localhost:9000"/>
   </php>
 
-  <source>
+  <source
+    ignoreIndirectDeprecations="true"
+  >
     <include>
       <directory>./src/</directory>
     </include>
