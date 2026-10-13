@@ -83,10 +83,10 @@ use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER,
-        "time" => DynamoDbAttributeType::NUMBER,
-        "error" => DynamoDbAttributeType::STRING,
-        "message" => DynamoDbAttributeType::STRING
+        "id" => DynamoDbAttributeType::Number,
+        "time" => DynamoDbAttributeType::Number,
+        "error" => DynamoDbAttributeType::String,
+        "message" => DynamoDbAttributeType::String
     ]
 ];
 ```
@@ -104,13 +104,13 @@ For example, if your DynamoDB table defines the `id` attribute as type `NUMBER` 
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER, // This must match the table schema
+        "id" => DynamoDbAttributeType::Number, // This must match the table schema
         // other attributes...
     ]
 ];
 ```
 
-Similarly, if your table defines the key as `STRING` (`S`), you must use `DynamoDbAttributeType::STRING`.
+Similarly, if your table defines the key as `STRING` (`S`), you must use `DynamoDbAttributeType::String`.
 
 ### Available Attribute Types
 
@@ -144,10 +144,10 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER,
-        "time" => DynamoDbAttributeType::NUMBER,
-        "error" => DynamoDbAttributeType::STRING,
-        "message" => DynamoDbAttributeType::STRING
+        "id" => DynamoDbAttributeType::Number,
+        "time" => DynamoDbAttributeType::Number,
+        "error" => DynamoDbAttributeType::String,
+        "message" => DynamoDbAttributeType::String
     ]
 ];
 
@@ -179,7 +179,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER,
+        "id" => DynamoDbAttributeType::Number,
     ]
 ];
 
@@ -207,7 +207,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER,
+        "id" => DynamoDbAttributeType::Number,
     ]
 ];
 
@@ -228,7 +228,7 @@ $dynamodb = Factory::getInstance('dynamodb://....');
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::NUMBER,
+        "id" => DynamoDbAttributeType::Number,
     ]
 ];
 
@@ -253,16 +253,16 @@ $options = [
    "KeyConditions" => [
        "id" => [
            "AttributeValueList" => [
-               [DynamoDbAttributeType::NUMBER->value => "1201"]
+               [DynamoDbAttributeType::Number->value => "1201"]
            ],
            "ComparisonOperator" => "EQ"
        ]
    ],
    "Types" => [
-       "id" => DynamoDbAttributeType::NUMBER,
-       "time" => DynamoDbAttributeType::NUMBER,
-       "error" => DynamoDbAttributeType::STRING,
-       "message" => DynamoDbAttributeType::STRING
+       "id" => DynamoDbAttributeType::Number,
+       "time" => DynamoDbAttributeType::Number,
+       "error" => DynamoDbAttributeType::String,
+       "message" => DynamoDbAttributeType::String
    ]
 ];
 
@@ -288,16 +288,16 @@ $options = [
    "ScanFilter" => [
        "error" => [
            "AttributeValueList" => [
-               [DynamoDbAttributeType::STRING->value => "Executive overflow"]
+               [DynamoDbAttributeType::String->value => "Executive overflow"]
            ],
            "ComparisonOperator" => "EQ"
        ]
    ],
    "Types" => [
-       "id" => DynamoDbAttributeType::NUMBER,
-       "time" => DynamoDbAttributeType::NUMBER,
-       "error" => DynamoDbAttributeType::STRING,
-       "message" => DynamoDbAttributeType::STRING
+       "id" => DynamoDbAttributeType::Number,
+       "time" => DynamoDbAttributeType::Number,
+       "error" => DynamoDbAttributeType::String,
+       "message" => DynamoDbAttributeType::String
    ]
 ];
 
@@ -329,8 +329,8 @@ use ByJG\AnyDataset\NoSql\Factory;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::STRING,
-        "isActive" => DynamoDbAttributeType::BOOLEAN
+        "id" => DynamoDbAttributeType::String,
+        "isActive" => DynamoDbAttributeType::Boolean
     ]
 ];
 
@@ -356,8 +356,8 @@ use ByJG\AnyDataset\NoSql\Factory;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::STRING,
-        "items" => DynamoDbAttributeType::LIST
+        "id" => DynamoDbAttributeType::String,
+        "items" => DynamoDbAttributeType::List
     ]
 ];
 
@@ -383,8 +383,8 @@ use ByJG\AnyDataset\NoSql\Factory;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::STRING,
-        "details" => DynamoDbAttributeType::MAP
+        "id" => DynamoDbAttributeType::String,
+        "details" => DynamoDbAttributeType::Map
     ]
 ];
 
@@ -414,8 +414,8 @@ use ByJG\AnyDataset\NoSql\Factory;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::STRING,
-        "optional" => DynamoDbAttributeType::NULL
+        "id" => DynamoDbAttributeType::String,
+        "optional" => DynamoDbAttributeType::Null
     ]
 ];
 
@@ -441,9 +441,9 @@ use ByJG\AnyDataset\NoSql\Factory;
 $options = [
     "KeyName" => "id",
     "Types" => [
-        "id" => DynamoDbAttributeType::STRING,
-        "tags" => DynamoDbAttributeType::STRING_SET,
-        "ratings" => DynamoDbAttributeType::NUMBER_SET
+        "id" => DynamoDbAttributeType::String,
+        "tags" => DynamoDbAttributeType::StringSet,
+        "ratings" => DynamoDbAttributeType::NumberSet
     ]
 ];
 

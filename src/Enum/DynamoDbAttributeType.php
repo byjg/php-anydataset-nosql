@@ -7,50 +7,50 @@ enum DynamoDbAttributeType: string
     /**
      * Represents a number type in DynamoDB
      */
-    case NUMBER = 'N';
+    case Number = 'N';
     
     /**
      * Represents a string type in DynamoDB
      */
-    case STRING = 'S';
+    case String = 'S';
     
     /**
      * Represents a binary type in DynamoDB
      */
-    case BINARY = 'B';
+    case Binary = 'B';
     
     /**
      * Represents a boolean type in DynamoDB
      */
-    case BOOLEAN = 'BOOL';
+    case Boolean = 'BOOL';
     
     /**
      * Represents a null type in DynamoDB
      */
-    case NULL = 'NULL';
+    case Null = 'NULL';
     
     /**
      * Represents a map type in DynamoDB (nested attributes)
      */
-    case MAP = 'M';
+    case Map = 'M';
     
     /**
      * Represents a list type in DynamoDB (ordered collection)
      */
-    case LIST = 'L';
+    case List = 'L';
     
     /**
      * Represents a string set type in DynamoDB
      */
-    case STRING_SET = 'SS';
+    case StringSet = 'SS';
     
     /**
      * Represents a number set type in DynamoDB
      */
-    case NUMBER_SET = 'NS';
+    case NumberSet = 'NS';
     
     /**
      * Represents a binary set type in DynamoDB
      */
-    case BINARY_SET = 'BS';
+    case BinarySet = 'BS';
 } 

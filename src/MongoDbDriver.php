@@ -121,7 +121,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $filter = new IteratorFilter();
         /** @psalm-suppress InvalidCast */
         $idStr = is_object($idDocument) ? (string)$idDocument : $idDocument;
-        $filter->and('_id', Relation::EQUAL, new ObjectId($idStr));
+        $filter->and('_id', Relation::Equal, new ObjectId($idStr));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -173,34 +173,34 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $result = [];
 
         $data = [
-            Relation::EQUAL->name => function ($value) {
+            Relation::Equal->name => function ($value) {
                 return $value;
             },
-            Relation::GREATER_THAN->name => function ($value) {
+            Relation::GreaterThan->name => function ($value) {
                 return [ '$gt' => $value ];
             },
-            Relation::LESS_THAN->name => function ($value) {
+            Relation::LessThan->name => function ($value) {
                 return [ '$lt' => $value ];
             },
-            Relation::GREATER_OR_EQUAL_THAN->name => function ($value) {
+            Relation::GreaterThanOrEqualTo->name => function ($value) {
                 return [ '$gte' => $value ];
             },
-            Relation::LESS_OR_EQUAL_THAN->name => function ($value) {
+            Relation::LessThanOrEqualTo->name => function ($value) {
                 return [ '$lte' => $value ];
             },
-            Relation::NOT_EQUAL->name => function ($value) {
+            Relation::NotEqual->name => function ($value) {
                 return [ '$ne' => $value ];
             },
-            Relation::STARTS_WITH->name => function ($value) {
+            Relation::StartsWith->name => function ($value) {
                 return [ '$regex' => "^$value" ];
             },
-            Relation::CONTAINS->name => function ($value) {
+            Relation::Contains->name => function ($value) {
                 return [ '$regex' => "$value" ];
             },
-            Relation::IN->name => function ($value) {
+            Relation::In->name => function ($value) {
                 return [ '$in' => $value ];
             },
-            Relation::NOT_IN->name => function ($value) {
+            Relation::NotIn->name => function ($value) {
                 return [ '$nin' => $value ];
             },
         ];
@@ -229,7 +229,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
-        $filter->and('_id', Relation::EQUAL, $idDocument);
+        $filter->and('_id', Relation::Equal, $idDocument);
         $this->deleteDocuments($filter, $collection);
         return null;
     }

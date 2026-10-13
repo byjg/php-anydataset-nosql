@@ -104,7 +104,7 @@ You can use the IteratorFilter to filter documents:
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $result = $mongo->getDocuments($filter, 'mycollection');
@@ -118,15 +118,15 @@ foreach ($result as $document)
 The MongoDbDriver supports the following filter relations:
 
 - `EQUAL`
-- `GREATER_THAN`
-- `LESS_THAN`
-- `GREATER_OR_EQUAL_THAN`
-- `LESS_OR_EQUAL_THAN`
-- `NOT_EQUAL`
-- `STARTS_WITH`
+- `GreaterThan`
+- `LessThan`
+- `GreaterThanOrEqualTo`
+- `LessThanOrEqualTo`
+- `NotEqual`
+- `StartsWith`
 - `CONTAINS`
 - `IN`
-- `NOT_IN`
+- `NotIn`
   :::
 
 ### Deleting Documents
@@ -138,7 +138,7 @@ $mongo->deleteDocumentById($id, 'mycollection');
 
 // Delete multiple documents by filter
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 $mongo->deleteDocuments($filter, 'mycollection');
 ```
 
@@ -147,7 +147,7 @@ $mongo->deleteDocuments($filter, 'mycollection');
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $data = [
     'field1' => 'new_value1',

@@ -77,7 +77,7 @@ class DynamoDbAttributeTypeTest extends TestCase
                     'AttributeDefinitions' => [
                         [
                             'AttributeName' => 'id',
-                            'AttributeType' => DynamoDbAttributeType::NUMBER->value
+                            'AttributeType' => DynamoDbAttributeType::Number->value
                         ],
                     ],
                     'ProvisionedThroughput' => [
@@ -102,9 +102,9 @@ class DynamoDbAttributeTypeTest extends TestCase
             $options = [
                 'KeyName' => 'id', // This must match the key in the table schema
                 'Types' => [
-                    'id' => DynamoDbAttributeType::NUMBER, // Must match the attribute type in table schema
-                    'stringValue' => DynamoDbAttributeType::STRING,
-                    'numberValue' => DynamoDbAttributeType::NUMBER
+                    'id' => DynamoDbAttributeType::Number, // Must match the attribute type in table schema
+                    'stringValue' => DynamoDbAttributeType::String,
+                    'numberValue' => DynamoDbAttributeType::Number
                 ],
                 'TableName' => $testTable
             ];
@@ -171,7 +171,7 @@ class DynamoDbAttributeTypeTest extends TestCase
                     'AttributeDefinitions' => [
                         [
                             'AttributeName' => 'id',
-                            'AttributeType' => DynamoDbAttributeType::NUMBER->value
+                            'AttributeType' => DynamoDbAttributeType::Number->value
                         ],
                     ],
                     'ProvisionedThroughput' => [
@@ -194,9 +194,9 @@ class DynamoDbAttributeTypeTest extends TestCase
             $options = [
                 'KeyName' => 'id', // This must match the key in the table schema
                 'Types' => [
-                    'id' => DynamoDbAttributeType::NUMBER, // Must match the attribute type in table schema
-                    'category' => DynamoDbAttributeType::STRING,
-                    'count' => DynamoDbAttributeType::NUMBER
+                    'id' => DynamoDbAttributeType::Number, // Must match the attribute type in table schema
+                    'category' => DynamoDbAttributeType::String,
+                    'count' => DynamoDbAttributeType::Number
                 ],
                 'TableName' => $testTable
             ];
@@ -219,7 +219,7 @@ class DynamoDbAttributeTypeTest extends TestCase
                 'ScanFilter' => [
                     'category' => [
                         'AttributeValueList' => [
-                            [DynamoDbAttributeType::STRING->value => 'books']
+                            [DynamoDbAttributeType::String->value => 'books']
                         ],
                         'ComparisonOperator' => 'EQ'
                     ]
@@ -283,7 +283,7 @@ class DynamoDbAttributeTypeTest extends TestCase
                     'AttributeDefinitions' => [
                         [
                             'AttributeName' => 'id',
-                            'AttributeType' => DynamoDbAttributeType::NUMBER->value
+                            'AttributeType' => DynamoDbAttributeType::Number->value
                         ],
                     ],
                     'ProvisionedThroughput' => [
@@ -315,13 +315,13 @@ class DynamoDbAttributeTypeTest extends TestCase
             $options = [
                 'KeyName' => 'id', // This must match the key in the table schema
                 'Types' => [
-                    'id' => DynamoDbAttributeType::NUMBER, // Must match the attribute type in table schema
-                    'boolValue' => DynamoDbAttributeType::BOOLEAN,
-                    'nullValue' => DynamoDbAttributeType::NULL,
-                    'listValue' => DynamoDbAttributeType::LIST,
-                    'mapValue' => DynamoDbAttributeType::MAP,
-                    'stringSetValue' => DynamoDbAttributeType::STRING_SET,
-                    'numberSetValue' => DynamoDbAttributeType::NUMBER_SET
+                    'id' => DynamoDbAttributeType::Number, // Must match the attribute type in table schema
+                    'boolValue' => DynamoDbAttributeType::Boolean,
+                    'nullValue' => DynamoDbAttributeType::Null,
+                    'listValue' => DynamoDbAttributeType::List,
+                    'mapValue' => DynamoDbAttributeType::Map,
+                    'stringSetValue' => DynamoDbAttributeType::StringSet,
+                    'numberSetValue' => DynamoDbAttributeType::NumberSet
                 ],
                 'TableName' => $testTable
             ];
