@@ -144,10 +144,11 @@ For large objects, you can retrieve specific chunks to manage memory usage:
 <?php
 $s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 
-// Get 1024 bytes starting from offset 0
+// The offset is the chunk number, not a byte position: bytes (offset * size) to (offset * size + size - 1)
+// Get the first 1024 bytes (bytes 0-1023)
 $chunk1 = $s3->getChunk("object_name", [], 1024, 0);
-// Get the next 1024 bytes (from offset 1024)
-$chunk2 = $s3->getChunk("object_name", [], 1024, 1024);
+// Get the next 1024 bytes (bytes 1024-2047)
+$chunk2 = $s3->getChunk("object_name", [], 1024, 1);
 
 // Example of reading a large file in chunks
 $size = 1024;
@@ -156,7 +157,7 @@ $data = "";
 do {
     $chunk = $s3->getChunk("object_name", [], $size, $offset);
     $data .= $chunk;
-    $offset += $size;
+    $offset++;
 } while (strlen($chunk) == $size);
 ```
 

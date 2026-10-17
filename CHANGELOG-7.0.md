@@ -11,9 +11,17 @@ Enum cases follow the ByJG standard and are written in PascalCase. The backed va
 change, so `->value`, `from()`, `tryFrom()` and stored data are not affected; only code that
 names a case (or reads `->name`) has to be updated.
 
+The `Relation` enum from `byjg/anydataset` 7.0 was renamed the same way (`Relation::EQUAL` is now
+`Relation::Equal`, etc.); update the filters you pass to `MongoDbDriver`.
+
 | Enum | Before (6.x) | After (7.0) |
 |---|---|---|
 | `DynamoDbAttributeType` | `NUMBER`, `STRING`, `BINARY`, `BOOLEAN`, `NULL`, `MAP`, `LIST`, `STRING_SET`, `NUMBER_SET`, `BINARY_SET` | `Number`, `String`, `Binary`, `Boolean`, `Null`, `Map`, `List`, `StringSet`, `NumberSet`, `BinarySet` |
+
+## Bug Fixes
+
+- `KeyValueCacheEngine::set()` stores the `.ttl` entry as a string. The S3 driver passes the value
+  as the object body and the AWS SDK rejected the integer, so setting a TTL failed on S3.
 
 ## Requirements
 

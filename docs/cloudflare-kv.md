@@ -46,16 +46,6 @@ print_r($iterator->toArray());
 Use `getLastCursor()` to retrieve the cursor for the next page of results when working with large datasets.
 :::
 
-### Check if a key exists
-
-```php
-<?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
-if ($kv->has("object_name")) {
-    // The key exists
-}
-```
-
 ### Inserting/Updating data
 
 Put a single value:
@@ -86,17 +76,6 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $value = $kv->get("object_name");
 ```
 
-### Get a portion of a value
-
-For large objects, you can retrieve just a portion:
-
-```php
-<?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
-// Get 1024 bytes starting from offset 0
-$chunk = $kv->getChunk("object_name", [], 1024, 0);
-```
-
 ### Remove a value
 
 Remove a single key:
@@ -115,13 +94,11 @@ $kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
 $kv->removeBatch(["key1", "key2"]);
 ```
 
-### Rename a key
-
-```php
-<?php
-$kv = \ByJG\AnyDataset\NoSql\Factory::getInstance('kv://....');
-$kv->rename("old_key_name", "new_key_name");
-```
+:::warning Not implemented
+`has()`, `getChunk()` and `rename()` are not implemented by the Cloudflare KV driver and throw
+`ByJG\AnyDataset\Core\Exception\NotImplementedException`. Because `has()` is not available, this driver
+cannot be used with the [Cache Store](cache.md).
+:::
 
 ----
 [Open source ByJG](http://opensource.byjg.com)

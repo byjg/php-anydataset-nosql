@@ -37,7 +37,7 @@ $mongo->save($document);
 ```
 
 :::info
-When a document is inserted, the fields `created` and `updated` are automatically added with the current date.
+When a document is inserted, the fields `createdAt` and `updatedAt` are automatically added with the current date.
 Because there is no ID (first parameter) provided, this is treated as an INSERT operation.
 :::
 
@@ -47,7 +47,7 @@ Because there is no ID (first parameter) provided, this is treated as an INSERT 
 <?php
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
-    'someid',
+    '5f1d7f1b2c3a4b5c6d7e8f90',
     'mycollection',
     [
         'field1' => 'value1',
@@ -59,8 +59,9 @@ $mongo->save($document);
 ```
 
 :::info
-When updating a document, the field `updated` is automatically updated with the current date.
-Because an ID (first parameter) is provided, this is treated as an UPDATE operation.
+When updating a document, the field `updatedAt` is automatically updated with the current date.
+Because an ID (first parameter) is provided, this is treated as an UPDATE operation (an upsert: the document is
+created if the ID does not exist). The ID must be a valid MongoDB ObjectId string.
 :::
 
 
@@ -89,8 +90,8 @@ The collection name is required as the second parameter.
 ```php
 <?php
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
-$result = $mongo->getDocuments(null, 'mycollection');
-foreach ($result as $document)
+$result = $mongo->getDocuments(new \ByJG\AnyDataset\Core\IteratorFilter(), 'mycollection');
+foreach ($result ?? [] as $document)
 {
     print_r($document->getIdDocument());
     print_r($document->getDocument());
@@ -107,8 +108,8 @@ $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
 $filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
-$result = $mongo->getDocuments($filter, 'mycollection');
-foreach ($result as $document)
+$result = $mongo->getDocuments($filter, 'mycollection'); // null when nothing matches
+foreach ($result ?? [] as $document)
 {
     // Do something
 }
@@ -117,15 +118,15 @@ foreach ($result as $document)
 :::tip Supported Relations
 The MongoDbDriver supports the following filter relations:
 
-- `EQUAL`
+- `Equal`
 - `GreaterThan`
 - `LessThan`
 - `GreaterThanOrEqualTo`
 - `LessThanOrEqualTo`
 - `NotEqual`
 - `StartsWith`
-- `CONTAINS`
-- `IN`
+- `Contains`
+- `In`
 - `NotIn`
   :::
 

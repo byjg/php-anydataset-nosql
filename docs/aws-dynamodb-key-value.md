@@ -118,16 +118,16 @@ The `DynamoDbAttributeType` enum provides the following types:
 
 | Enum Case  | Value  | Description                            |
 |------------|--------|----------------------------------------|
-| NUMBER     | 'N'    | Represents a number                    |
-| STRING     | 'S'    | Represents a string                    |
-| BINARY     | 'B'    | Represents binary data                 |
-| BOOLEAN    | 'BOOL' | Represents a boolean value             |
-| NULL       | 'NULL' | Represents a null value                |
-| MAP        | 'M'    | Represents a map (nested attributes)   |
-| LIST       | 'L'    | Represents a list (ordered collection) |
-| STRING_SET | 'SS'   | Represents a set of strings            |
-| NUMBER_SET | 'NS'   | Represents a set of numbers            |
-| BINARY_SET | 'BS'   | Represents a set of binary values      |
+| Number     | 'N'    | Represents a number                    |
+| String     | 'S'    | Represents a string                    |
+| Binary     | 'B'    | Represents binary data                 |
+| Boolean    | 'BOOL' | Represents a boolean value             |
+| Null       | 'NULL' | Represents a null value                |
+| Map        | 'M'    | Represents a map (nested attributes)   |
+| List       | 'L'    | Represents a list (ordered collection) |
+| StringSet  | 'SS'   | Represents a set of strings            |
+| NumberSet  | 'NS'   | Represents a set of numbers            |
+| BinarySet  | 'BS'   | Represents a set of binary values      |
 
 ## Basic Operations
 
@@ -431,7 +431,7 @@ $dynamodb->put(
 
 ### Set Types
 
-For SET types (STRING_SET, NUMBER_SET, BINARY_SET), use regular PHP arrays:
+For SET types (`StringSet`, `NumberSet`, `BinarySet`), use regular PHP arrays:
 
 ```php
 <?php
