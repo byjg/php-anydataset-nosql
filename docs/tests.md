@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 title: Running Tests
 description: How to run the test suite for AnyDataset NoSQL
 ---

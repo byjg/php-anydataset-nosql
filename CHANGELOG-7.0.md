@@ -18,10 +18,19 @@ The `Relation` enum from `byjg/anydataset` 7.0 was renamed the same way (`Relati
 |---|---|---|
 | `DynamoDbAttributeType` | `NUMBER`, `STRING`, `BINARY`, `BOOLEAN`, `NULL`, `MAP`, `LIST`, `STRING_SET`, `NUMBER_SET`, `BINARY_SET` | `Number`, `String`, `Binary`, `Boolean`, `Null`, `Map`, `List`, `StringSet`, `NumberSet`, `BinarySet` |
 
+### `KeyValueCacheEngine` removed
+
+`ByJG\AnyDataset\NoSql\Cache\KeyValueCacheEngine` (the PSR-16 cache on top of a Key/Value store)
+was removed, together with its documentation page (`cache.md`). It only worked with the S3 driver:
+Cloudflare KV does not implement `has()`, and DynamoDB needs key options the cache never passed.
+It was also the only reason this package required `byjg/cache-engine`, which is no longer a
+dependency.
+
+Use a cache from [byjg/cache-engine](https://github.com/byjg/php-cache-engine) instead (Redis,
+Memcached, FileSystem, ...). The Key/Value drivers (S3, DynamoDB, Cloudflare KV) are unchanged.
+
 ## Bug Fixes
 
-- `KeyValueCacheEngine::set()` stores the `.ttl` entry as a string. The S3 driver passes the value
-  as the object body and the AWS SDK rejected the integer, so setting a TTL failed on S3.
 - `MongoDbDriver`: the `uri.` and `driver.` connection string options now reach the MongoDB
   `Manager`. Before, every option was rejected with "Invalid option" (`parse_str()` turns the `.`
   into `_`); and even past that, `uri.` options were dropped and `driver.` options were passed
@@ -44,7 +53,7 @@ The `Relation` enum from `byjg/anydataset` 7.0 was renamed the same way (`Relati
 ### ByJG dependencies
 
 - `byjg/anydataset` is now `^7.0`.
-- `byjg/cache-engine` is now `^7.0`.
+- `byjg/cache-engine` is no longer required (see `KeyValueCacheEngine` removed above).
 - `byjg/serializer` is now `^7.0`.
 - `byjg/webrequest` is now `^7.0`.
 

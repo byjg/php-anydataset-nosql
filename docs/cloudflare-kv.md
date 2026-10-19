@@ -96,8 +96,7 @@ $kv->removeBatch(["key1", "key2"]);
 
 :::warning Not implemented
 `has()`, `getChunk()` and `rename()` are not implemented by the Cloudflare KV driver and throw
-`ByJG\AnyDataset\Core\Exception\NotImplementedException`. Because `has()` is not available, this driver
-cannot be used with the [Cache Store](cache.md).
+`ByJG\AnyDataset\Core\Exception\NotImplementedException`.
 :::
 
 ----

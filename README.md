@@ -29,7 +29,6 @@ Anydataset is an agnostic data source abstraction layer in PHP. See more about A
 - NoSQL document-based databases accessed through `NoSqlInterface`
 - Key/Value stores accessed through `KeyValueInterface`
 - Unified connection string format based on URIs
-- Built-in caching capabilities with PSR-16 compatibility
 - Type-safe DynamoDB attribute definitions using enums
 
 ## Connection Based on URI
@@ -59,7 +58,6 @@ See below the current implemented drivers:
 
 ### Additional Features
 
-- [Cache Store](docs/cache.md) - PSR-16 compatible cache layer for Key/Value stores
 - [Running Tests](docs/tests.md) - How to run the test suite
 
 ## Installation
