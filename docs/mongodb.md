@@ -17,6 +17,13 @@ The full connection string format:
 mongodb://username:password@server/dbname?uri.param1=value1&driver.param2=value2
 ```
 
+Percent-encode special characters (such as `@`, `:`, `/`, `%`, `?` and `#`) in the username and
+password, e.g. with `rawurlencode()`. The password `p@ss:word` becomes `p%40ss%3Aword`:
+
+```text
+mongodb://username:p%40ss%3Aword@server/dbname
+```
+
 :::note Replica sets
 Only one host is supported in the connection string; a host list such as `server1,server2,server3`
 throws an `InvalidArgumentException`. To connect to a replica set, pass one member as the seed host

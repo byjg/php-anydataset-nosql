@@ -94,7 +94,9 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         }
 
         if (!empty($username) && !empty($password)) {
-            $auth = "$username:$password@";
+            // MongoDB requires percent-encoded userinfo. Uri decodes the password but not the
+            // username, so the username is decoded first to avoid double encoding.
+            $auth = rawurlencode(rawurldecode($username)) . ':' . rawurlencode($password) . '@';
         } else {
             $auth = "";
         }

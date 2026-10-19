@@ -39,6 +39,21 @@ class MongoDbDriverOptionsTest extends TestCase
         $this->assertStringContainsString('mongodb://127.0.0.1:27017/?replicaSet=rs0', print_r($manager, true));
     }
 
+    public function testCredentialsArePercentEncoded()
+    {
+        // The input URI is percent-encoded; the connection string must keep it encoded once.
+        $manager = Factory::getInstance('mongodb://us%40er:p%40ss%3A%2F%25w@127.0.0.1/test')->getDbConnection();
+
+        $this->assertStringContainsString('mongodb://us%40er:p%40ss%3A%2F%25w@127.0.0.1:27017/?', print_r($manager, true));
+    }
+
+    public function testNoCredentialsProduceNoUserInfo()
+    {
+        $manager = Factory::getInstance('mongodb://127.0.0.1/test')->getDbConnection();
+
+        $this->assertStringContainsString('mongodb://127.0.0.1:27017/?', print_r($manager, true));
+    }
+
     public function testMultipleHostsAreRejected()
     {
         $this->expectException(\InvalidArgumentException::class);

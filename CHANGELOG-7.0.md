@@ -31,6 +31,10 @@ The `Relation` enum from `byjg/anydataset` 7.0 was renamed the same way (`Relati
 - `MongoDbDriver`: a connection string with a host list (`mongodb://server1,server2/db`) now throws
   an `InvalidArgumentException`. Before, only the first host was used and the database name was
   wrong (`,server2/db`). Use a single seed host with `uri.replicaSet=<name>` instead.
+- `MongoDbDriver`: the username and password are now percent-encoded in the MongoDB connection
+  string. Before, they were passed decoded, so a credential with `@`, `:`, `/`, `%`, `?` or `#`
+  broke the connection string or authenticated with the wrong credentials. Pass them
+  percent-encoded in the URI (e.g. `p%40ss` for `p@ss`).
 
 ## Requirements
 

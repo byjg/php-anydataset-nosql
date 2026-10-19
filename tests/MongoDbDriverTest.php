@@ -7,6 +7,8 @@ use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\AnyDataset\NoSql\MongoDbDriver;
 use ByJG\AnyDataset\NoSql\NoSqlDocument;
+use ByJG\Util\Uri;
+use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\ConnectionException;
 use MongoDB\Driver\Exception\Exception;
 use Override;
@@ -341,5 +343,34 @@ class MongoDbDriverTest extends TestCase
         $filter->and('name', Relation::Equal, 'Hilux');
         $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $documentList);
+    }
+
+    public function testAuthenticateWithSpecialCharactersInCredentials()
+    {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
+        $username = 'user@:/%?#';
+        $password = 'p@ss:/%?#word';
+        $admin = $this->dbDriver->getDbConnection();
+        $admin->executeCommand('admin', new Command([
+            'createUser' => $username,
+            'pwd' => $password,
+            'roles' => [['role' => 'readWrite', 'db' => 'test']],
+        ]));
+
+        try {
+            $host = new Uri(getenv("MONGODB_CONNECTION"));
+            $driver = Factory::getInstance(
+                'mongodb://' . rawurlencode($username) . ':' . rawurlencode($password) . '@' . $host->getHost() . '/test'
+            );
+
+            $filter = new IteratorFilter();
+            $filter->and('name', Relation::Equal, 'Hilux');
+            $this->assertCount(1, $driver->getDocuments($filter, self::TEST_COLLECTION));
+        } finally {
+            $admin->executeCommand('admin', new Command(['dropUser' => $username]));
+        }
     }
 }
