@@ -17,6 +17,7 @@ use Override;
 
 class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 {
+    use AwsCredentialsTrait;
 
     /**
      * @var DynamoDbClient
@@ -29,9 +30,9 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     protected string|array|null $table;
 
     /**
-     * AwsS3Driver constructor.
+     * AwsDynamoDbDriver constructor.
      *
-     *  s3://key:secret@region/bucket
+     *  dynamodb://key:secret@region/table
      *
      * @param string $connectionString
      */
@@ -42,11 +43,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         $defaultParameters = [
             'version'     => 'latest',
             'region'      => $uri->getHost(),
-            'credentials' => [
-                'key'    => $uri->getUsername(),
-                'secret' => $uri->getPassword(),
-            ],
-        ];
+        ] + self::credentialsFromUri($uri);
 
         $extraParameters = [];
         parse_str($uri->getQuery(), $extraParameters);

@@ -29,6 +29,18 @@ dependency.
 Use a cache from [byjg/cache-engine](https://github.com/byjg/php-cache-engine) instead (Redis,
 Memcached, FileSystem, ...). The Key/Value drivers (S3, DynamoDB, Cloudflare KV) are unchanged.
 
+### AWS drivers: no credentials in the URI means the SDK default provider chain
+
+`AwsS3Driver` and `AwsDynamoDbDriver` without a user in the URI (`s3://us-east-1/bucket`,
+`dynamodb://us-east-1/table`) now leave the credentials to the AWS SDK default provider chain:
+environment variables (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), the `~/.aws` files, then the
+ECS/EC2 instance role. Before, they passed an empty static key and secret, so every request was
+signed with empty credentials and an IAM role was never used. With byjg/uri 7.0 (absent parts are
+`null`) the old code threw `InvalidArgumentException: Credentials must be ...` in the constructor.
+
+`key@region` (a key without a secret) still uses the static key with an empty secret.
+`key:secret@region` is unchanged.
+
 ## Bug Fixes
 
 - `MongoDbDriver`: the `uri.` and `driver.` connection string options now reach the MongoDB
@@ -45,6 +57,9 @@ Memcached, FileSystem, ...). The Key/Value drivers (S3, DynamoDB, Cloudflare KV)
   broke the connection string or authenticated with the wrong credentials. Pass them
   percent-encoded in the URI (e.g. `p%40ss` for `p@ss`). Requires byjg/uri 7.0, which returns the
   username decoded like the password.
+- `MongoDbDriver`: a username or password of `"0"` was treated as missing (`!empty()`), so the
+  connection was opened without credentials. Both are now used; authentication is only skipped
+  when the username or the password is absent or empty.
 
 ## Requirements
 

@@ -27,6 +27,18 @@ Example:
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket
 ```
 
+## Credentials
+
+The `access_key:secret_key@` part is optional:
+
+| Connection string | Credentials used |
+|---|---|
+| `s3://access_key:secret_key@region/bucket` | The static key and secret from the URI |
+| `s3://access_key@region/bucket` | The static key with an empty secret |
+| `s3://region/bucket` | The AWS SDK [default credential provider chain](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_default_chain.html): environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`), the `~/.aws` files, then the ECS/EC2 instance role |
+
+Leave the credentials out of the URI to use an IAM role or the environment.
+
 ## Connection Options
 
 You can add any additional parameters supported by the S3 API to the query string. For a comprehensive list, refer to:

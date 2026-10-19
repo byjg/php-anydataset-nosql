@@ -26,6 +26,18 @@ Example:
 dynamodb://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mytable
 ```
 
+## Credentials
+
+The `access_key:secret_key@` part is optional:
+
+| Connection string | Credentials used |
+|---|---|
+| `dynamodb://access_key:secret_key@region/tablename` | The static key and secret from the URI |
+| `dynamodb://access_key@region/tablename` | The static key with an empty secret |
+| `dynamodb://region/tablename` | The AWS SDK [default credential provider chain](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_default_chain.html): environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`), the `~/.aws` files, then the ECS/EC2 instance role |
+
+Leave the credentials out of the URI to use an IAM role or the environment.
+
 ## Connection Options
 
 You can add any extra arguments supported by the DynamoDB API to the query string. For a comprehensive list, refer to

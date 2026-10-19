@@ -12,6 +12,8 @@ use Override;
 
 class AwsS3Driver implements KeyValueInterface, RegistrableInterface
 {
+    use AwsCredentialsTrait;
+
     const PARAM_BUCKET_ENDPOINT = 'bucket_endpoint';
     const PARAM_USE_ARN_REGION = 'use_arn_region';
     const PARAM_USE_ACCELERATE_ENDPOINT = 'use_accelerate_endpoint';
@@ -43,11 +45,7 @@ class AwsS3Driver implements KeyValueInterface, RegistrableInterface
             [
                 'version'     => 'latest',
                 'region'      => $uri->getHost(),
-                'credentials' => [
-                    'key'    => $uri->getUsername(),
-                    'secret' => $uri->getPassword(),
-                ],
-            ];
+            ] + self::credentialsFromUri($uri);
 
         $extraParameters = [];
         parse_str($uri->getQuery(), $extraParameters);

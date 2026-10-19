@@ -71,8 +71,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         }
         $path = preg_replace('~^/~', '', $this->connectionUri->getPath());
         $database = $path ?? '';
-        $username = $this->connectionUri->getUsername();
-        $password = $this->connectionUri->getPassword();
+        $username = $this->connectionUri->getUsername() ?? '';
+        $password = $this->connectionUri->getPassword() ?? '';
         // Not parse_str(): it turns the "." in "uri.x" into "_".
         // "uri." options go into the connection string, where MongoDB parses the typed values
         // (the $uriOptions array of the Manager rejects a string for an int or bool option).
@@ -93,7 +93,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             }
         }
 
-        if (!empty($username) && !empty($password)) {
+        // Not empty(): a user or a password "0" is a real credential
+        if ($username !== '' && $password !== '') {
             // MongoDB requires percent-encoded userinfo; Uri returns both values decoded
             $auth = rawurlencode($username) . ':' . rawurlencode($password) . '@';
         } else {

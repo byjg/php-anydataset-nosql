@@ -12,6 +12,7 @@ use MongoDB\Driver\Command;
 use MongoDB\Driver\Exception\ConnectionException;
 use MongoDB\Driver\Exception\Exception;
 use Override;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MongoDbDriverTest extends TestCase
@@ -345,14 +346,22 @@ class MongoDbDriverTest extends TestCase
         $this->assertCount(1, $documentList);
     }
 
-    public function testAuthenticateWithSpecialCharactersInCredentials()
+    public static function credentialsProvider(): array
+    {
+        return [
+            'special characters' => ['user@:/%?#', 'p@ss:/%?#word'],
+            'password "0"' => ['user0', '0'],
+            'user "0"' => ['0', 'pass0'],
+        ];
+    }
+
+    #[DataProvider('credentialsProvider')]
+    public function testAuthenticateWithCredentials(string $username, string $password)
     {
         if (empty($this->dbDriver)) {
             $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
         }
 
-        $username = 'user@:/%?#';
-        $password = 'p@ss:/%?#word';
         $admin = $this->dbDriver->getDbConnection();
         $admin->executeCommand('admin', new Command([
             'createUser' => $username,

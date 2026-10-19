@@ -24,6 +24,9 @@ password, e.g. with `rawurlencode()`. The password `p@ss:word` becomes `p%40ss%3
 mongodb://username:p%40ss%3Aword@server/dbname
 ```
 
+The credentials are sent only when both the username and the password are present and not empty
+(`"0"` is a valid value); otherwise the connection is opened without authentication.
+
 :::note Replica sets
 Only one host is supported in the connection string; a host list such as `server1,server2,server3`
 throws an `InvalidArgumentException`. To connect to a replica set, pass one member as the seed host
