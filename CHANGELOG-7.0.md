@@ -22,6 +22,15 @@ The `Relation` enum from `byjg/anydataset` 7.0 was renamed the same way (`Relati
 
 - `KeyValueCacheEngine::set()` stores the `.ttl` entry as a string. The S3 driver passes the value
   as the object body and the AWS SDK rejected the integer, so setting a TTL failed on S3.
+- `MongoDbDriver`: the `uri.` and `driver.` connection string options now reach the MongoDB
+  `Manager`. Before, every option was rejected with "Invalid option" (`parse_str()` turns the `.`
+  into `_`); and even past that, `uri.` options were dropped and `driver.` options were passed
+  with the prefix still on the key. `uri.` options are now added to the MongoDB connection
+  string (so typed values such as `uri.wtimeoutMS=500` work), and `driver.` options are passed
+  as driver options without the prefix.
+- `MongoDbDriver`: a connection string with a host list (`mongodb://server1,server2/db`) now throws
+  an `InvalidArgumentException`. Before, only the first host was used and the database name was
+  wrong (`,server2/db`). Use a single seed host with `uri.replicaSet=<name>` instead.
 
 ## Requirements
 

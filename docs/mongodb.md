@@ -14,8 +14,18 @@ $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 The full connection string format:
 
 ```text
-mongodb://username:password@server1,server2,server3/dbname?uri.param1=value1&driver.param2=value2
+mongodb://username:password@server/dbname?uri.param1=value1&driver.param2=value2
 ```
+
+:::note Replica sets
+Only one host is supported in the connection string; a host list such as `server1,server2,server3`
+throws an `InvalidArgumentException`. To connect to a replica set, pass one member as the seed host
+and the replica set name; the driver discovers the other members from it:
+
+```text
+mongodb://username:password@server1/dbname?uri.replicaSet=rs0
+```
+:::
 
 ## Inserting data to a Collection
 
@@ -167,8 +177,10 @@ mongodb://username:password@server:27017/dbname?uri.option1=value1&driver.option
 :::info Connection Parameters
 Parameters must be prefixed with:
 
-- `uri.` - Passed to the MongoDB URI connection string
-- `driver.` - Passed to the MongoDB driver options
+- `uri.` - Passed to the MongoDB URI connection string, without the prefix
+  (e.g. `uri.replicaSet=rs0&uri.w=majority`)
+- `driver.` - Passed to the `$driverOptions` of `MongoDB\Driver\Manager`, without the prefix.
+  The values arrive as strings, so only driver options that accept a string can be set this way
 
 Any other parameters will throw an exception.
 

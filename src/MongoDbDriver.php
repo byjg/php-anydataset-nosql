@@ -62,18 +62,32 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $hosts = $this->connectionUri->getHost();
         $port = $this->connectionUri->getPort() == '' ? 27017 : $this->connectionUri->getPort();
         $port = $port ?? 27017;
+        // Uri parses "server1,server2/db" as host "server1" and path ",server2/db".
+        if (str_starts_with($this->connectionUri->getPath(), ',')) {
+            throw new InvalidArgumentException(
+                "Multiple hosts are not supported in the MongoDB connection string. "
+                . "Use a single seed host and 'uri.replicaSet=<name>'; the driver discovers the other members."
+            );
+        }
         $path = preg_replace('~^/~', '', $this->connectionUri->getPath());
         $database = $path ?? '';
         $username = $this->connectionUri->getUsername();
         $password = $this->connectionUri->getPassword();
-        parse_str($this->connectionUri->getQuery(), $options);
+        // Not parse_str(): it turns the "." in "uri.x" into "_".
+        // "uri." options go into the connection string, where MongoDB parses the typed values
+        // (the $uriOptions array of the Manager rejects a string for an int or bool option).
         $uriOptions = [];
         $driverOptions = [];
-        foreach ($options as $key => $value) {
+        foreach (explode('&', $this->connectionUri->getQuery()) as $pair) {
+            if ($pair === '') {
+                continue;
+            }
+            [$key, $value] = explode('=', $pair, 2) + [1 => ''];
+            $key = rawurldecode($key);
             if (str_starts_with($key, 'uri.')) {
-                $options[$key] = $value;
+                $uriOptions[] = rawurlencode(substr($key, 4)) . '=' . $value;
             } elseif (str_starts_with($key, 'driver.')) {
-                $driverOptions[$key] = $value;
+                $driverOptions[substr($key, 7)] = rawurldecode($value);
             } else {
                 throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
             }
@@ -85,8 +99,8 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $auth = "";
         }
 
-        $connectString = sprintf('mongodb://%s%s:%d', $auth, $hosts, $port);
-        $this->mongoManager = new Manager($connectString, $uriOptions, $driverOptions);
+        $connectString = sprintf('mongodb://%s%s:%d/?%s', $auth, $hosts, $port, implode('&', $uriOptions));
+        $this->mongoManager = new Manager($connectString, [], $driverOptions);
         $this->database = $database;
     }
 
