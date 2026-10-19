@@ -43,7 +43,8 @@ Memcached, FileSystem, ...). The Key/Value drivers (S3, DynamoDB, Cloudflare KV)
 - `MongoDbDriver`: the username and password are now percent-encoded in the MongoDB connection
   string. Before, they were passed decoded, so a credential with `@`, `:`, `/`, `%`, `?` or `#`
   broke the connection string or authenticated with the wrong credentials. Pass them
-  percent-encoded in the URI (e.g. `p%40ss` for `p@ss`).
+  percent-encoded in the URI (e.g. `p%40ss` for `p@ss`). Requires byjg/uri 7.0, which returns the
+  username decoded like the password.
 
 ## Requirements
 

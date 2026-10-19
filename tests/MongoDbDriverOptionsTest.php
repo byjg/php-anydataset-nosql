@@ -47,6 +47,14 @@ class MongoDbDriverOptionsTest extends TestCase
         $this->assertStringContainsString('mongodb://us%40er:p%40ss%3A%2F%25w@127.0.0.1:27017/?', print_r($manager, true));
     }
 
+    public function testUsernameWithLiteralPercentIsEncodedOnce()
+    {
+        // The user is "us%41er" (a literal "%41"): it must not be decoded a second time into "usAer"
+        $manager = Factory::getInstance('mongodb://us%2541er:pw@127.0.0.1/test')->getDbConnection();
+
+        $this->assertStringContainsString('mongodb://us%2541er:pw@127.0.0.1:27017/?', print_r($manager, true));
+    }
+
     public function testNoCredentialsProduceNoUserInfo()
     {
         $manager = Factory::getInstance('mongodb://127.0.0.1/test')->getDbConnection();
