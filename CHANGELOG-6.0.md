@@ -52,7 +52,7 @@ Version 6.0 represents a major update with significant improvements to type safe
 | Component | Before (5.x) | After (6.0) | Description |
 |-----------|--------------|-------------|-------------|
 | **PHP Version** | `>=8.1 <8.4` | `>=8.3 <8.6` | Minimum PHP version raised to 8.3, added support for 8.4 and 8.5 |
-| **Dependencies** | `byjg/anydataset: ^5.0`<br>`byjg/anydataset-array: ^5.0`<br>`byjg/cache-engine: ^5.0`<br>`byjg/serializer: ^5.0`<br>`byjg/webrequest: ^5.0` | `byjg/anydataset: ^6.0`<br>`byjg/cache-engine: ^6.0`<br>`byjg/serializer: ^6.0`<br>`byjg/webrequest: ^6.0` | All ByJG dependencies upgraded to version 6.0. **Note**: `byjg/anydataset-array` removed as dependency |
+| **Dependencies** | `byjg/anydataset: ^5.0`<br/>`byjg/anydataset-array: ^5.0`<br/>`byjg/cache-engine: ^5.0`<br/>`byjg/serializer: ^5.0`<br/>`byjg/webrequest: ^5.0` | `byjg/anydataset: ^6.0`<br/>`byjg/cache-engine: ^6.0`<br/>`byjg/serializer: ^6.0`<br/>`byjg/webrequest: ^6.0` | All ByJG dependencies upgraded to version 6.0. **Note**: `byjg/anydataset-array` removed as dependency |
 | **PHPUnit** | `^9.6` | `^10.5\|^11.5` | PHPUnit upgraded to versions 10.5 or 11.5 |
 | **Psalm** | `^5.9` | `^5.9\|^6.13` | Psalm now supports version 6.13 |
 | **ArrayDataset** | `use ByJG\AnyDataset\Lists\ArrayDataset;` | `use ByJG\AnyDataset\Core\AnyDataset;` | `ArrayDataset` replaced with `AnyDataset` throughout the codebase |
