@@ -9,7 +9,7 @@ Version 6.0 represents a major update with significant improvements to type safe
 ### Type-Safe DynamoDB Attribute Definitions
 
 - **DynamoDb Enum Support**: Introduced `DynamoDbAttributeType` enum for type-safe attribute definitions
-  - All DynamoDB attribute types now available as enum cases: `STRING`, `NUMBER`, `BINARY`, `BOOLEAN`, `NULL`, `MAP`, `LIST`, `StringSet`, `NumberSet`, `BinarySet`
+  - All DynamoDB attribute types now available as enum cases: `STRING`, `NUMBER`, `BINARY`, `BOOLEAN`, `NULL`, `MAP`, `LIST`, `STRING_SET`, `NUMBER_SET`, `BINARY_SET`
   - Improved type safety when working with DynamoDB attributes
   - Better IDE autocomplete and compile-time validation
 
@@ -129,9 +129,9 @@ use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
 $options = [
     'KeyName' => 'id',
     'Types' => [
-        'id' => DynamoDbAttributeType::String,
-        'count' => DynamoDbAttributeType::Number,
-        'active' => DynamoDbAttributeType::Boolean,
+        'id' => DynamoDbAttributeType::STRING,
+        'count' => DynamoDbAttributeType::NUMBER,
+        'active' => DynamoDbAttributeType::BOOLEAN,
     ]
 ];
 ```
