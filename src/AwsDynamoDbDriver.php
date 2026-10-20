@@ -17,6 +17,7 @@ use Override;
 
 class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 {
+    use AwsCredentialsTrait;
 
     /**
      * @var DynamoDbClient
@@ -29,9 +30,9 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
     protected string|array|null $table;
 
     /**
-     * AwsS3Driver constructor.
+     * AwsDynamoDbDriver constructor.
      *
-     *  s3://key:secret@region/bucket
+     *  dynamodb://key:secret@region/table
      *
      * @param string $connectionString
      */
@@ -42,11 +43,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         $defaultParameters = [
             'version'     => 'latest',
             'region'      => $uri->getHost(),
-            'credentials' => [
-                'key'    => $uri->getUsername(),
-                'secret' => $uri->getPassword(),
-            ],
-        ];
+        ] + self::credentialsFromUri($uri);
 
         $extraParameters = [];
         parse_str($uri->getQuery(), $extraParameters);
@@ -114,13 +111,13 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         foreach ($array as $key => $val) {
             $attributeType = $this->getAttributeType($options, $key);
             $result[$key] = match ($attributeType) {
-                DynamoDbAttributeType::BOOLEAN->value => $this->prepareBooleanType($val),
-                DynamoDbAttributeType::NULL->value => $this->prepareNullType(),
-                DynamoDbAttributeType::LIST->value => $this->prepareListType($val),
-                DynamoDbAttributeType::MAP->value => $this->prepareMapType($val),
-                DynamoDbAttributeType::STRING_SET->value => $this->prepareStringSetType($val),
-                DynamoDbAttributeType::NUMBER_SET->value => $this->prepareNumberSetType($val),
-                DynamoDbAttributeType::NUMBER->value => $this->prepareNumberType($val),
+                DynamoDbAttributeType::Boolean->value => $this->prepareBooleanType($val),
+                DynamoDbAttributeType::Null->value => $this->prepareNullType(),
+                DynamoDbAttributeType::List->value => $this->prepareListType($val),
+                DynamoDbAttributeType::Map->value => $this->prepareMapType($val),
+                DynamoDbAttributeType::StringSet->value => $this->prepareStringSetType($val),
+                DynamoDbAttributeType::NumberSet->value => $this->prepareNumberSetType($val),
+                DynamoDbAttributeType::Number->value => $this->prepareNumberType($val),
                 default => $this->prepareDefaultType($val, $attributeType),
             };
         }
@@ -129,7 +126,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 
     protected function getAttributeType(array $options, string|int $key): string
     {
-        $attributeType = $options['Types'][$key] ?? DynamoDbAttributeType::STRING->value;
+        $attributeType = $options['Types'][$key] ?? DynamoDbAttributeType::String->value;
         if ($attributeType instanceof DynamoDbAttributeType) {
             $attributeType = $attributeType->value;
         }
@@ -138,12 +135,12 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 
     protected function prepareBooleanType(mixed $val): array
     {
-        return [DynamoDbAttributeType::BOOLEAN->value => (bool)$val];
+        return [DynamoDbAttributeType::Boolean->value => (bool)$val];
     }
 
     protected function prepareNullType(): array
     {
-        return [DynamoDbAttributeType::NULL->value => true];
+        return [DynamoDbAttributeType::Null->value => true];
     }
 
     protected function prepareListType(mixed $val): array
@@ -164,7 +161,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
                 $formattedList[] = ['S' => (string)$item];
             }
         }
-        return [DynamoDbAttributeType::LIST->value => $formattedList];
+        return [DynamoDbAttributeType::List->value => $formattedList];
     }
 
     protected function prepareMapType(mixed $val): array
@@ -186,7 +183,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
                     $formattedMap[$mapKey] = ['S' => (string)$mapValue];
                 }
             }
-            return [DynamoDbAttributeType::MAP->value => $formattedMap];
+            return [DynamoDbAttributeType::Map->value => $formattedMap];
         }
         return ['S' => (string)$val];
     }
@@ -197,7 +194,7 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         foreach ($val as $item) {
             $stringSet[] = (string)$item;
         }
-        return [DynamoDbAttributeType::STRING_SET->value => $stringSet];
+        return [DynamoDbAttributeType::StringSet->value => $stringSet];
     }
 
     protected function prepareNumberSetType(mixed $val): array
@@ -206,12 +203,12 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
         foreach ($val as $item) {
             $numberSet[] = (string)$item;
         }
-        return [DynamoDbAttributeType::NUMBER_SET->value => $numberSet];
+        return [DynamoDbAttributeType::NumberSet->value => $numberSet];
     }
 
     protected function prepareNumberType(mixed $val): array
     {
-        return [DynamoDbAttributeType::NUMBER->value => (string)$val];
+        return [DynamoDbAttributeType::Number->value => (string)$val];
     }
 
     protected function prepareDefaultType(mixed $val, string $attributeType): array
@@ -240,39 +237,39 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
 
         array_walk($raw, function($val, $key) use (&$result) {
             // Handle different attribute types
-            if (isset($val[DynamoDbAttributeType::NUMBER->value])) {
+            if (isset($val[DynamoDbAttributeType::Number->value])) {
                 // Convert string number to int or float
-                $numberVal = (string)$val[DynamoDbAttributeType::NUMBER->value];
+                $numberVal = (string)$val[DynamoDbAttributeType::Number->value];
                 $result[$key] = is_numeric($numberVal) ? 
                     (strpos($numberVal, '.') !== false ? (float)$numberVal : (int)$numberVal) : 
                     $numberVal;
             } 
-            else if (isset($val[DynamoDbAttributeType::STRING->value])) {
-                $result[$key] = $val[DynamoDbAttributeType::STRING->value];
+            else if (isset($val[DynamoDbAttributeType::String->value])) {
+                $result[$key] = $val[DynamoDbAttributeType::String->value];
             }
-            else if (isset($val[DynamoDbAttributeType::BOOLEAN->value])) {
-                $result[$key] = (bool)$val[DynamoDbAttributeType::BOOLEAN->value];
+            else if (isset($val[DynamoDbAttributeType::Boolean->value])) {
+                $result[$key] = (bool)$val[DynamoDbAttributeType::Boolean->value];
             }
-            else if (isset($val[DynamoDbAttributeType::NULL->value])) {
+            else if (isset($val[DynamoDbAttributeType::Null->value])) {
                 $result[$key] = null;
             }
-            else if (isset($val[DynamoDbAttributeType::LIST->value])) {
+            else if (isset($val[DynamoDbAttributeType::List->value])) {
                 // Extract list items
                 $list = [];
-                foreach ($val[DynamoDbAttributeType::LIST->value] as $item) {
-                    if (isset($item[DynamoDbAttributeType::STRING->value])) {
-                        $list[] = $item[DynamoDbAttributeType::STRING->value];
+                foreach ($val[DynamoDbAttributeType::List->value] as $item) {
+                    if (isset($item[DynamoDbAttributeType::String->value])) {
+                        $list[] = $item[DynamoDbAttributeType::String->value];
                     } 
-                    else if (isset($item[DynamoDbAttributeType::NUMBER->value])) {
-                        $numberVal = (string)$item[DynamoDbAttributeType::NUMBER->value];
+                    else if (isset($item[DynamoDbAttributeType::Number->value])) {
+                        $numberVal = (string)$item[DynamoDbAttributeType::Number->value];
                         $list[] = is_numeric($numberVal) ? 
                             (strpos($numberVal, '.') !== false ? (float)$numberVal : (int)$numberVal) : 
                             $numberVal;
                     }
-                    else if (isset($item[DynamoDbAttributeType::BOOLEAN->value])) {
-                        $list[] = (bool)$item[DynamoDbAttributeType::BOOLEAN->value];
+                    else if (isset($item[DynamoDbAttributeType::Boolean->value])) {
+                        $list[] = (bool)$item[DynamoDbAttributeType::Boolean->value];
                     }
-                    else if (isset($item[DynamoDbAttributeType::NULL->value])) {
+                    else if (isset($item[DynamoDbAttributeType::Null->value])) {
                         $list[] = null;
                     }
                     else {
@@ -282,23 +279,23 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
                 }
                 $result[$key] = $list;
             }
-            else if (isset($val[DynamoDbAttributeType::MAP->value])) {
+            else if (isset($val[DynamoDbAttributeType::Map->value])) {
                 // Extract map items
                 $map = [];
-                foreach ($val[DynamoDbAttributeType::MAP->value] as $mapKey => $mapValue) {
-                    if (isset($mapValue[DynamoDbAttributeType::STRING->value])) {
-                        $map[$mapKey] = $mapValue[DynamoDbAttributeType::STRING->value];
+                foreach ($val[DynamoDbAttributeType::Map->value] as $mapKey => $mapValue) {
+                    if (isset($mapValue[DynamoDbAttributeType::String->value])) {
+                        $map[$mapKey] = $mapValue[DynamoDbAttributeType::String->value];
                     } 
-                    else if (isset($mapValue[DynamoDbAttributeType::NUMBER->value])) {
-                        $numberVal = (string)$mapValue[DynamoDbAttributeType::NUMBER->value];
+                    else if (isset($mapValue[DynamoDbAttributeType::Number->value])) {
+                        $numberVal = (string)$mapValue[DynamoDbAttributeType::Number->value];
                         $map[$mapKey] = is_numeric($numberVal) ? 
                             (strpos($numberVal, '.') !== false ? (float)$numberVal : (int)$numberVal) : 
                             $numberVal;
                     }
-                    else if (isset($mapValue[DynamoDbAttributeType::BOOLEAN->value])) {
-                        $map[$mapKey] = (bool)$mapValue[DynamoDbAttributeType::BOOLEAN->value];
+                    else if (isset($mapValue[DynamoDbAttributeType::Boolean->value])) {
+                        $map[$mapKey] = (bool)$mapValue[DynamoDbAttributeType::Boolean->value];
                     }
-                    else if (isset($mapValue[DynamoDbAttributeType::NULL->value])) {
+                    else if (isset($mapValue[DynamoDbAttributeType::Null->value])) {
                         $map[$mapKey] = null;
                     }
                     else {
@@ -308,13 +305,13 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
                 }
                 $result[$key] = $map;
             }
-            else if (isset($val[DynamoDbAttributeType::STRING_SET->value])) {
-                $result[$key] = $val[DynamoDbAttributeType::STRING_SET->value];
+            else if (isset($val[DynamoDbAttributeType::StringSet->value])) {
+                $result[$key] = $val[DynamoDbAttributeType::StringSet->value];
             }
-            else if (isset($val[DynamoDbAttributeType::NUMBER_SET->value])) {
+            else if (isset($val[DynamoDbAttributeType::NumberSet->value])) {
                 // Convert string numbers to numbers
                 $numberSet = [];
-                foreach ($val[DynamoDbAttributeType::NUMBER_SET->value] as $num) {
+                foreach ($val[DynamoDbAttributeType::NumberSet->value] as $num) {
                     $strNum = (string)$num;
                     $numberSet[] = is_numeric($strNum) ? 
                         (strpos($strNum, '.') !== false ? (float)$strNum : (int)$strNum) : 

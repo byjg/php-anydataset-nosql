@@ -14,8 +14,28 @@ $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 The full connection string format:
 
 ```text
-mongodb://username:password@server1,server2,server3/dbname?uri.param1=value1&driver.param2=value2
+mongodb://username:password@server/dbname?uri.param1=value1&driver.param2=value2
 ```
+
+Percent-encode special characters (such as `@`, `:`, `/`, `%`, `?` and `#`) in the username and
+password, e.g. with `rawurlencode()`. The password `p@ss:word` becomes `p%40ss%3Aword`:
+
+```text
+mongodb://username:p%40ss%3Aword@server/dbname
+```
+
+The credentials are sent only when both the username and the password are present and not empty
+(`"0"` is a valid value); otherwise the connection is opened without authentication.
+
+:::note Replica sets
+Only one host is supported in the connection string; a host list such as `server1,server2,server3`
+throws an `InvalidArgumentException`. To connect to a replica set, pass one member as the seed host
+and the replica set name; the driver discovers the other members from it:
+
+```text
+mongodb://username:password@server1/dbname?uri.replicaSet=rs0
+```
+:::
 
 ## Inserting data to a Collection
 
@@ -37,7 +57,7 @@ $mongo->save($document);
 ```
 
 :::info
-When a document is inserted, the fields `created` and `updated` are automatically added with the current date.
+When a document is inserted, the fields `createdAt` and `updatedAt` are automatically added with the current date.
 Because there is no ID (first parameter) provided, this is treated as an INSERT operation.
 :::
 
@@ -47,7 +67,7 @@ Because there is no ID (first parameter) provided, this is treated as an INSERT 
 <?php
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $document = new \ByJG\AnyDataset\NoSql\NoSqlDocument(
-    'someid',
+    '5f1d7f1b2c3a4b5c6d7e8f90',
     'mycollection',
     [
         'field1' => 'value1',
@@ -59,8 +79,9 @@ $mongo->save($document);
 ```
 
 :::info
-When updating a document, the field `updated` is automatically updated with the current date.
-Because an ID (first parameter) is provided, this is treated as an UPDATE operation.
+When updating a document, the field `updatedAt` is automatically updated with the current date.
+Because an ID (first parameter) is provided, this is treated as an UPDATE operation (an upsert: the document is
+created if the ID does not exist). The ID must be a valid MongoDB ObjectId string.
 :::
 
 
@@ -89,8 +110,8 @@ The collection name is required as the second parameter.
 ```php
 <?php
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
-$result = $mongo->getDocuments(null, 'mycollection');
-foreach ($result as $document)
+$result = $mongo->getDocuments(new \ByJG\AnyDataset\Core\IteratorFilter(), 'mycollection');
+foreach ($result ?? [] as $document)
 {
     print_r($document->getIdDocument());
     print_r($document->getDocument());
@@ -104,11 +125,11 @@ You can use the IteratorFilter to filter documents:
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
-$result = $mongo->getDocuments($filter, 'mycollection');
-foreach ($result as $document)
+$result = $mongo->getDocuments($filter, 'mycollection'); // null when nothing matches
+foreach ($result ?? [] as $document)
 {
     // Do something
 }
@@ -117,16 +138,16 @@ foreach ($result as $document)
 :::tip Supported Relations
 The MongoDbDriver supports the following filter relations:
 
-- `EQUAL`
-- `GREATER_THAN`
-- `LESS_THAN`
-- `GREATER_OR_EQUAL_THAN`
-- `LESS_OR_EQUAL_THAN`
-- `NOT_EQUAL`
-- `STARTS_WITH`
-- `CONTAINS`
-- `IN`
-- `NOT_IN`
+- `Equal`
+- `GreaterThan`
+- `LessThan`
+- `GreaterThanOrEqualTo`
+- `LessThanOrEqualTo`
+- `NotEqual`
+- `StartsWith`
+- `Contains`
+- `In`
+- `NotIn`
   :::
 
 ### Deleting Documents
@@ -138,7 +159,7 @@ $mongo->deleteDocumentById($id, 'mycollection');
 
 // Delete multiple documents by filter
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 $mongo->deleteDocuments($filter, 'mycollection');
 ```
 
@@ -147,7 +168,7 @@ $mongo->deleteDocuments($filter, 'mycollection');
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::EQUAL, 'value');
+$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $data = [
     'field1' => 'new_value1',
@@ -166,8 +187,10 @@ mongodb://username:password@server:27017/dbname?uri.option1=value1&driver.option
 :::info Connection Parameters
 Parameters must be prefixed with:
 
-- `uri.` - Passed to the MongoDB URI connection string
-- `driver.` - Passed to the MongoDB driver options
+- `uri.` - Passed to the MongoDB URI connection string, without the prefix
+  (e.g. `uri.replicaSet=rs0&uri.w=majority`)
+- `driver.` - Passed to the `$driverOptions` of `MongoDB\Driver\Manager`, without the prefix.
+  The values arrive as strings, so only driver options that accept a string can be set this way
 
 Any other parameters will throw an exception.
 

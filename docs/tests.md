@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 title: Running Tests
 description: How to run the test suite for AnyDataset NoSQL
 ---
@@ -14,12 +14,12 @@ testing or configure connections to actual cloud services.
 A Docker Compose configuration is provided to set up local testing environments:
 
 ```bash
-# Start the test infrastructure (MongoDB, MinIO for S3, DynamoDB Local)
+# Start the test infrastructure (MongoDB, RustFS for S3, DynamoDB Local)
 docker compose up -d
 
 # Set environment variables for connecting to the local services
 export MONGODB_CONNECTION="mongodb://127.0.0.1/test"
-export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:4566"
+export S3_CONNECTION="s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://127.0.0.1:9000"
 export DYNAMODB_CONNECTION="dynamodb://accesskey:secretkey@us-east-1/tablename?endpoint=http://127.0.0.1:8000"
 
 # Run the tests

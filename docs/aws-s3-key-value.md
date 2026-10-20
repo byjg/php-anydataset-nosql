@@ -27,6 +27,18 @@ Example:
 s3://AKA12345678899:aaaaaaaaaaaaaaaaaaaaaaaaa@us-east-1/mybucket
 ```
 
+## Credentials
+
+The `access_key:secret_key@` part is optional:
+
+| Connection string | Credentials used |
+|---|---|
+| `s3://access_key:secret_key@region/bucket` | The static key and secret from the URI |
+| `s3://access_key@region/bucket` | The static key with an empty secret |
+| `s3://region/bucket` | The AWS SDK [default credential provider chain](https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/guide_credentials_default_chain.html): environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`), the `~/.aws` files, then the ECS/EC2 instance role |
+
+Leave the credentials out of the URI to use an IAM role or the environment.
+
 ## Connection Options
 
 You can add any additional parameters supported by the S3 API to the query string. For a comprehensive list, refer to:
@@ -144,10 +156,11 @@ For large objects, you can retrieve specific chunks to manage memory usage:
 <?php
 $s3 = \ByJG\AnyDataset\NoSql\Factory::getInstance('s3://....');
 
-// Get 1024 bytes starting from offset 0
+// The offset is the chunk number, not a byte position: bytes (offset * size) to (offset * size + size - 1)
+// Get the first 1024 bytes (bytes 0-1023)
 $chunk1 = $s3->getChunk("object_name", [], 1024, 0);
-// Get the next 1024 bytes (from offset 1024)
-$chunk2 = $s3->getChunk("object_name", [], 1024, 1024);
+// Get the next 1024 bytes (bytes 1024-2047)
+$chunk2 = $s3->getChunk("object_name", [], 1024, 1);
 
 // Example of reading a large file in chunks
 $size = 1024;
@@ -156,7 +169,7 @@ $data = "";
 do {
     $chunk = $s3->getChunk("object_name", [], $size, $offset);
     $data .= $chunk;
-    $offset += $size;
+    $offset++;
 } while (strlen($chunk) == $size);
 ```
 

@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         php-version:
+          - "8.6"
           - "8.5"
           - "8.4"
           - "8.3"
@@ -38,30 +39,25 @@ jobs:
           - 8000:8000
 
       s3:
-        image: localstack/localstack
+        image: rustfs/rustfs:1.0.0-rc.6
         ports:
-          - "4566:4566"
+          - "9000:9000"
         env:
-          SERVICES: s3
-          DEFAULT_REGION: us-west-1
-          AWS_DEFAULT_REGION: us-west-1
-          HOSTNAME: s3
-          HOSTNAME_EXTERNAL: s3
-          USE_SSL: false
-          DEBUG: 1
+          MINIO_ROOT_USER: aaa
+          MINIO_ROOT_PASSWORD: 12345678
         options: >-
-          --health-cmd "awslocal s3 ls"
+          --health-cmd "curl -sf http://localhost:9000/minio/health/live"
           --health-interval 5s
           --health-timeout 10s
           --health-retries 5
 
     env:
       MONGODB_CONNECTION: "mongodb://rootuser:rootpass@mongodb/test"
-      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:4566"
+      S3_CONNECTION: "s3://aaa:12345678@us-east-1/mybucket?create=true&endpoint=http://s3:9000"
       DYNAMODB_CONNECTION: "dynamodb://aaa:123456@us-east-1/tablename?endpoint=http://dynamodb:8000"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - run: composer install
       - run: composer test
 
@@ -72,12 +68,12 @@ jobs:
       # for github/codeql-action/upload-sarif to upload SARIF results
       security-events: write
     container:
-      image: byjg/php:8.4-cli
+      image: byjg/php:8.5-cli
       options: --user root --privileged
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Composer
         run: composer install
@@ -85,7 +81,7 @@ jobs:
       - name: Psalm
         # Note: Ignoring error code 2, which just signals that some
         # flaws were found, not that Psalm itself failed to run.
-        run: ./vendor/bin/psalm
+        run: ./vendor/bin/psalm.phar
           --show-info=true
           --report=psalm-results.sarif || [ $? = 2 ]
 

@@ -47,7 +47,7 @@ class AwsDynamoDbDriverTest extends TestCase
             'AttributeDefinitions' => [
                 [
                     'AttributeName' => 'id',
-                    'AttributeType' => DynamoDbAttributeType::NUMBER->value
+                    'AttributeType' => DynamoDbAttributeType::Number->value
                 ],
             ],
             'ProvisionedThroughput' => [
@@ -83,13 +83,13 @@ class AwsDynamoDbDriverTest extends TestCase
             'KeyName' => 'id',
             'TableName' => $this->testTable,
             'Types' => [
-                'id' => DynamoDbAttributeType::NUMBER,
-                'Name' => DynamoDbAttributeType::STRING,
-                'SurName' => DynamoDbAttributeType::STRING,
-                'Active' => DynamoDbAttributeType::BOOLEAN,
-                "Tags" => DynamoDbAttributeType::STRING_SET,
-                "CatIds" => DynamoDbAttributeType::NUMBER_SET,
-                "details" => DynamoDbAttributeType::MAP,
+                'id' => DynamoDbAttributeType::Number,
+                'Name' => DynamoDbAttributeType::String,
+                'SurName' => DynamoDbAttributeType::String,
+                'Active' => DynamoDbAttributeType::Boolean,
+                "Tags" => DynamoDbAttributeType::StringSet,
+                "CatIds" => DynamoDbAttributeType::NumberSet,
+                "details" => DynamoDbAttributeType::Map,
             ]
         ];
 

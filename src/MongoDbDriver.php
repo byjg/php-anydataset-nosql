@@ -62,31 +62,47 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $hosts = $this->connectionUri->getHost();
         $port = $this->connectionUri->getPort() == '' ? 27017 : $this->connectionUri->getPort();
         $port = $port ?? 27017;
+        // Uri parses "server1,server2/db" as host "server1" and path ",server2/db".
+        if (str_starts_with($this->connectionUri->getPath(), ',')) {
+            throw new InvalidArgumentException(
+                "Multiple hosts are not supported in the MongoDB connection string. "
+                . "Use a single seed host and 'uri.replicaSet=<name>'; the driver discovers the other members."
+            );
+        }
         $path = preg_replace('~^/~', '', $this->connectionUri->getPath());
         $database = $path ?? '';
-        $username = $this->connectionUri->getUsername();
-        $password = $this->connectionUri->getPassword();
-        parse_str($this->connectionUri->getQuery(), $options);
+        $username = $this->connectionUri->getUsername() ?? '';
+        $password = $this->connectionUri->getPassword() ?? '';
+        // Not parse_str(): it turns the "." in "uri.x" into "_".
+        // "uri." options go into the connection string, where MongoDB parses the typed values
+        // (the $uriOptions array of the Manager rejects a string for an int or bool option).
         $uriOptions = [];
         $driverOptions = [];
-        foreach ($options as $key => $value) {
+        foreach (explode('&', $this->connectionUri->getQuery()) as $pair) {
+            if ($pair === '') {
+                continue;
+            }
+            [$key, $value] = explode('=', $pair, 2) + [1 => ''];
+            $key = rawurldecode($key);
             if (str_starts_with($key, 'uri.')) {
-                $options[$key] = $value;
+                $uriOptions[] = rawurlencode(substr($key, 4)) . '=' . $value;
             } elseif (str_starts_with($key, 'driver.')) {
-                $driverOptions[$key] = $value;
+                $driverOptions[substr($key, 7)] = rawurldecode($value);
             } else {
                 throw new InvalidArgumentException("Invalid option '$key'. Need start with 'uri.' or 'driver.'. ");
             }
         }
 
-        if (!empty($username) && !empty($password)) {
-            $auth = "$username:$password@";
+        // Not empty(): a user or a password "0" is a real credential
+        if ($username !== '' && $password !== '') {
+            // MongoDB requires percent-encoded userinfo; Uri returns both values decoded
+            $auth = rawurlencode($username) . ':' . rawurlencode($password) . '@';
         } else {
             $auth = "";
         }
 
-        $connectString = sprintf('mongodb://%s%s:%d', $auth, $hosts, $port);
-        $this->mongoManager = new Manager($connectString, $uriOptions, $driverOptions);
+        $connectString = sprintf('mongodb://%s%s:%d/?%s', $auth, $hosts, $port, implode('&', $uriOptions));
+        $this->mongoManager = new Manager($connectString, [], $driverOptions);
         $this->database = $database;
     }
 
@@ -121,7 +137,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $filter = new IteratorFilter();
         /** @psalm-suppress InvalidCast */
         $idStr = is_object($idDocument) ? (string)$idDocument : $idDocument;
-        $filter->and('_id', Relation::EQUAL, new ObjectId($idStr));
+        $filter->and('_id', Relation::Equal, new ObjectId($idStr));
         $document = $this->getDocuments($filter, $collection);
 
         if (empty($document)) {
@@ -173,34 +189,34 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
         $result = [];
 
         $data = [
-            Relation::EQUAL->name => function ($value) {
+            Relation::Equal->name => function ($value) {
                 return $value;
             },
-            Relation::GREATER_THAN->name => function ($value) {
+            Relation::GreaterThan->name => function ($value) {
                 return [ '$gt' => $value ];
             },
-            Relation::LESS_THAN->name => function ($value) {
+            Relation::LessThan->name => function ($value) {
                 return [ '$lt' => $value ];
             },
-            Relation::GREATER_OR_EQUAL_THAN->name => function ($value) {
+            Relation::GreaterThanOrEqualTo->name => function ($value) {
                 return [ '$gte' => $value ];
             },
-            Relation::LESS_OR_EQUAL_THAN->name => function ($value) {
+            Relation::LessThanOrEqualTo->name => function ($value) {
                 return [ '$lte' => $value ];
             },
-            Relation::NOT_EQUAL->name => function ($value) {
+            Relation::NotEqual->name => function ($value) {
                 return [ '$ne' => $value ];
             },
-            Relation::STARTS_WITH->name => function ($value) {
+            Relation::StartsWith->name => function ($value) {
                 return [ '$regex' => "^$value" ];
             },
-            Relation::CONTAINS->name => function ($value) {
+            Relation::Contains->name => function ($value) {
                 return [ '$regex' => "$value" ];
             },
-            Relation::IN->name => function ($value) {
+            Relation::In->name => function ($value) {
                 return [ '$in' => $value ];
             },
-            Relation::NOT_IN->name => function ($value) {
+            Relation::NotIn->name => function ($value) {
                 return [ '$nin' => $value ];
             },
         ];
@@ -229,7 +245,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
     public function deleteDocumentById(string $idDocument, mixed $collection = null): mixed
     {
         $filter = new IteratorFilter();
-        $filter->and('_id', Relation::EQUAL, $idDocument);
+        $filter->and('_id', Relation::Equal, $idDocument);
         $this->deleteDocuments($filter, $collection);
         return null;
     }

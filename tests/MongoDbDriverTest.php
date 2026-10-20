@@ -7,10 +7,13 @@ use ByJG\AnyDataset\Core\IteratorFilter;
 use ByJG\AnyDataset\NoSql\Factory;
 use ByJG\AnyDataset\NoSql\MongoDbDriver;
 use ByJG\AnyDataset\NoSql\NoSqlDocument;
+use ByJG\Util\Uri;
+use MongoDB\Driver\Command;
+use MongoDB\Driver\Exception\ConnectionException;
 use MongoDB\Driver\Exception\Exception;
 use Override;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 
 class MongoDbDriverTest extends TestCase
 {
@@ -40,8 +43,11 @@ class MongoDbDriverTest extends TestCase
                     new Document('Hilux', 'Toyota', 120000)
                 )
             );
-        } catch (Throwable $e) {
-            $this->markTestIncomplete("In order to test MongoDB you must run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
+        } catch (ConnectionException $e) {
+            // Only an unreachable server (or bad credentials) skips the tests. Any
+            // other error is a real failure: a catch-all here hid a broken fixture
+            // and kept these tests from running at all.
+            $this->markTestIncomplete("MongoDB is not reachable. Run docker compose and set MONGODB_CONNECTION. Error: " . $e->getMessage());
             return;
         }
         $this->dbDriver->save(
@@ -101,7 +107,7 @@ class MongoDbDriverTest extends TestCase
 
         // Get the Object to test
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::EQUAL, 'Hilux');
+        $filter->and('name', Relation::Equal, 'Hilux');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
 
         // Check if returns one document
@@ -162,7 +168,7 @@ class MongoDbDriverTest extends TestCase
 
         // Get the Object to test
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::EQUAL, 'Hilux');
+        $filter->and('name', Relation::Equal, 'Hilux');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
 
         // Check if returns one document
@@ -220,7 +226,7 @@ class MongoDbDriverTest extends TestCase
 
         // Get the Object to test
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::EQUAL, 'Uno');
+        $filter->and('name', Relation::Equal, 'Uno');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $document);
 
@@ -233,7 +239,7 @@ class MongoDbDriverTest extends TestCase
 
         // Check if other objects weren't deleted
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::EQUAL, 'Hilux');
+        $filter->and('name', Relation::Equal, 'Hilux');
         $document = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $document);
     }
@@ -248,7 +254,7 @@ class MongoDbDriverTest extends TestCase
         }
 
         $filter = new IteratorFilter();
-        $filter->and('price', Relation::LESS_OR_EQUAL_THAN, 40000);
+        $filter->and('price', Relation::LessThanOrEqualTo, 40000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(2, $documents);
         $this->assertEquals('Fox', $documents[0]->getDocument()['name']);
@@ -259,7 +265,7 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('35000', $documents[1]->getDocument()['price']);
 
         $filter = new IteratorFilter();
-        $filter->and('price', Relation::LESS_THAN, 40000);
+        $filter->and('price', Relation::LessThan, 40000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $documents);
         $this->assertEquals('Uno', $documents[0]->getDocument()['name']);
@@ -267,7 +273,7 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('35000', $documents[0]->getDocument()['price']);
 
         $filter = new IteratorFilter();
-        $filter->and('price', Relation::GREATER_OR_EQUAL_THAN, 90000);
+        $filter->and('price', Relation::GreaterThanOrEqualTo, 90000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(2, $documents);
         $this->assertEquals('Hilux', $documents[0]->getDocument()['name']);
@@ -278,7 +284,7 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('90000', $documents[1]->getDocument()['price']);
 
         $filter = new IteratorFilter();
-        $filter->and('price', Relation::GREATER_THAN, 90000);
+        $filter->and('price', Relation::GreaterThan, 90000);
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $documents);
         $this->assertEquals('Hilux', $documents[0]->getDocument()['name']);
@@ -286,7 +292,7 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('120000', $documents[0]->getDocument()['price']);
 
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::STARTS_WITH, 'Co');
+        $filter->and('name', Relation::StartsWith, 'Co');
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(2, $documents);
         $this->assertEquals('Corolla', $documents[0]->getDocument()['name']);
@@ -297,7 +303,7 @@ class MongoDbDriverTest extends TestCase
         $this->assertEquals('60000', $documents[1]->getDocument()['price']);
 
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::CONTAINS, 'oba');
+        $filter->and('name', Relation::Contains, 'oba');
         $documents = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $documents);
         $this->assertEquals('Cobalt', $documents[0]->getDocument()['name']);
@@ -316,7 +322,7 @@ class MongoDbDriverTest extends TestCase
 
         // Get the Object to test
         $filter = new IteratorFilter();
-        $filter->and('brand', Relation::IN, ['Toyota', 'Audi']);
+        $filter->and('brand', Relation::In, ['Toyota', 'Audi']);
         $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(3, $documentList);
         foreach ($documentList as $document) {
@@ -335,8 +341,45 @@ class MongoDbDriverTest extends TestCase
 
         // Check if other objects weren't deleted
         $filter = new IteratorFilter();
-        $filter->and('name', Relation::EQUAL, 'Hilux');
+        $filter->and('name', Relation::Equal, 'Hilux');
         $documentList = $this->dbDriver->getDocuments($filter, self::TEST_COLLECTION);
         $this->assertCount(1, $documentList);
+    }
+
+    public static function credentialsProvider(): array
+    {
+        return [
+            'special characters' => ['user@:/%?#', 'p@ss:/%?#word'],
+            'password "0"' => ['user0', '0'],
+            'user "0"' => ['0', 'pass0'],
+        ];
+    }
+
+    #[DataProvider('credentialsProvider')]
+    public function testAuthenticateWithCredentials(string $username, string $password)
+    {
+        if (empty($this->dbDriver)) {
+            $this->markTestIncomplete("In order to test MongoDB you must define MONGODB_CONNECTION");
+        }
+
+        $admin = $this->dbDriver->getDbConnection();
+        $admin->executeCommand('admin', new Command([
+            'createUser' => $username,
+            'pwd' => $password,
+            'roles' => [['role' => 'readWrite', 'db' => 'test']],
+        ]));
+
+        try {
+            $host = new Uri(getenv("MONGODB_CONNECTION"));
+            $driver = Factory::getInstance(
+                'mongodb://' . rawurlencode($username) . ':' . rawurlencode($password) . '@' . $host->getHost() . '/test'
+            );
+
+            $filter = new IteratorFilter();
+            $filter->and('name', Relation::Equal, 'Hilux');
+            $this->assertCount(1, $driver->getDocuments($filter, self::TEST_COLLECTION));
+        } finally {
+            $admin->executeCommand('admin', new Command(['dropUser' => $username]));
+        }
     }
 }
