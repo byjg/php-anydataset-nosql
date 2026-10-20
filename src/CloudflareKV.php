@@ -168,7 +168,7 @@ class CloudflareKV implements KeyValueInterface, RegistrableInterface
      */
     protected function request(string $endpoint, array $options = []): Request
     {
-        $uri = Uri::getInstanceFromString($this->kvUri . $endpoint)
+        $uri = Uri::getInstance($this->kvUri . $endpoint)
             ->withQuery(http_build_query($options));
 
         return Request::getInstance($uri)

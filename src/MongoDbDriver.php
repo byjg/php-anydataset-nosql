@@ -228,7 +228,7 @@ class MongoDbDriver implements NoSqlInterface, RegistrableInterface
             $value = $itemFilter[3];
 
             if ($itemFilter[0] == ' or ') {
-                throw new InvalidArgumentException('MongoDBDriver does not support the addRelationOr');
+                throw new InvalidArgumentException('MongoDBDriver does not support or()');
             }
 
             if (isset($result[$name])) {

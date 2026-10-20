@@ -125,7 +125,7 @@ You can use the IteratorFilter to filter documents:
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
+$filter->and('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $mongo = \ByJG\AnyDataset\NoSql\Factory::getInstance('mongodb://server');
 $result = $mongo->getDocuments($filter, 'mycollection'); // null when nothing matches
@@ -159,7 +159,7 @@ $mongo->deleteDocumentById($id, 'mycollection');
 
 // Delete multiple documents by filter
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
+$filter->and('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 $mongo->deleteDocuments($filter, 'mycollection');
 ```
 
@@ -168,7 +168,7 @@ $mongo->deleteDocuments($filter, 'mycollection');
 ```php
 <?php
 $filter = new \ByJG\AnyDataset\Core\IteratorFilter();
-$filter->addRelation('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
+$filter->and('field', \ByJG\AnyDataset\Core\Enum\Relation::Equal, 'value');
 
 $data = [
     'field1' => 'new_value1',
