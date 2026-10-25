@@ -5,7 +5,7 @@ tags: [php, anydataset, databases]
 
 # NoSQL Database Abstraction
 
-Anydataset NoSQL standardizes the access to non-relational databases/repositories and provides a consistent interface for both NoSQL document databases and Key/Value stores.
+One interface for document databases and one for key/value stores, whatever the service behind them.
 The implementation supports:
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
@@ -22,6 +22,28 @@ The implementation supports:
 - Cloudflare KV (key/value)
 
 Anydataset is an agnostic data source abstraction layer in PHP. See more about Anydataset [here](https://opensource.byjg.com/php/anydataset).
+
+## Why
+
+MongoDB, DynamoDB, S3 and Cloudflare KV each come with their own SDK and their own way to
+read, write and list. Storing a file in S3 today and in Cloudflare KV tomorrow means
+rewriting every call.
+
+Anydataset NoSQL defines two contracts, `NoSqlInterface` for documents and
+`KeyValueInterface` for key/value stores, and picks the service from the connection URI:
+
+```php
+$store = Factory::getInstance('s3://key:secret@us-east-1/my-bucket');        // AWS S3
+$store = Factory::getInstance('kv://user:token@account/namespace');          // Cloudflare KV
+$store = Factory::getInstance('dynamodb://key:secret@host/table');           // DynamoDB
+
+$store->put('invoice-42', $pdf);
+$pdf = $store->get('invoice-42');
+```
+
+- **Change the service with the URI**, not the code that uses it.
+- **Same iterator as the rest of AnyDataset.** `getIterator()` returns the same rows as a
+  database or a file, and document queries use the same `IteratorFilter`.
 
 ## Features
 
