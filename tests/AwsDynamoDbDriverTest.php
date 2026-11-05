@@ -176,4 +176,58 @@ class AwsDynamoDbDriverTest extends TestCase
         $this->assertFalse($this->object->has(1, $options), "Record with ID test1 was not removed");
         $this->assertFalse($this->object->has(2, $options), "Record with ID test2 was not removed");
     }
+
+    public function testGetIteratorReadsAllPages()
+    {
+        $options = [
+            'KeyName' => 'id',
+            'TableName' => $this->testTable,
+            'Types' => [
+                'id' => DynamoDbAttributeType::Number,
+                'Name' => DynamoDbAttributeType::String,
+            ]
+        ];
+
+        $this->object->put(1, ["Name" => "John"], $options);
+        $this->object->put(2, ["Name" => "Jane"], $options);
+        $this->object->put(3, ["Name" => "Mary"], $options);
+
+        // Limit 1: each page has one item, so the three records come from three requests
+        $iterator = $this->object->getIterator([
+            'TableName' => $this->testTable,
+            'Limit' => 1,
+            'ScanFilter' => [
+                'id' => [
+                    'ComparisonOperator' => 'GT',
+                    'AttributeValueList' => [[DynamoDbAttributeType::Number->value => '0']],
+                ],
+            ],
+        ]);
+
+        $records = $iterator->toArray();
+        usort($records, fn($a, $b) => $a['id'] <=> $b['id']);
+
+        $this->assertEquals([
+            ["id" => 1, "Name" => "John"],
+            ["id" => 2, "Name" => "Jane"],
+            ["id" => 3, "Name" => "Mary"],
+        ], $records);
+    }
+
+    public function testGetIteratorEmpty()
+    {
+        $iterator = $this->object->getIterator([
+            'TableName' => $this->testTable,
+            'ScanFilter' => [
+                'id' => [
+                    'ComparisonOperator' => 'GT',
+                    'AttributeValueList' => [[DynamoDbAttributeType::Number->value => '0']],
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($iterator->exists());
+        $this->assertNull($iterator->first());
+        $this->assertSame([], $iterator->toArray());
+    }
 }

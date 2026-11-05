@@ -4,7 +4,6 @@ namespace ByJG\AnyDataset\NoSql;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\Result;
-use ByJG\AnyDataset\Core\AnyDataset;
 use ByJG\AnyDataset\Core\Exception\NotImplementedException;
 use ByJG\AnyDataset\Core\GenericIterator;
 use ByJG\AnyDataset\NoSql\Enum\DynamoDbAttributeType;
@@ -79,17 +78,12 @@ class AwsDynamoDbDriver implements KeyValueInterface, RegistrableInterface
             throw new InvalidArgumentException("You can pass only KeyConditions OR ScanFilter in \$options at time");
         }
 
-        $iterator = $this->dynamoDbClient->getIterator(
+        $items = $this->dynamoDbClient->getIterator(
             !empty($data["KeyConditions"]) ? 'Query' : 'Scan',
             $data
         );
 
-        $result = [];
-        foreach ($iterator as $item) {
-            $result[] = $this->extractRecord($item);
-        }
-
-        return (new AnyDataset($result))->getIterator();
+        return new AwsDynamoDbIterator($items, $this->extractRecord(...));
     }
 
     protected function validateOptions($options): void
