@@ -322,6 +322,18 @@ The Scan operation searches through the entire table, which can be slower but al
 attributes. For production use with large tables, prefer Query operations when possible.
 :::
 
+:::tip Large results
+The iterator requests the pages from DynamoDB while the rows are read: only the current page is in memory. Walk it
+with `foreach` to read a large result; `toArray()` loads all the rows. The iterator moves forward only: to read the
+rows again, call `getIterator()` again.
+
+```php
+foreach ($dynamodb->getIterator($options) as $row) {
+    echo $row->get("message") . "\n";
+}
+```
+:::
+
 ## Working with Complex Data Types
 
 :::tip Automatic Type Conversion
