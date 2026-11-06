@@ -41,7 +41,19 @@ signed with empty credentials and an IAM role was never used. With byjg/uri 7.0 
 `key@region` (a key without a secret) still uses the static key with an empty secret.
 `key:secret@region` is unchanged.
 
+## Performance
+
+### DynamoDB: the Query and Scan pages are streamed
+
+`AwsDynamoDbDriver::getIterator()` returns the new `AwsDynamoDbIterator` (a byjg/anydataset 7.0
+`GenericIterator`) over the AWS paginator: the pages are requested while the rows are read, and only the
+current page is in memory. Before, every page was loaded into an array and wrapped in an `AnyDataset`. Walk
+it with `foreach` for a large result; `toArray()` still loads all the rows. The return type is still
+`GenericIterator`.
+
 ## Bug Fixes
+
+- `AwsDynamoDbDriver::getIterator()`: an item converted to `null` is skipped; before, it threw a `TypeError`.
 
 - `MongoDbDriver`: the `uri.` and `driver.` connection string options now reach the MongoDB
   `Manager`. Before, every option was rejected with "Invalid option" (`parse_str()` turns the `.`
